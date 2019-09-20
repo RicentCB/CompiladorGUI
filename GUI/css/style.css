@@ -1,0 +1,91 @@
+h1{
+    margin: 0;
+    font-family: 'Fjalla One', sans-serif;
+    box-sizing: border-box;
+}
+h2, h3, h4{
+    margin: 0;
+    font-family: 'Oswald', sans-serif;
+    box-sizing: border-box;
+}
+
+p, a{
+    font-family: 'Quicksand', sans-serif;
+    box-sizing: border-box;
+    margin: 0;
+    text-decoration: none;
+}
+ul{
+    list-style: none;
+    box-sizing: border-box;
+}
+/***********************************************************/
+body{
+    overflow-x: hidden;
+    display: flex;
+}
+/* ----------------  A S I D E   M E N U  ---------------- */
+aside.menu-side{
+    flex: 1;
+    width: 15vw;
+    height: 100vh;
+    background-color: rgb(43, 48, 53);
+    padding-top: 15px;
+
+}
+aside.menu-side ul{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+aside.menu-side ul li{
+    box-sizing: border-box;
+    width: 100%;
+    height: 50px;
+}
+aside.menu-side ul li a{
+    padding: 12px 0;
+    height: 100%;
+    padding-left: 15px;
+    display: block;
+}
+aside.menu-side ul li a i{
+    font-size: .8em!important;
+    margin-right: 8px;
+}
+aside.menu-side ul li.title-menu a{
+    font-weight: bold;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 25px 12px 5px 15px;
+    font-size: .8em;
+    color:hsla(0,0%,100%,.4);
+}
+aside.menu-side ul li.menu-element a{
+    border-left: 3px solid rgba(24, 133, 201, 0);
+    color: rgb(231, 231, 231);
+}
+aside.menu-side ul li.menu-element.active a{
+    border-left: 3px solid rgb(24, 133, 201);
+    
+    background-color: rgb(61, 64, 66);
+}
+/* --------------------- MAIN CONTENT ---------------------*/
+main{
+    flex: 3.5;
+    background-color: rgb(255, 255, 239);
+    width: 85vw;
+    height: 100vh;
+    padding: 25px;
+}
+@media only screen and (min-width: 1170px){
+    main{
+        flex: 5;
+    }
+}
+main h1.main-title{
+    width: 100%;
+    
+}
