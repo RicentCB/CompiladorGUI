@@ -213,6 +213,7 @@ main .mainBoard{
     position: relative;
     overflow: auto;
     margin-bottom: 5vh;
+    padding: 20px;
 }
 
 main .mainBoard #goodCanvas1{
