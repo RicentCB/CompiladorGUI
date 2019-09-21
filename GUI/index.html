@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css" media="">
 
     <meta name="theme-color" content="#fafafa">
 </head>
@@ -24,13 +24,13 @@
                 <a href="#">Menu Principal</a>
             </li>
             <li class="menu-element active">
-                <a href="#"><i class="fas fa-home"></i>Inicio</a>
+                <a href="index.html"><i class="fas fa-home"></i>Inicio</a>
             </li>
             <li class="menu-element">
-                <a href="#"><i class="fas fa-edit"></i>Crear de Automata</a>
+                <a href="afn.html"><i class="fas fa-edit"></i>AFN</a>
             </li>
             <li class="menu-element">
-                <a href="#"><i class="fab fa-adn"></i>Analizador Lexico</a>
+                <a href="lexico.html"><i class="fab fa-adn"></i>Lexico</a>
             </li>
         </ul>
     </aside>
@@ -38,11 +38,19 @@
         <h1 class="main-title">Compiladores</h1>
         <p>
             Esta es una herramienta cuya interfaz se basa en Electron JS, puede correr en cualquier SO, 
-            siempre y cuando se tenga instalado NodeJS y Python (Version 3 o superior)
+            siempre y cuando se tenga instalado NodeJS y Python (Version 3 o superior), es necesario descargar
+            el proyecto basico de la pagina de Electron JS y copiar la carpeta "node_modules" en el directorio
+            "GUI".
         </p>
+        <br>
         <p>
-            En el menu lateral encontraras las principales opciones del fucionamiento
+            En el menu lateral encontraras las principales opciones del fucionamiento de esta aplicacion, como lo son:
+            <ol>
+               <li>Crear un AFN</li> 
+               <li>Analizar una cadena con expresion regulares</li>
+            </ol>
         </p>
+        
 
     </main>
 
