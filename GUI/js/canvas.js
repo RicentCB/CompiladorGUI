@@ -1,25 +1,91 @@
-const R = 25;
-const LINEW = 50;
-const DEC_TXT = 12
-const INI_SP = 20
-const Y_INI = 100
+const R = 40;
+const LINEW = 150;
+const HEADLEN = 10; 
+const DEC_TXT = 14;
+const INI_SP = 20;
+const Y_INI = 100;
 const COLOR_CNVS = "#555";
 
 //Funcion que dibuja una flecha dadas coordenadas x,y de orgine y destino
 function canvas_arrow(context, fromx, fromy, tox, toy) {
-    var headlen = 10; // length of head in pixels
     var dx = tox - fromx;
     var dy = toy - fromy;
     var angle = Math.atan2(dy, dx);
+    //Creacion de Linea
     context.moveTo(fromx, fromy);
     context.lineTo(tox, toy);
-    context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+    //Flecha
+    context.lineTo(tox - HEADLEN * Math.cos(angle - Math.PI / 6), toy - HEADLEN * Math.sin(angle - Math.PI / 6));   //Linea Inferior
     context.moveTo(tox, toy);
-    context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+    context.lineTo(tox - HEADLEN * Math.cos(angle + Math.PI / 6), toy - HEADLEN * Math.sin(angle + Math.PI / 6));
+}
+
+//Funcion Pitagoras calcula un cateto dado la hipotenusa y otro cateto
+function calcCat(hipo, cat){
+    const PowHipo = Math.pow(hipo,2);
+    const PowCat = Math.pow(cat,2);
+    return Math.floor(Math.sqrt(PowHipo-PowCat),4);
+}
+
+//Funcion que dibuja un arco entre dos estados dados los centros de idhcos estados
+function arcBetweenStates(context, xState1, yState1, xState2, yState2, string, up=true){
+    //Calcular Espacio en X para el text
+    var spaceXText = 0;
+    if(string.length > 1){
+        spaceXText -= DEC_TXT;
+    }
+    if (yState1 == yState2){
+        const MiniCircleX1 = Math.floor(xState1 + (R/2),2);             //Coordenada en X del minicirculo 1
+        const MiniCircleX2 = Math.floor(xState2 - (R/2), 2);            //Coordenada en X del minicirculo 1
+        const BigRadius = Math.floor(MiniCircleX2 - MiniCircleX1,4)     //Radio del arco
+        //Calcular coordenadas del Centro del Arco
+        const DeltaValueX = ((xState2 - xState1) /2 );          
+        const BigCircleX = DeltaValueX + xState1;                       //Coordenada en Equis del Circulo Arco
+        const DeltaValueY = calcCat((BigRadius - R/2), DeltaValueX);   
+        let BigCircleY = 0             //Cordenada en Ye del Ciruclo Arco
+        let startAngle = 0             //Angulo de Inicio 
+        let endAngle = 0;              //Angulo de fin
+        let negCte = 0;                //Variable para sumar o restar al momento de dibujar la cabeza de flecha
+
+        if (up){
+            //Coordenada en Y y angulo de inicio y Fin
+            BigCircleY = yState1 + DeltaValueY
+            startAngle = 180+60 
+            endAngle = 180+60+60 
+            //Dibujar Flecha
+            negCte = -1;      
+            //Colocar Leyenda
+            context.beginPath();
+            context.fillText(string, BigCircleX+spaceXText, (BigCircleY-BigRadius-5));
+            context.fill();
+
+        }else{
+            BigCircleY = yState1 - DeltaValueY;
+            startAngle = 60
+            endAngle = 60+60 
+            //Dibujar Flecha
+            negCte = 1;
+            //Colocar Leyenda
+            context.beginPath();
+            context.fillText(string, BigCircleX+spaceXText, (BigCircleY+BigRadius+17));
+            context.fill();
+        }
+        //Dibujar Cabeza de la flecha
+        context.moveTo(BigCircleX+(negCte)*(Math.sin(Math.PI /6) * BigRadius), BigCircleY+(negCte)*(Math.cos(Math.PI /6) * BigRadius));   //Incio de la cabeza de flecha
+        context.lineTo(BigCircleX+(negCte)*(Math.sin(Math.PI /6) * BigRadius) +(-1*negCte)*HEADLEN, BigCircleY+(negCte)*(Math.cos(Math.PI /6) * BigRadius));  //Trazo Inferior
+        context.moveTo(BigCircleX+(negCte)*(Math.sin(Math.PI /6) * BigRadius), BigCircleY+(negCte)*(Math.cos(Math.PI /6) * BigRadius));   //Incio de la cabeza de flecha
+        context.lineTo(BigCircleX+(negCte)*(Math.sin(Math.PI /6) * BigRadius) +(-1*negCte)*HEADLEN*Math.sin(Math.PI/6), BigCircleY+(negCte)*(Math.cos(Math.PI /6) * BigRadius)+(negCte)* (HEADLEN)*Math.cos(Math.PI/6));    //Trazo Superior
+        context.stroke();  
+        //Dibujar Arco
+        context.beginPath();
+        context.arc(BigCircleX, BigCircleY, BigRadius, Math.radians(startAngle),Math.radians(endAngle), false);
+        context.stroke();
+    
+    }else{  
+        console.log("Solo con Ye Iguales ")
+    }
 }
 $(document).ready(function(){
-
-    
 
     var canvas = document.getElementById("goodCanvas1");
     var ctx = canvas.getContext("2d");
@@ -30,7 +96,7 @@ $(document).ready(function(){
     ctx.fillStyle = COLOR_CNVS;
 
     ctx.beginPath();
-    ctx.arc((R+LINEW+INI_SP), Y_INI, R, 0, 2 * Math.PI, false);
+    ctx.arc((R+LINEW+INI_SP), Y_INI, R, 0, 2 * Math.PI);
     ctx.stroke();
 
     ctx.beginPath();
@@ -38,7 +104,7 @@ $(document).ready(function(){
     ctx.fill();
 
     ctx.beginPath();
-    ctx.arc(INI_SP+(R+LINEW)+((2*R)+LINEW), Y_INI, R, 0, 2 * Math.PI, false);
+    ctx.arc(INI_SP+(R+LINEW)+((2*R)+LINEW), Y_INI, R, 0, 2 * Math.PI);
     ctx.stroke();
 
     ctx.beginPath();
@@ -54,6 +120,7 @@ $(document).ready(function(){
     ctx.fillText("a-b", (INI_SP+LINEW+R)+(LINEW+R)/2, Y_INI-10);
     ctx.fill();
 
+    arcBetweenStates(ctx, (R+LINEW+INI_SP), Y_INI, INI_SP+(R+LINEW)+((2*R)+LINEW), Y_INI, '\u03B5', true);
 
     var addBasicAFDBtn = $("a.btn.add-btn#basicAFD");
     var addRangeAFDBtn = $("a.btn.add-btn#rangeAFD")
@@ -129,4 +196,8 @@ function isValidRange(string){
     }else{
         return false;
     }
+}
+
+Math.radians = function(degrees) {
+	return degrees * Math.PI / 180;
 }
