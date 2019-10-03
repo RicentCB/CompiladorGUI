@@ -156,12 +156,12 @@ main .options .container-select .title-container-select i{
     color: rgb(156, 202, 243);
     font-size: 1.5em;
 }
-main .options .container-select:nth-child(2n+1){
-    background-color: rgba(0, 0, 0, 0.123);
-}
+
 main .options .container-select.options-container{
     position: relative;
     overflow: auto;
+    background-color: rgba(0, 0, 0, 0.123);
+    margin: 0 10px;
 }
 main .options .container-select form.select-options{
     width: 100%;
