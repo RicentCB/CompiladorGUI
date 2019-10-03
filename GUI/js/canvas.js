@@ -6,7 +6,7 @@ const INI_SP = 20;
 const Y_INI = 100;
 const COLOR_CNVS = "#555";
 
-//Funcion que dibuja una flecha dadas coordenadas x,y de orgine y destino
+//Funcion que dibuja una flecha dadas coordenadas x,y de origen y destino
 function canvas_arrow(context, fromx, fromy, tox, toy) {
     var dx = tox - fromx;
     var dy = toy - fromy;
@@ -19,7 +19,25 @@ function canvas_arrow(context, fromx, fromy, tox, toy) {
     context.moveTo(tox, toy);
     context.lineTo(tox - HEADLEN * Math.cos(angle + Math.PI / 6), toy - HEADLEN * Math.sin(angle + Math.PI / 6));
 }
+//Funcion que dibuja una flecha entre dos estados dados los centros
+function arrowBetweenStates(context, x1, y1, x2, y2, str){
+    const alphaAngle = Math.atan2(Math.abs(x1-x2),Math.abs(y1-y2));
+    const betaAngle = Math.atan2(Math.abs(y1-y2),Math.abs(x1-x2));
 
+    const iniArrowX = Math.round(R*Math.sin(alphaAngle),2) + x1; 
+    const iniArrowY = Math.round(R*Math.cos(alphaAngle),2) + y1; 
+    const endArrowX = x2 - Math.round(R*Math.cos(betaAngle),2); 
+    const endArrowY = y2 - Math.round(R*Math.sin(betaAngle),2); 
+    
+    //Dibujar Flecha
+    context.beginPath();
+    canvas_arrow(context, iniArrowX, iniArrowY, endArrowX, endArrowY);
+    context.stroke();
+    //String de Cadena
+    context.beginPath();
+    context.fillText(str, x1+(Math.abs(x1-x2)/2) , y1+(Math.abs(y1-y2)/2) - 15);
+    context.fill();
+}
 //Funcion Pitagoras calcula un cateto dado la hipotenusa y otro cateto
 function calcCat(hipo, cat){
     const PowHipo = Math.pow(hipo,2);
@@ -85,6 +103,8 @@ function arcBetweenStates(context, xState1, yState1, xState2, yState2, string, u
         console.log("Solo con Ye Iguales ")
     }
 }
+
+
 $(document).ready(function(){
 
     var canvas = document.getElementById("goodCanvas1");
@@ -113,14 +133,14 @@ $(document).ready(function(){
 
     ctx.beginPath();
     canvas_arrow(ctx, INI_SP, Y_INI, INI_SP+LINEW, Y_INI);
-    canvas_arrow(ctx, INI_SP+(2*R+LINEW), Y_INI, INI_SP+(2*R+LINEW)+1*(LINEW), Y_INI);
     ctx.stroke();
 
-    ctx.beginPath();
-    ctx.fillText("a-b", (INI_SP+LINEW+R)+(LINEW+R)/2, Y_INI-10);
-    ctx.fill();
-
+    
+    arcBetweenStates(ctx, (R+LINEW+INI_SP), Y_INI, INI_SP+(R+LINEW)+((2*R)+LINEW), Y_INI, '\u03B5', false);
     arcBetweenStates(ctx, (R+LINEW+INI_SP), Y_INI, INI_SP+(R+LINEW)+((2*R)+LINEW), Y_INI, '\u03B5', true);
+
+    arrowBetweenStates(ctx, (R+LINEW+INI_SP), Y_INI, INI_SP+(R+LINEW)+((2*R)+LINEW), Y_INI, '\u03B5');
+    
 
     var addBasicAFDBtn = $("a.btn.add-btn#basicAFD");
     var addRangeAFDBtn = $("a.btn.add-btn#rangeAFD")
@@ -141,15 +161,18 @@ $(document).ready(function(){
                 if(result.value.length == 1){
                     //Caracter valido
                     var options = {
+                        mode: 'json',
+                        pythonOptions: ['-u'],
                         scriptPath:  path.join(__dirname, 'Engine/'),
                         pythonPath: '/usr/bin/python3',         //Cambiar la ruta de acuerdo al sistema
-                        args: [result.value]
+                        args: ["AFN","Basico",result.value]
                     };
 
-                    var car = new PythonShell('test.py', options);
+                    let car = new PythonShell('main.py', options);
 
                     car.on('message',function(message){
-                        Swal.fire(message);
+                        // Swal.fire(message);
+                        console.log(message);
                     });
 
                 }else
