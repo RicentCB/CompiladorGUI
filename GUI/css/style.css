@@ -207,7 +207,7 @@ main .options .divide{
 }
 /* CANVAS */
 main .mainBoard{
-    background-color: rgba(5, 148, 184, 0.582);
+    background-color: rgba(91, 222, 255, 0.582);
     width: 100%;
     height: 75vh;
     position: relative;
@@ -217,5 +217,5 @@ main .mainBoard{
 }
 
 main .mainBoard #goodCanvas1{
-    background-color: rgb(192, 192, 238);
+    background-color: transparent;
 }
