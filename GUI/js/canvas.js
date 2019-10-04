@@ -1,10 +1,14 @@
-const R = 40;
-const LINEW = 150;
+const R = 25;
+const LINEW = 60;
 const HEADLEN = 10; 
 const DEC_TXT = 14;
 const INI_SP = 20;
-const Y_INI = 100;
+const SPACE_BSTS = 150;
 const COLOR_CNVS = "#555";
+let Y_INI = 50;
+let Y_ADD = 70;
+
+let arrayAFNS = [];
 
 //Funcion que dibuja una flecha dadas coordenadas x,y de origen y destino
 function canvas_arrow(context, fromx, fromy, tox, toy) {
@@ -19,8 +23,9 @@ function canvas_arrow(context, fromx, fromy, tox, toy) {
     context.moveTo(tox, toy);
     context.lineTo(tox - HEADLEN * Math.cos(angle + Math.PI / 6), toy - HEADLEN * Math.sin(angle + Math.PI / 6));
 }
+
 //Funcion que dibuja una flecha entre dos estados dados los centros
-function arrowBetweenStates(context, x1, y1, x2, y2, str){
+function arrowBetweenStates(context, x1, y1, x2, y2, transition){
     const alphaAngle = Math.atan2(Math.abs(x1-x2),Math.abs(y1-y2));
     const betaAngle = Math.atan2(Math.abs(y1-y2),Math.abs(x1-x2));
 
@@ -35,7 +40,9 @@ function arrowBetweenStates(context, x1, y1, x2, y2, str){
     context.stroke();
     //String de Cadena
     context.beginPath();
-    context.fillText(str, x1+(Math.abs(x1-x2)/2) , y1+(Math.abs(y1-y2)/2) - 15);
+    (transition.length == 1) ?
+        context.fillText(transition, x1+(Math.abs(x1-x2)/2) - 8, y1+(Math.abs(y1-y2)/2) - 10) :
+        context.fillText(transition, x1+(Math.abs(x1-x2)/2) - 25 , y1+(Math.abs(y1-y2)/2) - 10) 
     context.fill();
 }
 //Funcion Pitagoras calcula un cateto dado la hipotenusa y otro cateto
@@ -104,50 +111,126 @@ function arcBetweenStates(context, xState1, yState1, xState2, yState2, string, u
     }
 }
 
+function drawState(context, x, y, name){
+    //Dibujar Circulo
+    context.beginPath();
+    context.arc(x, y, R, 0, 2 * Math.PI);
+    context.stroke();
+    //Titulo
+    context.beginPath();
+    context.fillText(name, x-DEC_TXT, y+5);
+    context.fill();
+}
+function drawIniState(context, x, y, number){
+    drawState(context, x, y, ("Q"+number))
+    arrowBetweenStates(context, x-1.5*LINEW, y, x, y, "");
+}
+function drawEndState(context, x, y, name){
+    drawState(context, x,y, name)
+    //Dibujar circulo pequeño
+    context.beginPath();
+    context.arc(x, y, R-(R*.2), 0, 2 * Math.PI);
+    context.stroke();
+}
+/*-----------------------------------------------------------------------
+ * ---- FUNCION QUE ACTUALIZA EL HTML DE ACUERDO A LOS OBJETO JSON ----
+-----------------------------------------------------------------------*/
+function updateHTMLSelectAFN(){
+    var arraySelect = $('.container-select .select-options');
+    for (let i = 0; i < arraySelect.length; i++) {
+        $(arraySelect[i]).empty();
+        let strId = $(arraySelect[i]).attr("id");
+        console.log(strId);
+        for (let j = 0; j < arrayAFNS.length; j++) {
+            $(arraySelect[i]).append("<p class='element'>"
+						+"<input type='radio' id='rd"+strId+(j)+"' name='radio-group'"+strId+" >"
+						+"<label for='rd"+strId+(j)+"' >AFN "+(j+1)+"</label>"
+				  	+"</p>")
+        }
+    }
+}
+
+/*--------------------------------------------------------------
+ * ---- FUNCION QUE GUARDA UN JSON EN LA PILA DE AUTOMATAS ----
+--------------------------------------------------------------*/
+ function pushAFN(jsonString){
+    //Insertamos el objeto JSON en arreglo del AFNS
+    arrayAFNS.push(jsonString);
+    //Mdificar el HTML de los selectores de AFNS
+    updateHTMLSelectAFN();
+    //Incrementar Y INI para el proximo automata
+    Y_INI = Math.floor((Y_INI + Y_ADD),2);
+}
+
+//---------------------------------------------------------------
+//Funcion que devuelve un string con el caracter de transicion
+function getCarTransition(row){
+    let stringOut = "";
+    (row[2] != row[3]) ?
+        stringOut = "["+row[2]+"-"+row[3]+"]" :
+        stringOut = row[2]
+    return stringOut;    
+}
+//---------------------------------------------------------------
+/*==============================================================
+ * ---- FUNCION QUE DIBUJA UN AUTOMATA DADO UN OBJETO JSON ----
+ =============================================================*/
+function drawAFN(jsonStr, context){
+    let actualState = jsonStr["iniSt"];
+    let endState = jsonStr["endSt"];
+    let transitions = jsonStr["transitions"];
+    let states = jsonStr["transitions"];
+
+    console.log(transitions);
+    xIni = 2*LINEW;
+    yIni = Y_INI;
+    xEnd = 0;
+    yEnd = 0
+    drawIniState(context, xIni, yIni, actualState);
+    
+    while(actualState != endState){
+        //Buscamos las transiciones que pertenecen al estado actual
+        auxArrayTrans = [];
+        for (let i = 0; i < transitions.length; i++) {
+            if(transitions[i][0] == actualState)
+                auxArrayTrans.push(transitions[i])
+        }
+        //Hay una bifurcacion
+        if(auxArrayTrans.length > 1){   
+            console.log("bifurcacion");
+        }else{//Solo hay un estado al que se llega
+            actualState = auxArrayTrans[0][1]   //Estado al que se llega
+            xEnd = Math.floor(xIni+SPACE_BSTS,2);
+            yEnd = yIni;
+        }
+        //Dibujar el estado de aceptacion
+        if  (actualState == endState){
+            drawEndState(context, xEnd, yEnd, ("Q"+actualState));
+            arrowBetweenStates(context, xIni, yIni, xEnd, yEnd, getCarTransition(auxArrayTrans[0]));
+        }
+    }
+    //Insertamos el objeto JSON y modificar el HTML
+    pushAFN(jsonStr);
+    return (arrayAFNS.length);
+}
 
 $(document).ready(function(){
 
+    //Inicializar Canvas
     var canvas = document.getElementById("goodCanvas1");
     var ctx = canvas.getContext("2d");
-    
     ctx.strokeStyle = COLOR_CNVS;
     ctx.lineWidth = 2;
     ctx.font = "20px Quicksand";
     ctx.fillStyle = COLOR_CNVS;
-
-    ctx.beginPath();
-    ctx.arc((R+LINEW+INI_SP), Y_INI, R, 0, 2 * Math.PI);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.fillText("q0", R+LINEW+INI_SP-DEC_TXT, Y_INI+5);
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(INI_SP+(R+LINEW)+((2*R)+LINEW), Y_INI, R, 0, 2 * Math.PI);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.fillText("q1", INI_SP+(R+LINEW)+((2*R)+LINEW)-DEC_TXT, Y_INI+5);
-    ctx.fill();
-
-    ctx.beginPath();
-    canvas_arrow(ctx, INI_SP, Y_INI, INI_SP+LINEW, Y_INI);
-    ctx.stroke();
-
-    
-    arcBetweenStates(ctx, (R+LINEW+INI_SP), Y_INI, INI_SP+(R+LINEW)+((2*R)+LINEW), Y_INI, '\u03B5', false);
-    arcBetweenStates(ctx, (R+LINEW+INI_SP), Y_INI, INI_SP+(R+LINEW)+((2*R)+LINEW), Y_INI, '\u03B5', true);
-
-    arrowBetweenStates(ctx, (R+LINEW+INI_SP), Y_INI, INI_SP+(R+LINEW)+((2*R)+LINEW), Y_INI, '\u03B5');
-    
-
+    //Botones para crear Automatas
     var addBasicAFDBtn = $("a.btn.add-btn#basicAFD");
     var addRangeAFDBtn = $("a.btn.add-btn#rangeAFD")
 
     const {PythonShell} = require("python-shell");
     var path = require("path");
 
+    //Boton de Automata Basico
     addBasicAFDBtn.click(function(e){
         e.preventDefault();
         //Lanzar Alerta
@@ -169,10 +252,11 @@ $(document).ready(function(){
                     };
 
                     let car = new PythonShell('main.py', options);
-
-                    car.on('message',function(message){
-                        // Swal.fire(message);
-                        console.log(message);
+                    //Creamos el automata
+                    car.on('message',function(jsonString){
+                        answer = drawAFN(jsonString, ctx);
+                        if(answer != false)
+                            Swal.fire("Exito al crear automata", "Id: "+answer, "success");
                     });
 
                 }else
@@ -183,7 +267,6 @@ $(document).ready(function(){
         
     });
 
-    /*
     //AFD de Rango
     addRangeAFDBtn.click(function(e){
         e.preventDefault();
@@ -196,14 +279,29 @@ $(document).ready(function(){
             inputPlaceholder: 'E.g a-z, A-Z, 0-9'
         }).then((result) => {
             if (isValidRange(result.value)) {
-                console.log("Result: " + result.value.length);
+                //Rango Valido
+                var options = {
+                    mode: 'json',
+                    pythonOptions: ['-u'],
+                    scriptPath:  path.join(__dirname, 'Engine/'),
+                    pythonPath: '/usr/bin/python3',         //Cambiar la ruta de acuerdo al sistema
+                    args: ["AFN","Rango",result.value]
+                };
+
+                let car = new PythonShell('main.py', options);
+                //Creamos el automata
+                car.on('message',function(jsonString){
+                    answer = drawAFN(jsonString, ctx);
+                    if(answer != false)
+                        Swal.fire("Exito al crear automata", "Id: "+answer, "success");
+                });
             }else
                 Swal.fire("No ingreso un rango valido", "Por favor revisa la entrada", "error")                
 
         });
         
     })
-    */
+
 })
 
 function isValidRange(string){
