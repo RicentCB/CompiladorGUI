@@ -1,5 +1,6 @@
-/GUI/node_modules
 /.vscode/
-/GUI/Engine/__pycache__
 npm-debug.log
 /.mypy_cache
+/GUI/node_modules
+/GUI/Engine/__pycache__
+/GUI/plugins/gojs/
