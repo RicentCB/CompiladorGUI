@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>State Chart</title>
+  <meta name="description" content="A finite state machine chart with editable and interactive features." />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Copyright 1998-2019 by Northwoods Software Corporation. -->
+
+  <script src="plugins/gojs/release/go.js"></script>
+
+  <script id="code">
+    function init() {
+      var $ = go.GraphObject.make;  // for conciseness in defining templates
+      myDiagram =
+        $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
+          {
+            // have mouse wheel events zoom in and out instead of scroll up and down
+            "toolManager.mouseWheelBehavior": go.ToolManager.WheelZoom,
+            // support double-click in background creating a new node
+            "clickCreatingTool.archetypeNodeData": { text: "new node" },
+            // enable undo & redo
+            "undoManager.isEnabled": true
+          });
+      // when the document is modified, add a "*" to the title and enable the "Save" button
+      myDiagram.addDiagramListener("Modified", function(e) {
+        var button = document.getElementById("SaveButton");
+        if (button) button.disabled = !myDiagram.isModified;
+        var idx = document.title.indexOf("*");
+        if (myDiagram.isModified) {
+          if (idx < 0) document.title += "*";
+        } else {
+          if (idx >= 0) document.title = document.title.substr(0, idx);
+        }
+      });
+      // define the Node template
+      myDiagram.nodeTemplate =
+        $(go.Node, "Auto",
+          new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+          // define the node's outer shape, which will surround the TextBlock
+          $(go.Shape, "RoundedRectangle",
+            {
+              parameter1: 20,  // the corner has a large radius
+              fill: $(go.Brush, "Linear", { 0: "rgb(254, 255, 120)", 1: "rgb(25, 12, 0)" }),//Botones
+              stroke: null,
+              portId: "",  // this Shape is the Node's port, not the whole Node
+              fromLinkable: true, fromLinkableSelfNode: true, fromLinkableDuplicates: true,
+              toLinkable: true, toLinkableSelfNode: true, toLinkableDuplicates: true,
+              cursor: "pointer"
+            }),
+          $(go.TextBlock,
+            {
+              font: "bold 11pt helvetica, bold arial, sans-serif",
+              editable: true  // editing the text automatically updates the model data
+            },
+            new go.Binding("text").makeTwoWay())
+        );
+      // replace the default Link template in the linkTemplateMap
+      myDiagram.linkTemplate =
+        $(go.Link,  // the whole link panel
+          {
+            curve: go.Link.Bezier, adjusting: go.Link.Stretch,
+            reshapable: true, relinkableFrom: true, relinkableTo: true,
+            toShortLength: 3
+          },
+          new go.Binding("points").makeTwoWay(),
+          new go.Binding("curviness"),
+          $(go.Shape,  // the link shape
+            { strokeWidth: 1.5 }),
+          $(go.Shape,  // the arrowhead
+            { toArrow: "standard", stroke: null }),
+          $(go.Panel, "Auto",
+            $(go.Shape,  // the label background, which becomes transparent around the edges
+              {
+                fill: $(go.Brush, "Radial",
+                  { 0: "rgb(255, 255, 255)", 0.3: "rgb(255, 255, 255)", 1: "rgba(255, 255, 255, 0)" }),
+                stroke: null
+              }),
+            $(go.TextBlock, "transition",  // the label text
+              {
+                textAlign: "center",
+                font: "9pt helvetica, arial, sans-serif",
+                margin: 4,
+                editable: true  // enable in-place editing
+              },
+              // editing the text automatically updates the model data
+              new go.Binding("text").makeTwoWay())
+          )
+        );
+      // read in the JSON data from the "mySavedModel" element
+      load();
+	}
+	let jsonC = { "class": "go.GraphLinksModel",
+			  "nodeKeyProperty": "id",
+			  "nodeDataArray": [
+				{ "id": 0, "loc": "120 120", "text": "Initial" },
+				{ "id": 1, "loc": "330 120", "text": "First down" },
+				{ "id": 2, "loc": "226 376", "text": "First up" },
+				{ "id": 3, "loc": "60 276", "text": "Second down" },
+				{ "id": 4, "loc": "226 226", "text": "Wait" }
+			  ],
+			  "linkDataArray": [
+				{ "from": 0, "to": 0, "text": "up or timer", "curviness": -20 },
+				{ "from": 0, "to": 1, "text": "down", "curviness": 20 },
+				{ "from": 1, "to": 0, "text": "up (moved)\nPOST", "curviness": 20 },
+				{ "from": 1, "to": 1, "text": "down", "curviness": -20 },
+				{ "from": 1, "to": 2, "text": "up (no move)" },
+				{ "from": 1, "to": 4, "text": "timer" },
+				{ "from": 2, "to": 0, "text": "timer\nPOST" },
+				{ "from": 2, "to": 3, "text": "down" },
+				{ "from": 3, "to": 0, "text": "up\nPOST\n(dblclick\nif no move)" },
+				{ "from": 3, "to": 3, "text": "down or timer", "curviness": 20 },
+				{ "from": 4, "to": 0, "text": "up\nPOST" },
+				{ "from": 4, "to": 4, "text": "down" }
+			  ]
+			};
+
+    function load() {
+	  myDiagram.model = go.Model.fromJson(jsonC);
+	}
+	
+  </script>
+</head>
+<body onload="init()">
+	<a href="index.html">INICIO</a>
+	<div id="sample">
+  		<div id="myDiagramDiv" style="border: solid 1px black; width: 100%; height: 400px"></div>
+		  
+	</div>
+</body>
+</html>
