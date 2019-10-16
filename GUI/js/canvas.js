@@ -181,7 +181,6 @@ function drawAFN(jsonStr, context){
     let transitions = jsonStr["transitions"];
     let states = jsonStr["transitions"];
 
-    console.log(transitions);
     xIni = 2*LINEW;
     yIni = Y_INI;
     xEnd = 0;
