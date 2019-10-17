@@ -1,0 +1,4 @@
+Ep -> Er;
+Er -> Er T1 | T1;
+T1 -> T1 F1 | F1;
+F1 -> Ep | num; 

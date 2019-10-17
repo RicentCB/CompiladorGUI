@@ -1,2 +1,10 @@
-Gramatica->alfabeto123  |  alfabesdaSAASDs13 ;
-Tp->Ex |Xi; 
+Gramatica -> ListasReglas ;
+ListasReglas -> Regla PC ListasReglasP ;
+ListasReglasP -> Regla PC ListasReglasP | Epsilon ;
+Regla -> LadoIzquierdo FLECHA LadosDerechos ;
+LadoIzquierdo -> SIMBOLO ;
+LadosDerechos -> ListaSimbolos LadosDerechosP ;
+LadosDerechosP -> OR ListaSimbolos LadosDerechosP | Epsilon ;
+ListaSimbolos -> SIMBOLO ListaSimbolosP ;
+ListaSimbolosP -> SIMBOLO ListaSimbolosP | Epsilon ;
+
