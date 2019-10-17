@@ -10,6 +10,19 @@ class LexAnalizer:
         self.string = string
         self.apCarActual = 0
     
+    #Metodo que funciona como get y set para el apuntador del caracter actual
+    def statusLex(self, apCar = None):
+        if apCar == None:#Get Status
+            return self.apCarActual
+        else:   #Set Status
+            if isinstance(apCar, int):
+                self.apCarActual = apCar
+            else:
+                print("El argumento debe ser un entero")
+                sys.exit()
+
+
+
     #Metodo que escannea la cadena dada como arugmento y 
     # devuelve el token dado por el estado 
     # y el lexema que corresponde a dicha clase lexica
@@ -23,7 +36,7 @@ class LexAnalizer:
                 if state == trans[0]:
                     arrayStatesTokens.append([state, trans[len(trans)-1]])
                     break
-        #Analizar la cadena dada
+        #Analizar la cadena dada como constructor del analizar
         actualState = self.AFD.ini_state    #Inciamos con el estado inicial del automata
         stringLex = ""
         foundedLexem = False
