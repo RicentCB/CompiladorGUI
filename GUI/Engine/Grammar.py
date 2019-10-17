@@ -22,16 +22,32 @@ class Grammar():
             regExp2 = "(-)&(>)"
             regExp3 = "(;)"
             regExp4 = "( )+"
-            regExpArray = [regExp1, regExp2, regExp3, regExp4]
-            tokenArray = [Token.grammar_SIMBOLO, Token.grammar_FLECHA, Token.grammar_PC, Token.grammar_SPACE]
+            regExp5 = "(\|)"
+            regExpArray = [regExp1, regExp2, regExp3, regExp4, regExp5]
+            tokenArray = [Token.grammar_SIMBOLO, Token.grammar_FLECHA, Token.grammar_PC, Token.grammar_SPACE, Token.grammar_OR]
             AFDMain = AFD.createSuperAFD(regExpArray, tokenArray)
             self.lexAn = LexAnalizer(AFDMain, self.strGrammar)
 
         else:
             sys.exit()
+    #Metodo que devuelve el token dado por el analizador lexico
+    def getToken(self):
+        token = self.lexAn.yylex()  #Devuelve el token y lexema
+        if token[0] == -1:
+            print("Error en la gramatica")
+            sys.exit()
+        #Token valido
+        elif token[0] == Token.grammar_SPACE:
+            return self.getToken()
+        else:
+            return token[0]
+    #Metodo que envia o recibe el estado del analizador lexico
+    def status(self, status=None):
+        return self.lexAn.statusLex(status);
     
+    #Empieza el Descenso recursivo para la creacion de gramaticas
     def G(self):
-        if self.ListaReglas != None:
+        if self.ListaReglas():
             return True
         else:
             return False
@@ -48,14 +64,14 @@ class Grammar():
     
     def ListaReglasP(self):
         token = -1
-        #edo = self.getEdo()
+        status = self.status()
         if self.Regla():
             token = self.getToken()
             if token == Token.grammar_PC:
                 if self.ListaReglasP():
                     return True
                 return False
-        #self.setEdo(edo)
+        self.setEdo(status)
         return True 
 
     def Regla(self):
@@ -71,7 +87,7 @@ class Grammar():
         token = -1
         token = self.getToken()
         if token == Token.grammar_SIMBOLO:
-            s = self.getLexema()    #Se modifica el string recibido como argumento
+            #s = self.getLexema()    #Se modifica el string recibido como argumento
             return True
         return False
     
@@ -89,14 +105,15 @@ class Grammar():
         #Nodo N
         token = -1
         token = self.getToken()
-        if token == Alphabet.grammar_OR:
+        status = self.status()
+        if token == Token.grammar_OR:
             if self.ListaSimbolos(): #(N)
                 #ArrReglas[IndArrelgo].Simb = s;
                 #ArrReglas[IndeArreglo+1].Ap=N
                 if self.LadosDerechosP(): #(S)
                     return True
             return False
-        self.backTrack()    #Es epsilon
+        self.status(status) #Hay "Epsilon"
         return True
 
     def ListaSimbolos(self):
@@ -114,14 +131,15 @@ class Grammar():
         return True
         #Codigo No dado, pero "sencillo", parecido a lista simbolos
 
-    
-
-
 
 if __name__ == "__main__":
     path = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/Gramatica.txt";
     g1 = Grammar(path)
-    # print(g1.file.read())
+    print(g1.getToken())
+    print(g1.getToken())
+    print(g1.getToken())
+    print(g1.getToken())
+    print(g1.getToken())
+    print(g1.getToken())
+    # g1.G()
 
-
-            
