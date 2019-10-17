@@ -4,7 +4,7 @@ from AFD import AFD
 from alphabet import Alphabet
 from regEx import RegularExp
 
-class analizadorLex:
+class LexAnalizer:
     def __init__(self, AFD, string):
         self.AFD = AFD
         self.string = string
@@ -83,10 +83,17 @@ def main():
     AFDMain = AFD.createSuperAFD(regExp, [10,20, 30, 40, 50, 60])
     
     stringAn = "SSS+965+TTT+74.96STTSLDLDSSLDDDT+++179SSLDLLL"
-    analizador = analizadorLex(AFDMain, stringAn)
+    analizador = LexAnalizer(AFDMain, stringAn)
     print(analizador.AFD.printMinimizeTable(['+','-','0-9','.','L','D','T','S']))
     # print(analizador.AFD.printTransitionTable())
-    analizador.analizeStr()
+    print(analizador.yylex())
+    print(analizador.yylex())
+    print(analizador.yylex())
+    print(analizador.yylex())
+    print(analizador.yylex())
+    print(analizador.yylex())
+
+    # analizador.analizeStr()
 
 
 if __name__ == '__main__':

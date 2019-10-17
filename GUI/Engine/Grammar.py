@@ -1,5 +1,9 @@
 import sys
 from alphabet import Alphabet
+from alphabet import Token
+from regEx import RegularExp
+from AFD import AFD
+from analizadorLexico import LexAnalizer
 
 #Clase Gramtica que construye una tabla LL a partir de un archivo dada una gramatica
 class Grammar():
@@ -7,6 +11,22 @@ class Grammar():
     def __init__(self, path):
         if isinstance(path, str):
             self.file = open(path, "r")
+            self.strGrammar = ""
+            fileLines = self.file.readlines()
+            for line in fileLines:
+                for car in line:
+                    if car != "\n":
+                        self.strGrammar += car
+            #Crear Analizador Lexico para Gramaticas
+            regExp1 = "((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9))*"
+            regExp2 = "(-)&(>)"
+            regExp3 = "(;)"
+            regExp4 = "( )+"
+            regExpArray = [regExp1, regExp2, regExp3, regExp4]
+            tokenArray = [Token.grammar_SIMBOLO, Token.grammar_FLECHA, Token.grammar_PC, Token.grammar_SPACE]
+            AFDMain = AFD.createSuperAFD(regExpArray, tokenArray)
+            self.lexAn = LexAnalizer(AFDMain, self.strGrammar)
+
         else:
             sys.exit()
     
@@ -43,7 +63,7 @@ class Grammar():
         if self.LadoIzquierdo():
             token = self.getToken()
             if token == Token.grammar_FLECHA:
-                if self.LadosDerechos()
+                if self.LadosDerechos():
                     return True
         return False
 
@@ -101,7 +121,7 @@ class Grammar():
 if __name__ == "__main__":
     path = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/Gramatica.txt";
     g1 = Grammar(path)
-    print(g1.file.read())
+    # print(g1.file.read())
 
 
             

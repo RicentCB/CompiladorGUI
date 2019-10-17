@@ -12,7 +12,6 @@ class Alphabet():
     symbol_PARI = '('   #  (
     symbol_PARD = ')'   #  )
 
-    grammar_PC = ';'    #;
 
 class Token():
     symbol_PLUS = 10    #  +
@@ -26,4 +25,7 @@ class Token():
     symbol_ALL = 90
     symbol_RANGE = 100
 
-    grammar_PC = 10
+    grammar_SIMBOLO = 10
+    grammar_FLECHA  = 20
+    grammar_SPACE   = 30
+    grammar_PC      = 40

@@ -1,2 +1,2 @@
-G -> T;
-Tp -> E | X; 
+Gramatica->alfabeto123 alfabesdaSAASDs13 ;
+Tp->Ex |Xi; 
