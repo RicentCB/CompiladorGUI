@@ -24,8 +24,9 @@ class Token():
     symbol_INTER = 80   #  ?
     symbol_ALL = 90
     symbol_RANGE = 100
-
-    grammar_SIMBOLO = 10
-    grammar_FLECHA  = 20
-    grammar_SPACE   = 30
-    grammar_PC      = 40
+    #Tokens Definidos para la clase Gramatica
+    grammar_SIMBOLO = 10    #L&(L|D)*
+    grammar_FLECHA  = 20    #->
+    grammar_SPACE   = 30    #" "
+    grammar_PC      = 40    #;
+    grammar_OR      = 50    #|
