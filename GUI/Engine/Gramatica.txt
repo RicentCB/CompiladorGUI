@@ -1,2 +1,2 @@
-Gramatica->alfabeto123 alfabesdaSAASDs13 ;
+Gramatica->alfabeto123  |  alfabesdaSAASDs13 ;
 Tp->Ex |Xi; 
