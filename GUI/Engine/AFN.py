@@ -374,12 +374,12 @@ class AFN():
             arrayStatesAux = self.go_to(S0, elem)
             if len(arrayStatesAux) > 0: #Conjunto NO vacio
                 stackAux.append(arrayStatesAux)
-                stateTo = len(stackAux) - 1 #COnjunto que se acaba de crear 
+                stateTo = len(stackAux) - 1 #Conjunto que se acaba de crear 
             else:
                 stateTo = -1    #Conjunto Vacio  
             # Agregamos token
             bandera = -1
-            tableFinal.append([cont, elem, stateTo,bandera])    #Transicon -> State Ini, Caracter, StateFinal
+            tableFinal.append([cont, elem, stateTo, bandera])    #Transicon -> State Ini, Caracter, StateFinal
         #Fin de Analisis S0
         #Arreglo donde se insertartan todos los nuevos estados
         allStates = []
@@ -412,21 +412,20 @@ class AFN():
             indexLastItem = len(stackAux)
             apunt = apunt + 1    
 
+        #Buscamos los estados de aceptacion
         arrayAcceptStates = []
-        
         #Buscar el token del subconjunto de estados
-        for elem in stackAux:
-            if self.end_state in elem:  #Estado de aceptacion del autoamta esta en el conjunto de estados
-                for state in elem:
+        index = 0
+        for row in stackAux:
+            if self.end_state in row:  #Estado de aceptacion del autoamta esta en el conjunto de estados
+                for state in row:
                     if state.token != -1:
-                        #Buscar el indice del elemen
-                        #Ya que hace el papel de "Estado inicial" en la tabla de transiciones
-                        index = stackAux.index(elem)
                         #Insertar estados de aceptacion en un arreglo
                         arrayAcceptStates.append(index)
                         for tupla in tableFinal:
                             if tupla[0] == index:
                                 tupla[3] = state.token
+            index+=1
         #Regresamos un array con 3 parametros para crear un objeto AFD
         arrayOut = [arrayAcceptStates, allStates, tableFinal, self.get_alphabet()]
         return arrayOut
