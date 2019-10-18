@@ -10,6 +10,11 @@ class Grammar():
 
     def __init__(self, path):
         if isinstance(path, str):
+            self.contAux = 1
+            self.rules = []
+            self.lastR = ""
+            self.lastL = []
+            #Abrir archivo de Gramatica
             self.file = open(path, "r")
             self.strGrammar = ""
             fileLines = self.file.readlines()
@@ -18,7 +23,7 @@ class Grammar():
                     if car != "\n":
                         self.strGrammar += car
             #Crear Analizador Lexico para Gramaticas
-            regExp1 = "((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9))*"
+            regExp1 = "((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*"
             regExp2 = "(-)&(>)"
             regExp3 = "(;)"
             regExp4 = "( )+"
@@ -32,15 +37,19 @@ class Grammar():
             sys.exit()
     #Metodo que devuelve el token dado por el analizador lexico
     def getToken(self):
-        token = self.lexAn.yylex()  #Devuelve el token y lexema
-        if token[0] == -1:
-            print("Error en la gramatica")
-            sys.exit()
-        #Token valido
-        elif token[0] == Token.grammar_SPACE:
-            return self.getToken()
+        if (self.lexAn.apCarActual < len(self.strGrammar)-1):
+            token = self.lexAn.yylex()  #Devuelve el token y lexema
+            if token[0] == -1:
+                print("Error en la gramatica.")
+                sys.exit()
+            #Token valido
+            elif token[0] == Token.grammar_SPACE:
+                return self.getToken()
+            else:
+                self.lastLexema = token[1]
+                return token[0]
         else:
-            return token[0]
+            return -1
     #Metodo que envia o recibe el estado del analizador lexico
     def status(self, status=None):
         return self.lexAn.statusLex(status);
@@ -48,6 +57,9 @@ class Grammar():
     #Empieza el Descenso recursivo para la creacion de gramaticas
     def G(self):
         if self.ListaReglas():
+            #Insertar La ultima Regla
+            if len(self.lastR) > 0:
+                self.rules.append([self.lastL, self.lastR])
             return True
         else:
             return False
@@ -68,10 +80,11 @@ class Grammar():
         if self.Regla():
             token = self.getToken()
             if token == Token.grammar_PC:
+                # print("--Ultima regla", self.rules[len(self.rules)-1])
                 if self.ListaReglasP():
                     return True
                 return False
-        self.setEdo(status)
+        self.status(status)
         return True 
 
     def Regla(self):
@@ -87,7 +100,13 @@ class Grammar():
         token = -1
         token = self.getToken()
         if token == Token.grammar_SIMBOLO:
-            #s = self.getLexema()    #Se modifica el string recibido como argumento
+            strLex = self.lastLexema
+            #Unir lado derecho y lado izquierdo
+            if len(self.lastR) > 0:
+                self.rules.append([self.lastL, self.lastR])
+            self.lastL = strLex
+            #Vaciar el arreglo auxuliar para lados izquierdos
+            self.lastR = []     
             return True
         return False
     
@@ -103,13 +122,28 @@ class Grammar():
 
     def LadosDerechosP(self):
         #Nodo N
+        status = self.status()
         token = -1
         token = self.getToken()
-        status = self.status()
         if token == Token.grammar_OR:
-            if self.ListaSimbolos(): #(N)
-                #ArrReglas[IndArrelgo].Simb = s;
-                #ArrReglas[IndeArreglo+1].Ap=N
+            if self.ListaSimbolos():
+                arrayRuleAux1 =[]
+                arrayRuleAux2 =[]
+                ap = 0
+                #Dividir el arreglo de lado derecho en dos partes con el "OR"
+                for elem in self.lastR:
+                    if ap < len(self.lastR) - self.contAux:
+                        arrayRuleAux1.append(elem)
+                    else:
+                        arrayRuleAux2.append(elem)
+                    ap += 1
+                self.lastR = []
+                #Insertar en la lista de Reglas
+                if len(arrayRuleAux1)>0:
+                    self.rules.append([self.lastL,arrayRuleAux1])
+                self.rules.append([self.lastL,arrayRuleAux2])
+
+                #Continuar con el desceno recursivo    
                 if self.LadosDerechosP(): #(S)
                     return True
             return False
@@ -121,6 +155,12 @@ class Grammar():
         token = -1
         token = self.getToken()
         if token == Token.grammar_SIMBOLO:
+            #Insertar Lexema en el arreglo de lados derechos
+            arrayAux = self.lastR.copy()
+            arrayAux.append(self.lastLexema)
+            
+            self.contAux = 1
+            self.lastR = arrayAux.copy()
             #N = New Nodo(Lexico.getLexema)
             if self.ListaSimbolosP():   #N2
                 #N.ApSig = N2
@@ -128,18 +168,29 @@ class Grammar():
         return False
 
     def ListaSimbolosP(self):
+        status = self.status()
+        token = -1
+        token = self.getToken()
+        if token == Token.grammar_SIMBOLO:
+            #Insertar Lexema en el arreglo de lados derechos
+            arrayAux = self.lastR.copy()
+            arrayAux.append(self.lastLexema)
+
+            self.lastR = arrayAux.copy()
+            self.contAux += 1
+            #N = New Nodo(Lexico.getLexema())
+            if self.ListaSimbolosP():   #N2
+                #N.ApSig = N2
+                return True
+            return False
+        self.status(status)
         return True
-        #Codigo No dado, pero "sencillo", parecido a lista simbolos
 
 
 if __name__ == "__main__":
     path = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/Gramatica.txt";
     g1 = Grammar(path)
-    print(g1.getToken())
-    print(g1.getToken())
-    print(g1.getToken())
-    print(g1.getToken())
-    print(g1.getToken())
-    print(g1.getToken())
-    # g1.G()
+    g1.G()
+    for rule in g1.rules:
+        print(rule)
 

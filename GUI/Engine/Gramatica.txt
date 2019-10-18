@@ -5,6 +5,6 @@ Regla -> LadoIzquierdo FLECHA LadosDerechos ;
 LadoIzquierdo -> SIMBOLO ;
 LadosDerechos -> ListaSimbolos LadosDerechosP ;
 LadosDerechosP -> OR ListaSimbolos LadosDerechosP | Epsilon ;
-ListaSimbolos -> SIMBOLO ListaSimbolosP ;
-ListaSimbolosP -> SIMBOLO ListaSimbolosP | Epsilon ;
+ListaSimbolos -> SIMBOLO ListaSimbolos' ;
+ListaSimbolos' -> SIMBOLO ListaSimbolos' | Epsilon ;
 
