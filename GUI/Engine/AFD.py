@@ -131,7 +131,6 @@ class AFD():
             if column[0] not in statesFrom:
                 statesFrom.append(column[0])    #Traes Estados Inciales
         #Recorrer Arreglo de simbolos
-        # print("\n  Estado | ",end="")
         stringOut = stringOut +"\n  Estado  | "
         for elem in allSymbols:
             out = ""
@@ -155,13 +154,10 @@ class AFD():
                 out = specialAlphabet[indexAux]
             else:
                 out = elem
-            # print("  {:>2}  |".format(out), end="")
             stringOut = stringOut +"  {:>3}  |".format(out)
-        # print("| token |", end="")
         stringOut = stringOut +"| token |\n"
-        # print("\n")
-        
         cont = 0
+        #Recorrer fila de transiciones
         for state in statesFrom:
             #Fila de Estados
             #Estado Inicial es de aceptacion
