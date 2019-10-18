@@ -1,6 +1,6 @@
-Gramatica -> ListasReglas ;
-ListasReglas -> Regla PC ListasReglasP ;
-ListasReglasP -> Regla PC ListasReglasP | Epsilon ;
+G -> Lp ;
+Lp -> Regla PC ListasReglasP ;
+ListasReglasP -> Regla PC ListasReglasP | Epsilon Epsilon2 Epsilon3;
 Regla -> LadoIzquierdo FLECHA LadosDerechos ;
 LadoIzquierdo -> SIMBOLO ;
 LadosDerechos -> ListaSimbolos LadosDerechosP ;
