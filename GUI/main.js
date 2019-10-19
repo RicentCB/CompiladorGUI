@@ -16,13 +16,14 @@ function createWindow () {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true
     }
+    
   })
 
-  //Python
-  var python = require("child_process").spawn('python', ['Engine/test.py']);
-  python.stdout.on('data',function(data){
-    console.log("data", data.toString("utf8"));
-  })
+  //Inicializar arreglo de atuomatas en python
+  // var python = require("child_process").spawn('python', ['Engine/test.py']);
+  // python.stdout.on('data',function(data){
+  //   console.log("data", data.toString("utf8"));
+  // })
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
