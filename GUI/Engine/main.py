@@ -49,7 +49,7 @@ else:   #Numero de argumentos valido
                 pickle.dump(arrayAFN, fileObjWrite)
                 fileObjWrite.close()
                 #Imprimir la respuesta
-                print(json.dumps({"AFN":basicAFN.toJSON(), "Id": len(arrayAFN)}))
+                print(json.dumps({"AFN":basicAFN.toJSON(), "Id": len(arrayAFN), "message": True}))
             else:
                 print(json.dumps({"message":"Error en en automata basico"}))
         elif(sys.argv[2] == "Rango"):
@@ -65,7 +65,7 @@ else:   #Numero de argumentos valido
                 pickle.dump(arrayAFN, fileObjWrite)
                 fileObjWrite.close()
                 #Imprimir la respuesta
-                print(json.dumps({"AFN":rangeAFN.toJSON(), "Id":len(arrayAFN)}))
+                print(json.dumps({"AFN":rangeAFN.toJSON(), "Id":len(arrayAFN), "message": True}))
             else:
                 print(json.dumps({"message":"Error en en automata rango"}))
         else:
