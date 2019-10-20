@@ -1,6 +1,6 @@
 
 const LINEW = 60;
-const SPACE_BSTS = 140;
+const SPACE_BSTS = 160;
 let Y_INI = 0;
 let Y_ADD = 120;
 
@@ -19,7 +19,15 @@ var mainJsonAFN = {
         // { "from": 0, "to": 0, "text": "up or timer", "curviness": -30 },
         // { "from": 0, "to": 3, "text": "down", "curviness": 30 },
     ]
-}
+};
+var path = require("path");
+var optionsPython = {
+    mode: 'json',
+    pythonOptions: ['-u'],
+    scriptPath: path.join(__dirname, 'Engine/'),
+    pythonPath: '/usr/bin/python3',         //Cambiar la ruta de acuerdo al sistema
+    args: []
+};
 
 function init() {
     var $ = go.GraphObject.make;  // for conciseness in defining templates
@@ -195,7 +203,7 @@ function drawAFN(jsonStr) {
                 // ------ C U R V O ------
                 if(drawStates.includes(auxArrayTrans[indexSpecialState][0])){//Ya se ha pasado por ahi
                     //Agregamos Transicion Especial
-                    arrayTrans.push({"from": actualState, "to":auxArrayTrans[indexSpecialState][1], "text": getCarTransition(auxArrayTrans[indexSpecialState]),"curviness": 50 });
+                    arrayTrans.push({"from": actualState, "to":auxArrayTrans[indexSpecialState][1], "text": getCarTransition(auxArrayTrans[indexSpecialState]),"curviness": 60 });
                 }else{  //Nuevo Estado
                     //Agregar Transicion                    
                     arrayTrans.push({"from": actualState, "to":auxArrayTrans[indexSpecialState][1], "text": getCarTransition(auxArrayTrans[indexSpecialState]),"curviness": -100 });
@@ -269,7 +277,7 @@ $(document).ready(function () {
     var addRangeAFDBtn = $("a.btn.add-btn#rangeAFD")
 
     const { PythonShell } = require("python-shell");
-    var path = require("path");
+    
     /* ========================== CONSTRUIR AFNS ==========================*/
     //Boton de Automata Basico
     addBasicAFDBtn.click(function (e) {
@@ -283,15 +291,9 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.value.length == 1) {
                 //Caracter valido
-                var options = {
-                    mode: 'json',
-                    pythonOptions: ['-u'],
-                    scriptPath: path.join(__dirname, 'Engine/'),
-                    pythonPath: '/usr/bin/python3',         //Cambiar la ruta de acuerdo al sistema
-                    args: ["AFN", "Basico", result.value]
-                };
+                optionsPython.args = ["AFN", "Basico", result.value]
 
-                let car = new PythonShell('main.py', options);
+                let car = new PythonShell('main.py', optionsPython);
                 //Creamos el automata
                 car.on('message', function (jsonString) {
                     //Insertar JSON en Arreglo
@@ -321,17 +323,10 @@ $(document).ready(function () {
             input: 'text',
             inputPlaceholder: 'E.g a-z, A-Z, 0-9'
         }).then((result) => {
-            if (isValidRange(result.value)) {
-                //Rango Valido
-                var options = {
-                    mode: 'json',
-                    pythonOptions: ['-u'],
-                    scriptPath: path.join(__dirname, 'Engine/'),
-                    pythonPath: '/usr/bin/python3',         //Cambiar la ruta de acuerdo al sistema
-                    args: ["AFN", "Rango", result.value]
-                };
-
-                let car = new PythonShell('main.py', options);
+            if (isValidRange(result.value)) {//Rango Valido
+                
+                optionsPython.args = ["AFN", "Rango", result.value]
+                let car = new PythonShell('main.py', optionsPython);
                 //Creamos el automata
                 car.on('message', function (jsonString) {
                     //Insertar en el arreglo AFN
@@ -370,15 +365,8 @@ $(document).ready(function () {
             Swal.fire("No puedes concatenar el mismo AFN", "Elige dos diferentes", "warning");
         }else{//Operacion Concatenar
             //Llamamos a Python
-            var options = {
-                mode: 'json',
-                pythonOptions: ['-u'],
-                scriptPath: path.join(__dirname, 'Engine/'),
-                pythonPath: '/usr/bin/python3',         //Cambiar la ruta de acuerdo al sistema
-                args: ["AFN", "Concatenar", idAFN1, idAFN2]
-            };
-
-            let answer = new PythonShell('main.py', options);
+            optionsPython.args = ["AFN", "Concatenar", idAFN1, idAFN2]
+            let answer = new PythonShell('main.py', optionsPython);
             //Creamos el automata
             answer.on('message', function (jsonString) {
                 //Sacar AFNS
@@ -405,15 +393,8 @@ $(document).ready(function () {
             Swal.fire("Seleccione un AFN", "", "error");
         }else{
             //Llamar a Metodo en Python
-            var options = {
-                mode: 'json',
-                pythonOptions: ['-u'],
-                scriptPath: path.join(__dirname, 'Engine/'),
-                pythonPath: '/usr/bin/python3',         //Cambiar la ruta de acuerdo al sistema
-                args: ["AFN", "Opcional", idAFN]
-            };
-
-            let answer = new PythonShell('main.py', options);
+            optionsPython.args = ["AFN", "Opcional", idAFN]
+            let answer = new PythonShell('main.py', optionsPython);
             //Creamos el automata
             answer.on('message', function (jsonString) {
                 //Sacar AFNS
@@ -429,7 +410,7 @@ $(document).ready(function () {
             });
         }
     })
-    //Opcional AFN
+    //Kleen Plus AFN
     btnOpKlPlus.click(function(e){
         e.preventDefault();
         let idAFN = $("input[name='radio-group-3']:checked", "#3").val();  
@@ -438,19 +419,11 @@ $(document).ready(function () {
             Swal.fire("Seleccione un AFN", "", "error");
         }else{
             //Llamar a Metodo en Python
-            var options = {
-                mode: 'json',
-                pythonOptions: ['-u'],
-                scriptPath: path.join(__dirname, 'Engine/'),
-                pythonPath: '/usr/bin/python3',         //Cambiar la ruta de acuerdo al sistema
-                args: ["AFN", "Plus", idAFN]
-            };
-
-            let answer = new PythonShell('main.py', options);
+            optionsPython.args = ["AFN", "Plus", idAFN]
+            let answer = new PythonShell('main.py', optionsPython);
             //Creamos el automata
             answer.on('message', function (jsonString) {
-                console.log(jsonString)
-                //Sacar AFNS
+                //Sacar AFN
                 arrayAFNS[parseInt(idAFN)]["visible"] = false
                 //InsertarAFN
                 pushAFN({"AFN": jsonString["AFN"], "id": jsonString["Id"], "visible": true});
@@ -462,6 +435,34 @@ $(document).ready(function () {
                     console.log(jsonString["message"])
             });
         }
+    })
+    //Kleen Star AFN
+    btnOpKlStar.click(function(e){
+        e.preventDefault();
+        let idAFN = $("input[name='radio-group-3']:checked", "#3").val();  
+
+        if(typeof(idAFN) == "undefined"){
+            Swal.fire("Seleccione un AFN", "", "error");
+        }else{
+            //Llamar a Metodo en Python
+            optionsPython.args = ["AFN", "Star", idAFN]
+            let answer = new PythonShell('main.py', optionsPython);
+            //Creamos el automata
+            answer.on('message', function (jsonString) {
+                console.log(jsonString["AFN"])
+                //Sacar AFN
+                arrayAFNS[parseInt(idAFN)]["visible"] = false
+                //InsertarAFN
+                pushAFN({"AFN": jsonString["AFN"], "id": jsonString["Id"], "visible": true});
+                if (jsonString["message"] == true){
+                    Swal.fire("Exito al crear automata", "Id: " + jsonString["Id"], "success");
+                    reloadJsonString(); //Cargar GoJS
+                }
+                else
+                    console.log(jsonString["message"])
+            });
+        }
+
     })
 })
 
