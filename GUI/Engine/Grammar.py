@@ -203,7 +203,7 @@ class Grammar():
     def first(self, regla):
         c_first = []
         terminales = self.simbolosTerminales()
-        print("En first: "+regla[0])
+        #print("En first: "+regla[0])
         if(regla[0]=="Epsilon"):
             c_first.append(regla[0])
             return c_first
@@ -216,7 +216,12 @@ class Grammar():
                 if rule[0]==regla[0]:
                     first_auxiliar = self.first(rule[1])
                     c_first.append(first_auxiliar)
-            return c_first
+            #Quitamos elementos repetidos
+            auxiliar = []
+            for simbolo in c_first:
+                if simbolo not in auxiliar:
+                    auxiliar.append(simbolo)
+            return auxiliar
 
 if __name__ == "__main__":
     path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/Gramatica.txt";
