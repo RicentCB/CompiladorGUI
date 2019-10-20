@@ -72,7 +72,7 @@ class AFN():
         rangeAFN = AFN(iniSt, endSt, [trans], [iniSt, endSt])
         return rangeAFN
     #Union del objetos de auntomota con otro autoamta
-    #Sobreescribe el automata SELF
+    #Devuelve iun nuevo AFN
     def union(self, AFN2):
         if isinstance(AFN2, AFN):
             #Borramos el estado de aceptacion de los AFN

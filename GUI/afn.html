@@ -64,8 +64,8 @@
 			<!-- Botones Opciones -->
 			<div class="container-select">
                 <div class="container buttons-vertical">
-                    <a href="#" class="btn"></i> Unir</a>
-                    <a href="#" class="btn"></i>Concatenar</a>
+                    <a href="#" class="btn operAFN" id="union"></i> Unir</a>
+                    <a href="#" class="btn operAFN" id="conc"></i>Concatenar</a>
                 </div>
 			</div>
 			<!-- D I V I S I O N -->
@@ -80,60 +80,14 @@
 			
             <div class="container-select">
                 <div class="container buttons-vertical">
-                    <a href="#" class="btn"></i>Opcional ?</a>
-                    <a href="#" class="btn"></i>Cerradura +</a>
-                    <a href="#" class="btn"></i>Cerradura *</a>
+                    <a href="#" class="btn operAFN" id="optional"></i>Opcional ?</a>
+                    <a href="#" class="btn operAFN" id="klPlus"></i>Cerradura +</a>
+                    <a href="#" class="btn operAFN" id="klStar"></i>Cerradura *</a>
                 </div>
             </div>
         </div>
-        
-        <!-- <div class="mainBoard">
-            <canvas id="goodCanvas1" width="800" height="700" role="img"></canvas>
-        </div> -->
-        <script src="go.js"></script>
+        <div id="myDiagramDivAFN" style="border: solid 1px black; width: 100%; height: 800px"></div>        
  
-<script id="code">
-  function init() {
-    var $ = go.GraphObject.make;  // for conciseness in defining templates
- 
-    var myDiagram =
-      $(go.Diagram, "myDiagramDiv",  // create a Diagram for the DIV HTML element
-        { // enable undo & redo
-          "undoManager.isEnabled": true
-        });
- 
-    // define a simple Node template
-    myDiagram.nodeTemplate =
-      $(go.Node, "Auto",  // the Shape will go around the TextBlock
-        $(go.Shape, "RoundedRectangle",
-          { strokeWidth: 0, fill: "white" },  // default fill is white
-          // Shape.fill is bound to Node.data.color
-          new go.Binding("fill", "color")),
-        $(go.TextBlock,
-          { margin: 8 },  // some room around the text
-          // TextBlock.text is bound to Node.data.key
-          new go.Binding("text", "key"))
-      );
- 
-    // but use the default Link template, by not setting Diagram.linkTemplate
- 
-    // create the model data that will be represented by Nodes and Links
-    myDiagram.model = new go.GraphLinksModel(
-    [
-      { key: "Alpha", color: "lightblue" },
-      { key: "Beta", color: "orange" },
-      { key: "Gamma", color: "lightgreen" },
-      { key: "Delta", color: "pink" }
-    ],
-    [
-      { from: "Alpha", to: "Beta" },
-      { from: "Alpha", to: "Gamma" },
-      { from: "Beta", to: "Beta" },
-      { from: "Gamma", to: "Delta" },
-      { from: "Delta", to: "Alpha" }
-    ]);
-  }
-</script> 
         <p>Gracias por usar la aplicacion</p>
 
     </main>
@@ -144,8 +98,8 @@
     <script src="js/vendor/modernizr-3.7.1.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+    <script src="plugins/gojs/release/go.js"></script>
     <script src="js/plugins.js"></script>
-    <script src="js/main.js"></script>
     <script src="js/canvas.js"></script>
 
 </body>
