@@ -139,26 +139,75 @@ function getCarTransition(row) {
     return stringOut;
 }
 //Funcion que verifica su existen dos transciones que llevan a un mismo estado
-function existTwoTrans(arrayTtransitions, state){
+function existTwoTrans(arrayTransitions, state){
     //Trasncion = [IniState, EndState, MinSymbol, MaxSimbol]
-    let arrayStates = []
     let cont = 0;
-    for (let i = 0; i < arrayTtransitions.length; i++) {
-        if(parseInt(arrayTtransitions[i][1]) == parseInt(state)){
+    for (let i = 0; i < arrayTransitions.length; i++) {
+        if(parseInt(arrayTransitions[i][1]) == parseInt(state))
             cont ++;
-            arrayStates.push(arrayTtransitions[i][0]) //Insertamos el estado de origen
+    }
+    if(cont > 1){   return true;
+    }else{          return false;
+    }
+}
+//Funcion dado un estado, el conjunto de transiciones y el estado de acpetacion
+// retorna el numero de "saltos" para llegar al estado de acpetacion
+function stateCloser(state, finalState, arrayTransitions){
+    let cont = 0;
+    let arrayStatesActual = [];
+    let arrayStatesChecked = [];
+    //Insertar Estado
+    arrayStatesActual.push(state)
+    arrayStatesChecked.push(state)
+    let maxCont = 0;
+    while (!arrayStatesActual.includes(finalState+"")){
+        //Recorrer los estados a donde vamos a partir del estado actual
+        for (let i = 0; i < arrayStatesActual.length; i++) {
+            // if (!arrayStatesChecked.includes(arrayStatesActual[i])){//No se ha pasado por ese estado
+                let arrayStateTo = []
+                //Recorremos Transiciones
+                //Transcion = [IniState, EndState, MinSymbol, MaxSimbol]
+                for (let j = 0; j < arrayTransitions.length; j++) {
+                    //Transiciones de de los estados en el arreglo de "actuales"
+                    if(arrayTransitions[j][0] == arrayStatesActual[i]){
+                        //Insertar State To
+                        arrayStateTo.push(arrayTransitions[j][1])
+                        arrayStatesChecked.push(arrayTransitions[j][1])
+                    }
+                }
+                //Sobre Escribir Estado Actual
+                arrayStatesActual = arrayStateTo.slice()
+            // }
         }
+        cont ++;
+        if (maxCont == 100){
+            console.log("Error de Ciclo Infinito");
+            break;
+        }
+        else maxCont ++;
     }
-    if(cont > 1){
-        return true;
-    }else{
-        return false;
-    }
+    //Regrear numro de saltos
+    return cont;
+}
+//Funcion que dado dos estados retorna cual esta mas cerca del estado de aceptacion
+function twoStatesCloser(state1, state2, finalState, arrayTrans){
+    if (state1 == finalState)   return state1;
+    else if(state2 == finalState)   return state2;
+    else{
+        //Verificar el numero de "saltos" para llegar al estado de aceptacion
+        let cont1 = 0;
+        let cont2 = 0;
+        cont1 = stateCloser(state1, finalState, arrayTrans);
+        cont2 = stateCloser(state2, finalState, arrayTrans);
+        if(cont1 < cont2)
+            return state1;
+        else if(cont2 < cont1)
+            return state2;
+    }   
 }
 /*---------------------------------------------------------------
  * ---- FUNCION QUE DIBUJA UN AUTOMATA DADO UN OBJETO JSON ----
 ---------------------------------------------------------------*/
-
 function drawAFN(jsonStr) {
     let actualState = jsonStr["iniSt"];
     let endState = jsonStr["endSt"];
@@ -174,6 +223,7 @@ function drawAFN(jsonStr) {
     //Insertar Estado Inicial
     drawStates.push(jsonStr["iniSt"]);
     arrayStates.push({"id":jsonStr["iniSt"], "loc":""+0+" "+Y_INI, "text":">Q"+jsonStr["iniSt"]})
+    let maxcont = 0;
     while (actualState != endState) {
         //Buscamos las transiciones que pertenecen al estado actual
         auxArrayTrans = [];
@@ -189,7 +239,7 @@ function drawAFN(jsonStr) {
                 console.log("bifurcacion tipo OR");
             }
             //Dos transiciones hacia un mismo estado
-            else if(analizeSt1 || analizeSt2){   
+            else if((analizeSt1 && !analizeSt2) || (!analizeSt1 && analizeSt2) ){   
                 //Buscamos cual es el estado "lineal" y  "curvo"
                 let indexSpecialState = 0;
                 let indexLinealState = 0
@@ -221,9 +271,43 @@ function drawAFN(jsonStr) {
                     arrayStates.push({"id": actualState, "loc":""+goX+" "+Y_INI, "text":"Q"+actualState})
                 //Agregar Transcion
                 arrayTrans.push({"from": iniState,"to":actualState, "text": getCarTransition(auxArrayTrans[indexLinealState]),"curviness": 30 })
-                
             }
-            
+            else if (analizeSt1 && analizeSt2){ //Bifurcacion de Cerradrua Estrella
+                let stateAux1 = auxArrayTrans[0][1];
+                let stateAux2 = auxArrayTrans[1][1];
+                //Buscamos cual lleva mas cerca del estado de aceptacion y agregamos su transcion
+                let stateClose = twoStatesCloser(stateAux1, stateAux2, endState, transitions);
+                let stateFar = stateAux1;
+                if (stateClose == stateAux1){
+                    stateFar = stateAux2;
+                }
+                let linealState = 0;
+                let curveState = 0
+                //Verficiar si el estado mas LEJOS del estado de ACEPTACION ya ha sido dibujado
+                if(drawStates.includes(stateFar)){//El estado mas cerca sera el estado "curvo"
+                    curveState = stateFar;
+                    linealState = stateClose;
+                    // ---- C U R V O ----
+                    arrayTrans.push({"from": actualState,"to":curveState, "text":"ε","curviness": 60});
+                }else{          //El estado mas cerca sera el estado "lineal"
+                    curveState = stateClose;
+                    linealState = stateFar;
+                    // ---- C U R V O ----
+                    arrayTrans.push({"from": actualState,"to":curveState, "text":"ε","curviness": -100});
+                }
+                //Posicionarte en el estado lineal
+                iniState = actualState
+                actualState = linealState   //Estado al que se llega, indice cero ya que solo hay una transcion
+                drawStates.push(actualState);
+                goX = (goX + SPACE_BSTS);
+                if(actualState == endState) //Llegmaos al estado de aceptacion
+                    arrayStates.push({"id": actualState, "loc":""+goX+" "+Y_INI, "text":"Q"+actualState+"*"})
+                else
+                    arrayStates.push({"id": actualState, "loc":""+goX+" "+Y_INI, "text":"Q"+actualState})
+                //Agregar Transicion
+                arrayTrans.push({"from": iniState,"to":actualState, "text":"ε", "curviness":30 })
+        
+            }
         //Solo hay un estado al que se llega desde el estado Actual
         } else {
             iniState = actualState
@@ -235,7 +319,13 @@ function drawAFN(jsonStr) {
             else
                 arrayStates.push({"id": actualState, "loc":""+goX+" "+Y_INI, "text":"Q"+actualState})
             //Agregar Transicion
-            arrayTrans.push({"from": iniState,"to":actualState, "text": getCarTransition(auxArrayTrans[0]),"curviness": 30 })
+            arrayTrans.push({"from": iniState,"to":actualState, "text": getCarTransition(auxArrayTrans[0]),"curviness":30 })
+        }
+        if (maxcont == 100){
+            console.log("Error de Ciclo Infinito");
+            break;
+        }else{
+            maxcont ++;
         }
     }
     //Modificar Main Json
