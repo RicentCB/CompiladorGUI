@@ -1,6 +1,6 @@
 
 const LINEW = 60;
-const SPACE_BSTS = 180;
+const SPACE_BSTS = 140;
 let Y_INI = 0;
 let Y_ADD = 120;
 
@@ -133,15 +133,19 @@ function getCarTransition(row) {
 //Funcion que verifica su existen dos transciones que llevan a un mismo estado
 function existTwoTrans(arrayTtransitions, state){
     //Trasncion = [IniState, EndState, MinSymbol, MaxSimbol]
-    let arrayState = []
+    let arrayStates = []
+    let cont = 0;
     for (let i = 0; i < arrayTtransitions.length; i++) {
-        if(arrayTtransitions[i][1] == state)
-            arrayStates.push(arrayTrans[0]) //Insertamos el estado de origen
+        if(parseInt(arrayTtransitions[i][1]) == parseInt(state)){
+            cont ++;
+            arrayStates.push(arrayTtransitions[i][0]) //Insertamos el estado de origen
+        }
     }
-    if(arrayState.length > 1)
-        return true
-    else
-        return false
+    if(cont > 1){
+        return true;
+    }else{
+        return false;
+    }
 }
 /*---------------------------------------------------------------
  * ---- FUNCION QUE DIBUJA UN AUTOMATA DADO UN OBJETO JSON ----
@@ -151,6 +155,8 @@ function drawAFN(jsonStr) {
     let actualState = jsonStr["iniSt"];
     let endState = jsonStr["endSt"];
     let transitions = jsonStr["transitions"];
+    //Arreglo para saber si ya se ha dibujado el estado
+    let drawStates = [];
     //Arreglo de Estados para insertar en el main JSON AFN
     let arrayStates= [];
     //Arreglo de Transncions para insertar en el main JSON AFN
@@ -158,6 +164,7 @@ function drawAFN(jsonStr) {
     goX = 0
     yIni= Y_INI
     //Insertar Estado Inicial
+    drawStates.push(jsonStr["iniSt"]);
     arrayStates.push({"id":jsonStr["iniSt"], "loc":""+0+" "+Y_INI, "text":">Q"+jsonStr["iniSt"]})
     while (actualState != endState) {
         //Buscamos las transiciones que pertenecen al estado actual
@@ -168,10 +175,52 @@ function drawAFN(jsonStr) {
         }
         //Hay una bifurcacion
         if (auxArrayTrans.length > 1) {
-            console.log("bifurcacion");
-        } else {//Solo hay un estado al que se llega
+            let analizeSt1 = existTwoTrans(transitions, auxArrayTrans[0][1]);   //Estado al que se llega primer transicion
+            let analizeSt2 = existTwoTrans(transitions, auxArrayTrans[1][1]);   //Estado al que se llega segunda transicion
+            if(!analizeSt1 && !analizeSt2){
+                console.log("bifurcacion tipo OR");
+            }
+            //Dos transiciones hacia un mismo estado
+            else if(analizeSt1 || analizeSt2){   
+                //Buscamos cual es el estado "lineal" y  "curvo"
+                let indexSpecialState = 0;
+                let indexLinealState = 0
+                if (analizeSt1){
+                    indexSpecialState = 0;
+                    indexLinealState = 1;
+                }else if(analizeSt2){   //Dos transnciones al estado 2 ()
+                    indexSpecialState = 1;
+                    indexLinealState = 0;
+                }
+                // ------ C U R V O ------
+                if(drawStates.includes(auxArrayTrans[indexSpecialState][0])){//Ya se ha pasado por ahi
+                    //Agregamos Transicion Especial
+                    arrayTrans.push({"from": actualState, "to":auxArrayTrans[indexSpecialState][1], "text": getCarTransition(auxArrayTrans[indexSpecialState]),"curviness": 50 });
+                }else{  //Nuevo Estado
+                    //Agregar Transicion                    
+                    arrayTrans.push({"from": actualState, "to":auxArrayTrans[indexSpecialState][1], "text": getCarTransition(auxArrayTrans[indexSpecialState]),"curviness": -100 });
+                }
+                // ------ L I N E A L ----- 
+                //Cambiar de Estado
+                iniState = actualState;
+                actualState = auxArrayTrans[indexLinealState][1];
+                drawStates.push(actualState);
+                goX = (goX + SPACE_BSTS);
+                //Agregar Estado
+                if(actualState == endState) //Llegmaos al estado de aceptacion
+                    arrayStates.push({"id": actualState, "loc":""+goX+" "+Y_INI, "text":"Q"+actualState+"*"})
+                else                        //NO ES Aceptacion
+                    arrayStates.push({"id": actualState, "loc":""+goX+" "+Y_INI, "text":"Q"+actualState})
+                //Agregar Transcion
+                arrayTrans.push({"from": iniState,"to":actualState, "text": getCarTransition(auxArrayTrans[indexLinealState]),"curviness": 30 })
+                
+            }
+            
+        //Solo hay un estado al que se llega desde el estado Actual
+        } else {
             iniState = actualState
             actualState = auxArrayTrans[0][1]   //Estado al que se llega, indice cero ya que solo hay una transcion
+            drawStates.push(actualState);
             goX = (goX + SPACE_BSTS);
             if(actualState == endState) //Llegmaos al estado de aceptacion
                 arrayStates.push({"id": actualState, "loc":""+goX+" "+Y_INI, "text":"Q"+actualState+"*"})
@@ -190,11 +239,9 @@ function drawAFN(jsonStr) {
     Y_INI = (Y_INI + Y_ADD)
 
 }
-//----------------------------------------------------------------------
 /*======================================================================
  * -------------- FUNCION QUE INICIALIZA ---------- GO JS --------------
  =====================================================================*/
-//----------------------------------------------------------------------
 
 //Funcion que inserta cada estado y trnasicion de todos los AFNS 
 // en el Main JSON
@@ -369,22 +416,53 @@ $(document).ready(function () {
             let answer = new PythonShell('main.py', options);
             //Creamos el automata
             answer.on('message', function (jsonString) {
-                console.log(jsonString)
                 //Sacar AFNS
-                // arrayAFNS[parseInt(idAFN1)]["visible"] = false
-                // arrayAFNS[parseInt(idAFN2)]["visible"] = false
-                // //InsertarAFN
-                // pushAFN({"AFN": jsonString["AFN"], "id": jsonString["Id"], "visible": true});
-                // if (jsonString["message"] == true){
-                //     Swal.fire("Exito al crear automata", "Id: " + jsonString["Id"], "success");
-                //     reloadJsonString(); //Cargar GoJS
-                // }
-                // else
-                //     console.log(jsonString["message"])
+                arrayAFNS[parseInt(idAFN)]["visible"] = false
+                //InsertarAFN
+                pushAFN({"AFN": jsonString["AFN"], "id": jsonString["Id"], "visible": true});
+                if (jsonString["message"] == true){
+                    Swal.fire("Exito al crear automata", "Id: " + jsonString["Id"], "success");
+                    reloadJsonString(); //Cargar GoJS
+                }
+                else
+                    console.log(jsonString["message"])
             });
         }
     })
+    //Opcional AFN
+    btnOpKlPlus.click(function(e){
+        e.preventDefault();
+        let idAFN = $("input[name='radio-group-3']:checked", "#3").val();  
 
+        if(typeof(idAFN) == "undefined"){
+            Swal.fire("Seleccione un AFN", "", "error");
+        }else{
+            //Llamar a Metodo en Python
+            var options = {
+                mode: 'json',
+                pythonOptions: ['-u'],
+                scriptPath: path.join(__dirname, 'Engine/'),
+                pythonPath: '/usr/bin/python3',         //Cambiar la ruta de acuerdo al sistema
+                args: ["AFN", "Plus", idAFN]
+            };
+
+            let answer = new PythonShell('main.py', options);
+            //Creamos el automata
+            answer.on('message', function (jsonString) {
+                console.log(jsonString)
+                //Sacar AFNS
+                arrayAFNS[parseInt(idAFN)]["visible"] = false
+                //InsertarAFN
+                pushAFN({"AFN": jsonString["AFN"], "id": jsonString["Id"], "visible": true});
+                if (jsonString["message"] == true){
+                    Swal.fire("Exito al crear automata", "Id: " + jsonString["Id"], "success");
+                    reloadJsonString(); //Cargar GoJS
+                }
+                else
+                    console.log(jsonString["message"])
+            });
+        }
+    })
 })
 
 //--------------------------------------------------

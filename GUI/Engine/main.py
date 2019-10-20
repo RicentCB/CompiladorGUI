@@ -91,6 +91,16 @@ else:   #Numero de argumentos valido
             fileObjRead = open(fileAFN, 'rb')
             arrayAFN = pickle.load(fileObjRead) 
             fileObjRead.close()
-            #
+            #Adquirir AFN de la lista
+            AFNOp = arrayAFN[int(sys.argv[3])]
+            #Crear nuevo AFN
+            AFNNew = AFNOp.optional()
+            #Insertartlo en el array y escribir el archivo
+            arrayAFN.append(AFNNew)
+            fileObjWrite = open(fileAFN, 'wb')
+            pickle.dump(arrayAFN, fileObjWrite)
+            fileObjWrite.close()
+            #Imprimir la respuesta
+            print(json.dumps({"AFN":AFNNew.toJSON(), "Id":len(arrayAFN), "message": True}))
         else:
             print(json.dumps({"message": "Error opcion AFN no valida"}));
