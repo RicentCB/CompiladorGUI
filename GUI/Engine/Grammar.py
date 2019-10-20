@@ -186,11 +186,85 @@ class Grammar():
         self.status(status)
         return True
 
+    def simbolos_NoTerminales(self):
+        terminales = []
+        for rule in self.rules:
+            terminales.append(rule[0])
+        return set(terminales)
+
+    def simbolosTerminales(self):
+        no_terminales = []
+        for regla in self.rules:
+            for simbolo in regla[1]:
+                if simbolo not in self.simbolos_NoTerminales():
+                    no_terminales.append(simbolo)
+        return set(no_terminales)
+    
+    def first(self, regla):
+        c_first = []
+        terminales = self.simbolosTerminales()
+        #print("En first: "+regla[0])
+        if(regla[0]=="Epsilon"):    
+            c_first.append(regla[0])
+            return c_first
+        elif regla[0] in terminales:
+            c_first.append(regla[0])
+            return c_first
+        else:
+        #Para el caso de que es un simbolo no terminal
+            for rule in self.rules:
+                if rule[0]==regla[0]:
+                    first_auxiliar = self.first(rule[1])
+                    c_first.append(first_auxiliar)
+            #Quitamos elementos repetidos
+            auxiliar = []
+            for simbolo in c_first:
+                if simbolo not in auxiliar:
+                    auxiliar.append(simbolo)
+            return auxiliar
+
+    #Esta función determina determina si una regla
+    #contiene producciones con epsilon, es decir, que 
+    #puede ser omitida
+    def is_nullable(self, regla):
+        nullable = False
+        for rule in self.rules:
+            if rule[0] == regla[0]:
+                if 'Epsilon' in rule[1]:
+                    nullable = True
+        return nullable
+
+
+        
+    # def follow(self, s_noTerminal):
+    #     c_follow = []
+    #     if(s_noTerminal==self.rules[0][0]):
+    #         c_follow.append("$")
+    #         return c_follow
+    #     for rule in self.rules:
+    #         if s_noTerminal in rule[1]:
+    #             if(rule[1].index(s_noTerminal)):
+    #                 print("Si jala")
+                
+
 
 if __name__ == "__main__":
-    path = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/Gramatica.txt";
+    path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
     g1 = Grammar(path)
     g1.G()
+    # no_terminales = g1.simbolos_NoTerminales()
+    # terminales = g1.simbolosTerminales()
     for rule in g1.rules:
         print(rule)
-
+    #print(g1.rules[0][0])
+    # print("---Simbolos terminales---")
+    # for simbolo in terminales:
+    #     print(simbolo)
+    # print("---Simbolos no terminales---")
+    # for simbolo in no_terminales:
+    #     print(simbolo)
+    # print(g1.rules[4])
+    first_s= g1.first(g1.rules[0][0])
+    print(first_s)
+    # print(g1.rules[2])
+    print(g1.is_nullable(g1.rules[2]))
