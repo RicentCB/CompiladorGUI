@@ -34,10 +34,10 @@ else:   #Numero de argumentos valido
             fileObjWrite = open(fileAFN, 'wb')
             pickle.dump(array,fileObjWrite)
             fileObjWrite.close()
-        #Opciones del Menu Principal
+        #----------- Opciones del Menu Principal -----------
+        #Crear AFN Basico
         elif(sys.argv[2] == "Basico"):
             if (len(sys.argv[3]) == 1):
-                
                 #Abrir Archivo de Automatas
                 fileObjRead = open(fileAFN, 'rb')
                 arrayAFN = pickle.load(fileObjRead) 
@@ -52,6 +52,7 @@ else:   #Numero de argumentos valido
                 print(json.dumps({"AFN":basicAFN.toJSON(), "Id": len(arrayAFN), "message": True}))
             else:
                 print(json.dumps({"message":"Error en en automata basico"}))
+        #Crear AFN de Rango
         elif(sys.argv[2] == "Rango"):
             if (len(sys.argv[3]) == 3):
                 #Abrir Archivo de Automatas
@@ -68,5 +69,28 @@ else:   #Numero de argumentos valido
                 print(json.dumps({"AFN":rangeAFN.toJSON(), "Id":len(arrayAFN), "message": True}))
             else:
                 print(json.dumps({"message":"Error en en automata rango"}))
+        elif(sys.argv[2] == "Concatenar"):
+            #Deserializar el array AFN
+            fileObjRead = open(fileAFN, 'rb')
+            arrayAFN = pickle.load(fileObjRead) 
+            fileObjRead.close()
+            #Adquirir los dos AFN de la lista
+            AFN1 = arrayAFN[int(sys.argv[3])]
+            AFN2 = arrayAFN[int(sys.argv[4])]
+            #Crearmos el nuevo AFN
+            AFNConc = AFN1.concatenate(AFN2)
+            #Insertartlo en el array y escribir el archivo
+            arrayAFN.append(AFNConc)
+            fileObjWrite = open(fileAFN, 'wb')
+            pickle.dump(arrayAFN, fileObjWrite)
+            fileObjWrite.close()
+            #Imprimir la respuesta
+            print(json.dumps({"AFN":AFNConc.toJSON(), "Id":len(arrayAFN), "message": True}))
+        elif(sys.argv[2] == "Opcional"):
+            #Deserializar el array AFN
+            fileObjRead = open(fileAFN, 'rb')
+            arrayAFN = pickle.load(fileObjRead) 
+            fileObjRead.close()
+            #
         else:
             print(json.dumps({"message": "Error opcion AFN no valida"}));
