@@ -5,46 +5,7 @@ let Y_INI = 0;
 let Y_ADD = 120;
 
 let arrayAFNS = [];
-/* ------------- Funcion que actulza los select Box ------------- */
-function updateHTMLSelectAFN(){
-    var arraySelect = $('.container-select .select-options');
-    for (let i = 0; i < arraySelect.length; i++) {
-        $(arraySelect[i]).empty();
-        let strId = $(arraySelect[i]).attr("id");
-        for (let j = 0; j < arrayAFNS.length; j++) {
-            $(arraySelect[i]).append("<p class='element'>"
-						+"<input type='radio' id='rd"+strId+(j)+"' name='radio-group'"+strId+" >"
-						+"<label for='rd"+strId+(j)+"' >AFN "+(j+1)+"</label>"
-				  	+"</p>")
-        }
-    }
-}
-/*--------------------------------------------------------------
- * ---- FUNCION QUE GUARDA UN JSON EN LA PILA DE AUTOMATAS ----
---------------------------------------------------------------*/
-function pushAFN(jsonString) {
-    //Insertamos el objeto JSON en arreglo del AFNS
-    arrayAFNS.push(jsonString);
-    //Mdificar el HTML de los selectores de AFNS
-    updateHTMLSelectAFN();
-    //Incrementar Y INI para el proximo automata
-    Y_INI = (Y_INI + Y_ADD)
-}
 
-//---------------------------------------------------------------
-//Funcion que devuelve un string con el caracter de transicion
-function getCarTransition(row) {
-    let stringOut = "";
-    (row[2] != row[3]) ?
-        stringOut = "[" + row[2] + "-" + row[3] + "]" :
-        stringOut = row[2]
-    if (stringOut == "Epsilon")
-        stringOut = "ε";
-    return stringOut;
-}
-/*---------------------------------------------------------------
- * ---- FUNCION QUE DIBUJA UN AUTOMATA DADO UN OBJETO JSON ----
----------------------------------------------------------------*/
 var mainJsonAFN = {
     "class": "go.GraphLinksModel",
     "nodeKeyProperty": "id",
@@ -59,52 +20,7 @@ var mainJsonAFN = {
         // { "from": 0, "to": 3, "text": "down", "curviness": 30 },
     ]
 }
-function drawAFN(jsonStr) {
-    let actualState = jsonStr["iniSt"];
-    let endState = jsonStr["endSt"];
-    let transitions = jsonStr["transitions"];
-    //Arreglo de Estados para insertar en el main JSON AFN
-    let arrayStates= [];
-    //Arreglo de Transncions para insertar en el main JSON AFN
-    let arrayTrans = [];
-    goX = 0
-    yIni= Y_INI
-    //Insertar Estado Inicial
-    arrayStates.push({"id":jsonStr["iniSt"], "loc":""+0+" "+Y_INI, "text":">Q"+jsonStr["iniSt"]})
-    while (actualState != endState) {
-        //Buscamos las transiciones que pertenecen al estado actual
-        auxArrayTrans = [];
-        for (let i = 0; i < transitions.length; i++) {
-            if (transitions[i][0] == actualState)
-                auxArrayTrans.push(transitions[i])
-        }
-        //Hay una bifurcacion
-        if (auxArrayTrans.length > 1) {
-            console.log("bifurcacion");
-        } else {//Solo hay un estado al que se llega
-            iniState = actualState
-            actualState = auxArrayTrans[0][1]   //Estado al que se llega, indice cero ya que solo hay una transcion
-            goX = (goX + SPACE_BSTS);
-            if(actualState == endState) //Llegmaos al estado de aceptacion
-                arrayStates.push({"id": actualState, "loc":""+goX+" "+Y_INI, "text":"Q"+actualState+"*"})
-            else
-                arrayStates.push({"id": actualState, "loc":""+goX+" "+Y_INI, "text":"Q"+actualState})
-            //Agregar Transicion
-            arrayTrans.push({"from": iniState,"to":actualState, "text": getCarTransition(auxArrayTrans[0]),"curviness": 30 })
-        }
-    }
-    //Modificar Main Json
-    for (let i = 0; i < arrayStates.length; i++)    //Agregar Estados
-        mainJsonAFN["nodeDataArray"].push(arrayStates[i]);
-    for (let i = 0; i < arrayTrans.length; i++)    //Agregar Transiciones
-        mainJsonAFN["linkDataArray"].push(arrayTrans[i]);
 
-}
-//-----------------------------------------------------------------------
-/*=======================================================================
- * ---- FUNCION QUE DIBUJA UN AUTOMATA DADO UN OBJETO JSON CON GO JS ----
- ======================================================================*/
-//-----------------------------------------------------------------------
 function init() {
     var $ = go.GraphObject.make;  // for conciseness in defining templates
     myDiagram =
@@ -180,6 +96,122 @@ function LoadGoJS() {
     myDiagram.model = go.Model.fromJson(mainJsonAFN);
 }
 
+/* ------------- Funcion que actulza los select Box ------------- */
+function updateHTMLSelectAFN(){
+    var arraySelect = $('.container-select .select-options');
+    for (let i = 0; i < arraySelect.length; i++) {
+        $(arraySelect[i]).empty();
+        let strId = $(arraySelect[i]).attr("id");
+        //Recorrer Arreglo de AFNS
+        for (let j = 0; j < arrayAFNS.length; j++) {
+            if (arrayAFNS[j]["visible"]){
+                $(arraySelect[i]).append("<p class='element'>"
+                +"<input type='radio' id='rd"+strId+(j)+"' value='"+(arrayAFNS[j]["id"]-1)+"' name='radio-group-"+strId+"' >"
+                +"<label for='rd"+strId+(j)+"' >AFN "+arrayAFNS[j]["id"] +"</label>"
+              +"</p>")         
+            }
+        }
+    }
+}
+/* ---- FUNCION QUE GUARDA UN JSON EN LA PILA DE AUTOMATAS ---- */
+function pushAFN(jsonString) {
+    //Insertamos el objeto JSON en arreglo del AFNS
+    arrayAFNS.push(jsonString);
+}
+
+//---------------------------------------------------------------
+//Funcion que devuelve un string con el caracter de transicion
+function getCarTransition(row) {
+    let stringOut = "";
+    (row[2] != row[3]) ?
+        stringOut = "[" + row[2] + "-" + row[3] + "]" :
+        stringOut = row[2]
+    if (stringOut == "Epsilon")
+        stringOut = "ε";
+    return stringOut;
+}
+//Funcion que verifica su existen dos transciones que llevan a un mismo estado
+function existTwoTrans(arrayTtransitions, state){
+    //Trasncion = [IniState, EndState, MinSymbol, MaxSimbol]
+    let arrayState = []
+    for (let i = 0; i < arrayTtransitions.length; i++) {
+        if(arrayTtransitions[i][1] == state)
+            arrayStates.push(arrayTrans[0]) //Insertamos el estado de origen
+    }
+    if(arrayState.length > 1)
+        return true
+    else
+        return false
+}
+/*---------------------------------------------------------------
+ * ---- FUNCION QUE DIBUJA UN AUTOMATA DADO UN OBJETO JSON ----
+---------------------------------------------------------------*/
+
+function drawAFN(jsonStr) {
+    let actualState = jsonStr["iniSt"];
+    let endState = jsonStr["endSt"];
+    let transitions = jsonStr["transitions"];
+    //Arreglo de Estados para insertar en el main JSON AFN
+    let arrayStates= [];
+    //Arreglo de Transncions para insertar en el main JSON AFN
+    let arrayTrans = [];
+    goX = 0
+    yIni= Y_INI
+    //Insertar Estado Inicial
+    arrayStates.push({"id":jsonStr["iniSt"], "loc":""+0+" "+Y_INI, "text":">Q"+jsonStr["iniSt"]})
+    while (actualState != endState) {
+        //Buscamos las transiciones que pertenecen al estado actual
+        auxArrayTrans = [];
+        for (let i = 0; i < transitions.length; i++) {
+            if (transitions[i][0] == actualState)
+                auxArrayTrans.push(transitions[i])
+        }
+        //Hay una bifurcacion
+        if (auxArrayTrans.length > 1) {
+            console.log("bifurcacion");
+        } else {//Solo hay un estado al que se llega
+            iniState = actualState
+            actualState = auxArrayTrans[0][1]   //Estado al que se llega, indice cero ya que solo hay una transcion
+            goX = (goX + SPACE_BSTS);
+            if(actualState == endState) //Llegmaos al estado de aceptacion
+                arrayStates.push({"id": actualState, "loc":""+goX+" "+Y_INI, "text":"Q"+actualState+"*"})
+            else
+                arrayStates.push({"id": actualState, "loc":""+goX+" "+Y_INI, "text":"Q"+actualState})
+            //Agregar Transicion
+            arrayTrans.push({"from": iniState,"to":actualState, "text": getCarTransition(auxArrayTrans[0]),"curviness": 30 })
+        }
+    }
+    //Modificar Main Json
+    for (let i = 0; i < arrayStates.length; i++)    //Agregar Estados
+        mainJsonAFN["nodeDataArray"].push(arrayStates[i]);
+    for (let i = 0; i < arrayTrans.length; i++)    //Agregar Transiciones
+        mainJsonAFN["linkDataArray"].push(arrayTrans[i]);
+    //Incrementar Y INI para el proximo automata
+    Y_INI = (Y_INI + Y_ADD)
+
+}
+//----------------------------------------------------------------------
+/*======================================================================
+ * -------------- FUNCION QUE INICIALIZA ---------- GO JS --------------
+ =====================================================================*/
+//----------------------------------------------------------------------
+
+//Funcion que inserta cada estado y trnasicion de todos los AFNS 
+// en el Main JSON
+function reloadJsonString(){
+    //Mdificar el HTML de los selectores de AFNS
+    updateHTMLSelectAFN();
+    //Inicializar Main Json
+    mainJsonAFN["nodeDataArray"] = [];
+    mainJsonAFN["linkDataArray"] = [];
+    //Cargar Estados y transisicones de Main JSON
+    for (let i = 0; i < arrayAFNS.length; i++) {
+        if (arrayAFNS[i]["visible"])
+            drawAFN(arrayAFNS[i]["AFN"]);
+    }
+    //Cargar en GoJS
+    LoadGoJS();
+}
 
 $(document).ready(function () {
 
@@ -215,11 +247,13 @@ $(document).ready(function () {
                 let car = new PythonShell('main.py', options);
                 //Creamos el automata
                 car.on('message', function (jsonString) {
-                    drawAFN(jsonString["AFN"])
-                    pushAFN(jsonString["AFN"]);
+                    //Insertar JSON en Arreglo
+                    // pushAFN(jsonString["AFN"]);
+                    pushAFN({"AFN": jsonString["AFN"], "id": jsonString["Id"], "visible": true});
+                    
                     if (jsonString["message"] == true){
                         Swal.fire("Exito al crear automata", "Id: " + jsonString["Id"], "success");
-                        LoadGoJS(); //Cargar GoJS
+                        reloadJsonString(); //Cargar GoJS
                     }
                     else
                         console.log(jsonString["message"])
@@ -229,7 +263,7 @@ $(document).ready(function () {
                 Swal.fire("Solo se permite un caracter", "Por favor revisa la entrada", "error")
         });
     });
-    //AFD de Rango
+    //Boton de Automata Rango
     addRangeAFDBtn.click(function (e) {
         e.preventDefault();
 
@@ -253,11 +287,11 @@ $(document).ready(function () {
                 let car = new PythonShell('main.py', options);
                 //Creamos el automata
                 car.on('message', function (jsonString) {
-                    drawAFN(jsonString["AFN"]);
-                    pushAFN(jsonString["AFN"]);
+                    //Insertar en el arreglo AFN
+                    pushAFN({"AFN": jsonString["AFN"], "id": jsonString["Id"], "visible": true});                    
                     if (jsonString["message"] == true){
                         Swal.fire("Exito al crear automata", "Id: " + jsonString["Id"], "success");
-                        LoadGoJS(); //Cargar GoJS
+                        reloadJsonString(); //Cargar GoJS
                     }
                     else
                         console.log(jsonString["message"])
@@ -269,14 +303,93 @@ $(document).ready(function () {
 
     })
     /* ======================= OPERACIONES CON AFNS =======================*/
-    var btnOpUnion = $('a.btn.operAFN#union');
     var btnOpConc= $('a.btn.operAFN#conc');
+    var btnOpUnion = $('a.btn.operAFN#union');
     var btnOpOptional= $('a.btn.operAFN#optional');
     var btnOpKlPlus = $('a.btn.operAFN#klPlus');
     var btnOpKlStar = $('a.btn.operAFN#klStar');
 
+    //Concatenar AFN
+    btnOpConc.click(function(e){
+        e.preventDefault();
+        //El id es el indice de la pila de AFNS serializados por Python, nos servira para hacer la operacion
+        let idAFN1 = $("input[name='radio-group-1']:checked", "#1").val();  
+        let idAFN2 = $("input[name='radio-group-2']:checked", "#2").val();
+
+        if (typeof(idAFN1) == "undefined" || typeof(idAFN2) == "undefined" ){
+            Swal.fire("Verfica tu seleccion","","warning");
+
+        }else if (idAFN1 == idAFN2){//Selecciono el mismo AFN
+            Swal.fire("No puedes concatenar el mismo AFN", "Elige dos diferentes", "warning");
+        }else{//Operacion Concatenar
+            //Llamamos a Python
+            var options = {
+                mode: 'json',
+                pythonOptions: ['-u'],
+                scriptPath: path.join(__dirname, 'Engine/'),
+                pythonPath: '/usr/bin/python3',         //Cambiar la ruta de acuerdo al sistema
+                args: ["AFN", "Concatenar", idAFN1, idAFN2]
+            };
+
+            let answer = new PythonShell('main.py', options);
+            //Creamos el automata
+            answer.on('message', function (jsonString) {
+                //Sacar AFNS
+                arrayAFNS[parseInt(idAFN1)]["visible"] = false
+                arrayAFNS[parseInt(idAFN2)]["visible"] = false
+                //InsertarAFN
+                pushAFN({"AFN": jsonString["AFN"], "id": jsonString["Id"], "visible": true});
+                if (jsonString["message"] == true){
+                    Swal.fire("Exito al crear automata", "Id: " + jsonString["Id"], "success");
+                    reloadJsonString(); //Cargar GoJS
+                }
+                else
+                    console.log(jsonString["message"])
+            });
+        }
+        
+    })
+    //Opcional AFN
+    btnOpOptional.click(function(e){
+        e.preventDefault();
+        let idAFN = $("input[name='radio-group-3']:checked", "#3").val();  
+
+        if(typeof(idAFN) == "undefined"){
+            Swal.fire("Seleccione un AFN", "", "error");
+        }else{
+            //Llamar a Metodo en Python
+            var options = {
+                mode: 'json',
+                pythonOptions: ['-u'],
+                scriptPath: path.join(__dirname, 'Engine/'),
+                pythonPath: '/usr/bin/python3',         //Cambiar la ruta de acuerdo al sistema
+                args: ["AFN", "Opcional", idAFN]
+            };
+
+            let answer = new PythonShell('main.py', options);
+            //Creamos el automata
+            answer.on('message', function (jsonString) {
+                console.log(jsonString)
+                //Sacar AFNS
+                // arrayAFNS[parseInt(idAFN1)]["visible"] = false
+                // arrayAFNS[parseInt(idAFN2)]["visible"] = false
+                // //InsertarAFN
+                // pushAFN({"AFN": jsonString["AFN"], "id": jsonString["Id"], "visible": true});
+                // if (jsonString["message"] == true){
+                //     Swal.fire("Exito al crear automata", "Id: " + jsonString["Id"], "success");
+                //     reloadJsonString(); //Cargar GoJS
+                // }
+                // else
+                //     console.log(jsonString["message"])
+            });
+        }
+    })
+
 })
 
+//--------------------------------------------------
+// ---- F U N C I O N E S   A U X I L I A R E S ----
+//--------------------------------------------------
 function isValidRange(string) {
     if (string.length == 3) {
         if (string[1] == '-') {
@@ -290,8 +403,4 @@ function isValidRange(string) {
     } else {
         return false;
     }
-}
-
-Math.radians = function (degrees) {
-    return degrees * Math.PI / 180;
 }
