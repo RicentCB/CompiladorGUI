@@ -186,11 +186,52 @@ class Grammar():
         self.status(status)
         return True
 
+    def simbolos_NoTerminales(self):
+        terminales = []
+        for rule in self.rules:
+            terminales.append(rule[0])
+        return set(terminales)
+
+    def simbolosTerminales(self):
+        no_terminales = []
+        for regla in self.rules:
+            for simbolo in regla[1]:
+                if simbolo not in self.simbolos_NoTerminales():
+                    no_terminales.append(simbolo)
+        return set(no_terminales)
+    
+    def first(self, regla):
+        c_first = []
+        terminales = self.simbolosTerminales()
+        print("En first: "+regla[0])
+        if(regla[0]=="Epsilon"):
+            c_first.append(regla[0])
+            return c_first
+        elif regla[0] in terminales:
+            c_first.append(regla[0])
+            return c_first
+        else:
+        #Para el caso de que es un simbolo no terminal
+            for rule in self.rules:
+                if rule[0]==regla[0]:
+                    first_auxiliar = self.first(rule[1])
+                    c_first.append(first_auxiliar)
+            return c_first
 
 if __name__ == "__main__":
-    path = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/Gramatica.txt";
+    path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/Gramatica.txt";
     g1 = Grammar(path)
     g1.G()
-    for rule in g1.rules:
-        print(rule)
-
+    # no_terminales = g1.simbolos_NoTerminales()
+    # terminales = g1.simbolosTerminales()
+    # for rule in g1.rules:
+    #     print(rule)
+    # print("---Simbolos terminales---")
+    # for simbolo in terminales:
+    #     print(simbolo)
+    # print("---Simbolos no terminales---")
+    # for simbolo in no_terminales:
+    #     print(simbolo)
+    print(g1.rules[4])
+    first_regla = g1.first(g1.rules[4])
+    print(first_regla)
