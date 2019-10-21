@@ -201,22 +201,59 @@ class Grammar():
                     no_terminales.append(simbolo)
         return set(no_terminales)
     
-    def first(self, regla):
+    def first(self, regla, regla_anterior=[]):        
         c_first = []
         terminales = self.simbolosTerminales()
         #print("En first: "+regla[0])
         if(regla[0]=="Epsilon"):    
-            c_first.append(regla[0])
-            return c_first
+            #c_first.append(regla[0])
+            return regla[0]
+
         elif regla[0] in terminales:
-            c_first.append(regla[0])
-            return c_first
+            #c_first.append(regla[0])
+            return regla[0]
         else:
         #Para el caso de que es un simbolo no terminal
+            #contador = 0
             for rule in self.rules:
                 if rule[0]==regla[0]:
-                    first_auxiliar = self.first(rule[1])
-                    c_first.append(first_auxiliar)
+                    
+                    if self.is_nullable(regla[0]) == False:
+                        first_auxiliar = self.first(rule[1],rule[1])
+                        if isinstance(first_auxiliar, str):
+                            c_first.append(first_auxiliar)
+                        else:
+                            c_first = c_first + first_auxiliar
+                    elif self.is_nullable(regla[0]) and (regla[0] in self.simbolos_NoTerminales()):
+                        #print(f"Regla 0 : {regla[0]}")
+                        eliminar_epsilon = False 
+                        first_auxiliar2 = self.first(rule[1])
+                        c_first.append(first_auxiliar2)
+                        contador = 0
+                        if len(regla_anterior) > 1:
+                            eliminar_epsilon = True
+                            for simbolo in regla_anterior:
+                                if self.is_nullable(simbolo):
+                                    contador = contador+1
+                                else:
+                                    break
+                            for i in range(contador+1):
+                                #print(i)
+                                indice = regla_anterior.index(regla[0])+i
+                                first_auxiliar = self.first(regla_anterior[indice])
+                                if isinstance(first_auxiliar, str):
+                                    c_first.append(first_auxiliar)
+                                else:
+                                    c_first = c_first + first_auxiliar
+                        # print(f"Afuera: {eliminar_epsilon}")
+                        # print(f"Antes de eliminar: {c_first}")
+                        # print(f"Despues de eliminar: {auxiliar2}")
+                        if eliminar_epsilon is True:
+                            auxiliar1 = set(c_first)
+                            auxiliar1.discard('Epsilon')
+                            auxiliar2 = list(auxiliar1)
+                            #print(f"En cond {auxiliar2}")
+                            c_first = auxiliar2  
             #Quitamos elementos repetidos
             auxiliar = []
             for simbolo in c_first:
@@ -234,9 +271,6 @@ class Grammar():
                 if 'Epsilon' in rule[1]:
                     nullable = True
         return nullable
-
-
-        
     # def follow(self, s_noTerminal):
     #     c_follow = []
     #     if(s_noTerminal==self.rules[0][0]):
@@ -266,7 +300,8 @@ if __name__ == "__main__":
     # for simbolo in no_terminales:
     #     print(simbolo)
     # print(g1.rules[4])
-    first_s= g1.first(g1.rules[0][0])
-    print(first_s)
-    # print(g1.rules[2])
-    print(g1.is_nullable(g1.rules[2]))
+    print("---First---")
+    for simbolo in g1.rules:
+        first = g1.first(simbolo, simbolo)
+        print(f"First de {simbolo[0]}: {first}")
+        #print(simbolo[0])
