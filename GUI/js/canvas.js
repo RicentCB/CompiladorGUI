@@ -123,8 +123,7 @@ function updateHTMLSelectAFN(){
 }
 /* ---- FUNCION QUE GUARDA UN JSON EN LA PILA DE AUTOMATAS ---- */
 function pushAFN(jsonString) {
-    //Insertamos el objeto JSON en arreglo del AFNS
-    arrayAFNS.push(jsonString);
+    arrayAFNS.push(jsonString);//Insertamos el objeto JSON en arreglo del AFNS
 }
 
 //---------------------------------------------------------------
