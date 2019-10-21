@@ -2,5 +2,5 @@ S -> A B C D E ;
 A -> a | Epsilon ;
 B -> b | Epsilon ;
 C -> c ;
-D -> d | Epsilon ;
+D -> ( d  - ) | Epsilon ;
 E -> e | Epsilon ;
