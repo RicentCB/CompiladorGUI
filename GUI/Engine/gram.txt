@@ -1,3 +1,6 @@
-S -> B b | C d ;
-B -> a B | Epsilon ;
-C -> ( - C ? + ) | Epsilon ;
+S -> A B C D E ;
+A -> a | Epsilon ;
+B -> b | Epsilon ;
+C -> c ;
+D -> d | Epsilon ;
+E -> e | Epsilon ;
