@@ -1,4 +1,6 @@
 import sys
+import pickle
+
 from alphabet import Alphabet
 from alphabet import Token
 from regEx import RegularExp
@@ -22,16 +24,29 @@ class Grammar():
                 for car in line:
                     if car != "\n":
                         self.strGrammar += car
+            #Modificar de acuerdo a la ruta especifica
+            #pathLexAn = ""
+            pathLexAn = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/analizadorLexicoGramatica.txt"
             #Crear Analizador Lexico para Gramaticas
-            regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
-            regExp2 = "(-)&(>)"
-            regExp3 = "(;)"
-            regExp4 = "( )+"
-            regExp5 = "(\|)"
-            regExpArray = [regExp1, regExp2, regExp3, regExp4, regExp5]
-            tokenArray = [Token.grammar_SIMBOLO, Token.grammar_FLECHA, Token.grammar_PC, Token.grammar_SPACE, Token.grammar_OR]
-            AFDMain = AFD.createSuperAFD(regExpArray, tokenArray)
-            self.lexAn = LexAnalizer(AFDMain, self.strGrammar)
+            # regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
+            # regExp2 = "(-)&(>)"
+            # regExp3 = "(;)"
+            # regExp4 = "( )+"
+            # regExp5 = "(\|)"
+            # regExpArray = [regExp1, regExp2, regExp3, regExp4, regExp5]
+            # tokenArray = [Token.grammar_SIMBOLO, Token.grammar_FLECHA, Token.grammar_PC, Token.grammar_SPACE, Token.grammar_OR]
+            # AFDMain = AFD.createSuperAFD(regExpArray, tokenArray)
+            # lexAnal = LexAnalizer(AFDMain, self.strGrammar)
+            # #Serializacion de Objeto Analizador Lexico
+            # fileObjWrite = open(pathLexAn, 'wb')
+            # pickle.dump(lexAnal, fileObjWrite)
+            # fileObjWrite.close()
+            #Deserializacion del Objeto
+            fileObjRead = open(pathLexAn, 'rb')
+            objectSerialLexAn = pickle.load(fileObjRead) 
+            fileObjRead.close()
+            #Asignacion
+            self.lexAn = objectSerialLexAn
 
         else:
             sys.exit()
