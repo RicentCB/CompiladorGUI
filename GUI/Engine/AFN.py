@@ -105,7 +105,7 @@ class AFN():
             sys.exit()
 
     #Concatenar dos Automatas        
-    #Recibe un obejto AFN, sobreescribe el automata SELF
+    #Recibe un obejto AFN, retorna un nuevo AFN
     def concatenate(self, AFN2):
         if isinstance(AFN2, AFN):
             #Borramos estados de aceptacion
@@ -132,7 +132,7 @@ class AFN():
             sys.exit()
     
     #Opcional "?"   
-    #Modifica el mismo automata
+    #Retor un nuevo automata
     def optional(self):
         #Eliminar Aceptacion del mismo automata
         self.deleteAcceptState()
