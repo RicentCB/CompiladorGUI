@@ -223,7 +223,7 @@ class Grammar():
                     auxiliar.append(simbolo)
             return auxiliar
 
-    #Esta función determina determina si una regla
+    #Esta función determina si una regla
     #contiene producciones con epsilon, es decir, que 
     #puede ser omitida
     def is_nullable(self, regla):
