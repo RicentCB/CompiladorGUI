@@ -23,7 +23,7 @@ class Grammar():
                     if car != "\n":
                         self.strGrammar += car
             #Crear Analizador Lexico para Gramaticas
-            regExp1 = "((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*"
+            regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
             regExp2 = "(-)&(>)"
             regExp3 = "(;)"
             regExp4 = "( )+"
@@ -186,6 +186,7 @@ class Grammar():
         self.status(status)
         return True
 
+    # --- TERMINA DESCENO RECURSIVO ----
     def simbolos_NoTerminales(self):
         terminales = []
         for rule in self.rules:
@@ -249,7 +250,8 @@ class Grammar():
 
 
 if __name__ == "__main__":
-    path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
+    path = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/gram.txt" #Belmont
+    # path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
     g1 = Grammar(path)
     g1.G()
     # no_terminales = g1.simbolos_NoTerminales()
