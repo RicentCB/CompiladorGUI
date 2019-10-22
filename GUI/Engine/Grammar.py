@@ -36,17 +36,18 @@ class Grammar():
             # regExpArray = [regExp1, regExp2, regExp3, regExp4, regExp5]
             # tokenArray = [Token.grammar_SIMBOLO, Token.grammar_FLECHA, Token.grammar_PC, Token.grammar_SPACE, Token.grammar_OR]
             # AFDMain = AFD.createSuperAFD(regExpArray, tokenArray)
-            # lexAnal = LexAnalizer(AFDMain, self.strGrammar)
-            # #Serializacion de Objeto Analizador Lexico
+            # #Serializacion de Objeto Super AFD
             # fileObjWrite = open(pathLexAn, 'wb')
-            # pickle.dump(lexAnal, fileObjWrite)
+            # pickle.dump(AFDMain, fileObjWrite)
             # fileObjWrite.close()
             #Deserializacion del Objeto
             fileObjRead = open(pathLexAn, 'rb')
-            objectSerialLexAn = pickle.load(fileObjRead) 
+            objectSerialAFD = pickle.load(fileObjRead) 
             fileObjRead.close()
+            #Construir Analizador lexico
+            lexAnal = LexAnalizer(objectSerialAFD, self.strGrammar)
             #Asignacion
-            self.lexAn = objectSerialLexAn
+            self.lexAn = lexAnal
 
         else:
             sys.exit()
