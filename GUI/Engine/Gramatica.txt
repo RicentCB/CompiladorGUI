@@ -7,4 +7,3 @@ LadosDerechos -> ListaSimbolos LadosDerechosP ;
 LadosDerechosP -> OR ListaSimbolos LadosDerechosP | Epsilon ;
 ListaSimbolos -> SIMBOLO ListaSimbolos' ;
 ListaSimbolos' -> SIMBOLO ListaSimbolos' | Epsilon ;
-
