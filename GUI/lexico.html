@@ -1,0 +1,87 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Place favicon.ico in the root directory -->
+    <link href="https://fonts.googleapis.com/css?family=Fjalla+One|Oswald|Quicksand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/normalize.css">
+    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.1/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/style.css" media="">
+
+    <meta name="theme-color" content="#fafafa">
+    <!-- S C R I P T S -->
+    <script src="https://kit.fontawesome.com/faf5c76420.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <aside class="menu-side">
+        <ul>
+            <li class="title-menu">
+                <a href="#">Menu Principal</a>
+            </li>
+            <li class="menu-element">
+                <a href="index.html"><i class="fas fa-home"></i>Inicio</a>
+            </li>
+            <li class="menu-element">
+                <a href="afn.html"><i class="fas fa-edit"></i>AFN</a>
+            </li>
+            <li class="menu-element active">
+                <a href="lexico.html"><i class="fab fa-adn"></i>Lexico</a>
+            </li>
+        </ul>
+    </aside>
+    <main>
+        <h1 class="main-title">Analizador Lexico</h1>
+        <p>
+            En esta secci&oacute;n podras realizar <b>anlizadores lexicos con expresiones regulares</b>, dichas 
+            expresiones estaran dadas por cualquiera caracter, <b>excluyendo: '(', ')', '&', '|', '+', '*', '?'.</b>
+            <br>
+            Ya que dichos simbolos son usados para hacer las operaciones con dichas expresiones:
+        </p>
+        <ul>
+            <li> + : Cerradura Positiva</li>
+            <li> + : Cerradura Estrella</li>
+            <li> & : Concatenacion</li>
+            <li> | : Pipe u operacion OR</li>
+            <li> ? : Opcional</li>
+            <li> (): Usados para albergar otra expresion</li>
+        </ul>
+        <br>
+        <p>
+            Si fuese <b>necesario hacer uso de estos simbolos "exclusivos"</b>, solo es necesario <b>antecederlos con una diagonal invertida '\'.</b>
+            Ademas las <b>expresiones puede ser usadas con rangos</b>, como: "A-Z", "a-z", "0-9". Se puede hacer uso de rangos contenidos en estos;
+            por ejemplo: "C-M", "2-5".
+            <br>
+            <br>
+            Pero <b>nunca mezclando rangos</b> entre ellos como "a-K", "0-z", "A-3", etc...
+        </p>
+        <p>
+            Se tiene que </b>asignar un token cada expresion regular.</b> 
+            Con dichas expresion se <b>podra analizar una cadena, y el resultado sera el los "tokens"</b> asociados a dicha cadena,
+            si <b>no se correspondiera con alguna expresion regular</b> el token devuelto sera = <b>-1</b> 
+        </p>
+        <section class="input-container" id="regular-expression-continer">
+
+        </section>
+
+
+
+    </main>
+
+    <script src="js/vendor/modernizr-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+    <script src="js/plugins.js"></script>
+    <script src="js/main.js"></script>
+    <!-- You can also require other files to run in this process -->
+    <script src="./renderer.js"></script>
+  
+</body>
+
+</html>

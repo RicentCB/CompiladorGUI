@@ -26,7 +26,7 @@ ul{
     list-style: none;
     box-sizing: border-box;
 }
-ol{
+ol, ul{
     font-family: 'Quicksand', sans-serif;
 }
 a.btn{
