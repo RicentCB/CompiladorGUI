@@ -26,27 +26,27 @@ class Grammar():
                         self.strGrammar += car
             #Modificar de acuerdo a la ruta especifica
             #pathLexAn = ""
-            pathLexAn = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/analizadorLexicoGramatica.txt"
+            #pathLexAn = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/analizadorLexicoGramatica.txt"
             #Crear Analizador Lexico para Gramaticas
-            # regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
-            # regExp2 = "(-)&(>)"
-            # regExp3 = "(;)"
-            # regExp4 = "( )+"
-            # regExp5 = "(\|)"
-            # regExpArray = [regExp1, regExp2, regExp3, regExp4, regExp5]
-            # tokenArray = [Token.grammar_SIMBOLO, Token.grammar_FLECHA, Token.grammar_PC, Token.grammar_SPACE, Token.grammar_OR]
-            # AFDMain = AFD.createSuperAFD(regExpArray, tokenArray)
-            # lexAnal = LexAnalizer(AFDMain, self.strGrammar)
+            regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
+            regExp2 = "(-)&(>)"
+            regExp3 = "(;)"
+            regExp4 = "( )+"
+            regExp5 = "(\|)"
+            regExpArray = [regExp1, regExp2, regExp3, regExp4, regExp5]
+            tokenArray = [Token.grammar_SIMBOLO, Token.grammar_FLECHA, Token.grammar_PC, Token.grammar_SPACE, Token.grammar_OR]
+            AFDMain = AFD.createSuperAFD(regExpArray, tokenArray)
+            lexAnal = LexAnalizer(AFDMain, self.strGrammar)
             # #Serializacion de Objeto Analizador Lexico
             # fileObjWrite = open(pathLexAn, 'wb')
             # pickle.dump(lexAnal, fileObjWrite)
             # fileObjWrite.close()
             #Deserializacion del Objeto
-            fileObjRead = open(pathLexAn, 'rb')
-            objectSerialLexAn = pickle.load(fileObjRead) 
-            fileObjRead.close()
+            # fileObjRead = open(pathLexAn, 'rb')
+            # objectSerialLexAn = pickle.load(fileObjRead) 
+            # fileObjRead.close()
             #Asignacion
-            self.lexAn = objectSerialLexAn
+            self.lexAn = lexAnal
 
         else:
             sys.exit()
@@ -223,7 +223,6 @@ class Grammar():
         if(regla[0]=="Epsilon"):    
             #c_first.append(regla[0])
             return regla[0]
-
         elif regla[0] in terminales:
             #c_first.append(regla[0])
             return regla[0]
@@ -232,7 +231,6 @@ class Grammar():
             #contador = 0
             for rule in self.rules:
                 if rule[0]==regla[0]:
-                    
                     if self.is_nullable(regla[0]) == False:
                         first_auxiliar = self.first(rule[1],rule[1])
                         if isinstance(first_auxiliar, str):
@@ -286,37 +284,107 @@ class Grammar():
                 if 'Epsilon' in rule[1]:
                     nullable = True
         return nullable
-    # def follow(self, s_noTerminal):
-    #     c_follow = []
-    #     if(s_noTerminal==self.rules[0][0]):
-    #         c_follow.append("$")
-    #         return c_follow
-    #     for rule in self.rules:
-    #         if s_noTerminal in rule[1]:
-    #             if(rule[1].index(s_noTerminal)):
-    #                 print("Si jala")
-                
+    def follow(self, s_noTerminal):
+        eliminar_epsilon = False
+        c_follow = []
+        ocurrencias = 0
+        reglas_auxiliar = []
+        for rule in self.rules:
+            if s_noTerminal in rule[1]:
+                ocurrencias = ocurrencias+1
+                reglas_auxiliar.append(rule)
+        if(s_noTerminal==self.rules[0][0] and ocurrencias == 0):
+            return ['$']
+        if(s_noTerminal==self.rules[0][0]):
+            c_follow.append("$")
+        for rule in reglas_auxiliar:
+            if s_noTerminal in rule[1] and rule[1].index(s_noTerminal) < len(rule[1])-1:
+                indice = rule[1].index(s_noTerminal)+1
+                first_auxiliar = self.first([rule[1][indice]])
+                if self.is_nullable([rule[1][indice]]):
+                    follow_auxiliar = self.follow(rule[1][indice])
+                    if isinstance(first_auxiliar,str):
+                        c_follow.append(first_auxiliar)
+                    else:
+                        c_follow = c_follow + first_auxiliar
+                    if isinstance(follow_auxiliar,str):
+                        c_follow.append(follow_auxiliar)
+                    else:
+                        c_follow = c_follow + follow_auxiliar
+                    eliminar_epsilon = True
+                else:
+                    if isinstance(first_auxiliar,str):
+                        c_follow.append(first_auxiliar)
+                    else:
+                        c_follow = c_follow + first_auxiliar
+                if eliminar_epsilon:
+                    c_follow.remove('Epsilon')
+                return c_follow
+            elif s_noTerminal in rule[1] and rule[1].index(s_noTerminal) == len(rule[1])-1:
+                auxiliar = self.follow(rule[0])
+                if isinstance(auxiliar,str):
+                    c_follow.append(auxiliar)
+                else:
+                    c_follow = c_follow + auxiliar
+                return c_follow
+    
+    def set_table_LL1(self): 
+        terminales = list(self.simbolosTerminales())
+        terminales.append('$')
+        terminales.remove('Epsilon')
+        no_terminales = list(self.simbolos_NoTerminales())
+        no_terminales.append('$')
+        #Llenamos la tabla con los no terminales en la cabecera y los terminales en el principio
+        tabla_ll1 = [[no_terminales[j-1] if i==0 and j>0 else ' ' for i in range(len(terminales)+1)] for j in range(len(no_terminales)+1)]
+        tabla_ll1[0] = list(set(tabla_ll1[0]))+terminales
+        #Obtenemos el contenido de la tabla
+        n_regla = 1
+        for rule in self.rules:
+            first_aux = self.first(rule[1])
+            if 'Epsilon' in first_aux:
+                follow_aux = self.follow(rule[0])
+                insertar(tabla_ll1,rule[0], follow_aux,n_regla,rule[1])
+            else:
+               insertar(tabla_ll1,rule[0],first_aux,n_regla,rule[1])
+            n_regla = n_regla+1
+        for tupla in tabla_ll1:
+            print(tupla)
+        # print(no_terminales)
 
+
+def insertar(tabla,no_terminal, simbolos, num_regla,regla):
+    for tupla in tabla:
+        if no_terminal == tupla[0]:
+            indice1 = tabla.index(tupla)
+    indice2 = []
+    for terminal in tabla[0]:
+        for simbolo in simbolos:
+            if terminal == simbolo:
+                indice2.append(tabla[0].index(terminal))
+    # print(f"Indice de {no_terminal}: {indice1}")
+    # print(f"Indices de {simbolos}: {indice2}")
+    cad = "{0},{1}".format(regla,num_regla)
+    for indice in indice2:
+        tabla[indice1][indice] = cad
+
+
+
+            
+
+            
 
 if __name__ == "__main__":
-    path = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/gram.txt" #Belmont
-    # path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
+    #path = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/gram.txt" #Belmont
+    path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
     g1 = Grammar(path)
     g1.G()
-    # no_terminales = g1.simbolos_NoTerminales()
-    # terminales = g1.simbolosTerminales()
+    no_terminales = g1.simbolos_NoTerminales()
+    terminales = g1.simbolosTerminales()
     for rule in g1.rules:
-        print(rule)
-    #print(g1.rules[0][0])
-    # print("---Simbolos terminales---")
-    # for simbolo in terminales:
-    #     print(simbolo)
-    # print("---Simbolos no terminales---")
+        print(rule)    
+    # print("---first----")
     # for simbolo in no_terminales:
-    #     print(simbolo)
-    # print(g1.rules[4])
-    print("---First---")
-    for simbolo in g1.rules:
-        first = g1.first(simbolo, simbolo)
-        print(f"First de {simbolo[0]}: {first}")
-        #print(simbolo[0])
+    #     print(f"First de {simbolo}: {g1.follow(simbolo)}")
+    print("-------ll1--------")
+    g1.set_table_LL1()
+    
