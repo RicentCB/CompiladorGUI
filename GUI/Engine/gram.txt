@@ -1,5 +1,6 @@
-T -> T Ep ;
-Ep -> + T Ep | Epsilon ;
-T -> F Tp ;
-Tp -> * F TP | Epsilon ;
-F -> id | ( E ) ;
+S -> a A C | B b ;
+A -> e D ;
+B -> f | g ;
+C -> h | i ;
+D -> b E | Epsilon ;
+E -> e D | d D ;
