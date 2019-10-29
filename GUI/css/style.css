@@ -289,8 +289,11 @@ table{
     text-align: right;
 }
 .create-table-result table tbody td{
-    background-color: rgb(231, 231, 231);
+    background-color: rgb(211, 211, 211);
     padding: 4px 20px;
+}
+.create-table-result table tbody td.td-white{
+    background-color: rgb(241, 241, 241);
 }
 .create-table-result table tbody tr td:first-child{
     background-color: #575757;
