@@ -25,27 +25,27 @@ class Grammar():
                     if car != "\n":
                         self.strGrammar += car
             #Modificar de acuerdo a la ruta especifica
-            #pathLexAn = ""
+            pathLexAn = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/analizadorLexicoGramatica.txt"
             #pathLexAn = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/analizadorLexicoGramatica.txt"
             #Crear Analizador Lexico para Gramaticas
-            regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
-            regExp2 = "(-)&(>)"
-            regExp3 = "(;)"
-            regExp4 = "( )+"
-            regExp5 = "(\|)"
-            regExpArray = [regExp1, regExp2, regExp3, regExp4, regExp5]
-            tokenArray = [Token.grammar_SIMBOLO, Token.grammar_FLECHA, Token.grammar_PC, Token.grammar_SPACE, Token.grammar_OR]
-            AFDMain = AFD.createSuperAFD(regExpArray, tokenArray)
-            lexAnal = LexAnalizer(AFDMain, self.strGrammar)
-            # #Serializacion de Objeto Analizador Lexico
+            # regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
+            # regExp2 = "(-)&(>)"
+            # regExp3 = "(;)"
+            # regExp4 = "( )+"
+            # regExp5 = "(\|)"
+            # regExpArray = [regExp1, regExp2, regExp3, regExp4, regExp5]
+            # tokenArray = [Token.grammar_SIMBOLO, Token.grammar_FLECHA, Token.grammar_PC, Token.grammar_SPACE, Token.grammar_OR]
+            # AFDMain = AFD.createSuperAFD(regExpArray, tokenArray)
+            # #Serializacion de Objeto AFDN MAIN
             # fileObjWrite = open(pathLexAn, 'wb')
-            # pickle.dump(lexAnal, fileObjWrite)
+            # pickle.dump(AFDMain, fileObjWrite)
             # fileObjWrite.close()
-            #Deserializacion del Objeto
-            # fileObjRead = open(pathLexAn, 'rb')
-            # objectSerialLexAn = pickle.load(fileObjRead) 
-            # fileObjRead.close()
+            # Deserializacion del Objeto
+            fileObjRead = open(pathLexAn, 'rb')
+            objectSerialAFD = pickle.load(fileObjRead) 
+            fileObjRead.close()
             #Asignacion
+            lexAnal = LexAnalizer(objectSerialAFD, self.strGrammar)
             self.lexAn = lexAnal
 
         else:
@@ -329,6 +329,7 @@ class Grammar():
                 return c_follow
     
     def set_table_LL1(self): 
+        self.G()
         terminales = list(self.simbolosTerminales())
         terminales.append('$')
         terminales.remove('Epsilon')
@@ -347,9 +348,11 @@ class Grammar():
             else:
                insertar(tabla_ll1,rule[0],first_aux,n_regla,rule[1])
             n_regla = n_regla+1
-        for tupla in tabla_ll1:
-            print(tupla)
-        # print(no_terminales)
+        
+        body =[]
+        for cont in range (1,len(tabla_ll1)):
+            body.append(tabla_ll1[cont])
+        return tabla_ll1[0], body
 
 
 def insertar(tabla,no_terminal, simbolos, num_regla,regla):
@@ -374,17 +377,16 @@ def insertar(tabla,no_terminal, simbolos, num_regla,regla):
             
 
 if __name__ == "__main__":
-    #path = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/gram.txt" #Belmont
-    path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
+    path = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/gram.txt" #Belmont
+    #path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
     g1 = Grammar(path)
-    g1.G()
-    no_terminales = g1.simbolos_NoTerminales()
-    terminales = g1.simbolosTerminales()
-    for rule in g1.rules:
-        print(rule)    
     # print("---first----")
     # for simbolo in no_terminales:
     #     print(f"First de {simbolo}: {g1.follow(simbolo)}")
     print("-------ll1--------")
-    g1.set_table_LL1()
+    head, body = g1.set_table_LL1()
+    print("HD")
+    print(head)
+    print("BD")
+    print(body)
     
