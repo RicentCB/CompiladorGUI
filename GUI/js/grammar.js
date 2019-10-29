@@ -40,7 +40,7 @@ $(document).ready(function(){
                 //Insertar JSON en Arreglo
                 console.log(jsonString);
                 if (jsonString["message"] == true){
-                    Swal.fire("Gramatica Acpetada", "", "success");
+                    Swal.fire("Gramatica Aceptada", "", "success");
                     //Creamos la tabla
                     
                     //Construir la tabla con json generado
