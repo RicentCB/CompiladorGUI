@@ -3,6 +3,7 @@ import json
 import pickle
 from AFN import AFN
 from state import State
+from Grammar import Grammar
 
 
 #Funcion que retorna el id mas grande de todos los AFNS insertados
@@ -46,7 +47,7 @@ if len(sys.argv) > 5:
 else:   #Numero de argumentos valido
     if(sys.argv[1] == "AFN"):
         #Leer el archivo de objetos serializados
-        fileAFN = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/AFNS.txt"
+        fileAFN = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/AFNS.txt"
         #Enviar Ultimo Id a la Clase Estado
         setLastIdState(fileAFN)
         if (sys.argv[2] == "Inicializar"):  #Inicializa Arreglo de Automtas
@@ -130,3 +131,13 @@ else:   #Numero de argumentos valido
         
         else:
             print(json.dumps({"message": "Error opcion AFN no valida"}));
+    #Opciones de Gramatica
+    elif(sys.argv[1] == "Grammar"):
+        if(sys.argv[2] == "Path"):
+            #Creamos un objeto gramatica y lo serializamos
+            gram = Grammar(sys.argv[3])
+            head, body = gram.set_table_LL1()
+            print(json.dumps({"Head":head, "Body":body, "message": True}))
+        
+        else:
+            print(json.dumps({"message": "Error opcion Grammar no valida"}));

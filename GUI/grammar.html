@@ -16,6 +16,7 @@
 
     <meta name="theme-color" content="#fafafa">
     <!-- S C R I P T S -->
+    <script src="plugins/sweetalert/sweetalert2.all.min.js"></script>
     <script src="https://kit.fontawesome.com/faf5c76420.js" crossorigin="anonymous"></script>
 </head>
 
@@ -25,7 +26,7 @@
             <li class="title-menu">
                 <a href="#">Menu Principal</a>
             </li>
-            <li class="menu-element active">
+            <li class="menu-element">
                 <a href="index.html"><i class="fas fa-home"></i>Inicio</a>
             </li>
             <li class="menu-element">
@@ -34,36 +35,45 @@
             <li class="menu-element">
                 <a href="lexico.html"><i class="fab fa-adn"></i>Lexico</a>
             </li>
-            <li class="menu-element">
+            <li class="menu-element active">
                 <a href="grammar.html"><i class="fas fa-font"></i>Gramatica</a>
             </li>
+            
         </ul>
     </aside>
-    <main>
-        <h1 class="main-title">Compiladores</h1>
-        <p>
-            Esta es una herramienta cuya interfaz se basa en Electron JS, puede correr en cualquier SO, 
-            siempre y cuando se tenga instalado NodeJS y Python (Version 3 o superior), es necesario descargar
-            el proyecto basico de la pagina de Electron JS y copiar la carpeta "node_modules" en el directorio
-            "GUI".
+    <main id="grammar">
+        <h1 class="main-title">Gramatica</h1>
+        <p class="col-50">
+            En este apartado crearas una un analizador sintactico de tipo LL1, dado una gramatica como entrada
+            <br>
+            <br>
+            Todas las reglas de la gramatica deberan estar constriudas de la siguiente manera:
         </p>
-        <br>
-        <p>
-            En el menu lateral encontraras las principales opciones del fucionamiento de esta aplicacion, como lo son:
-            <ol>
-               <li>Crear un AFN</li> 
-               <li>Analizar una cadena con expresion regulares</li>
-            </ol>
+        <p class="col-50" style="background-color: #94cde7;">
+            S -> a A C | B b c; <br>
+            A -> e D ; <br>
+            B -> f | g ; <br>
+            C -> h | i ; <br>
+            D -> b E | &#949; ; <br>
+            E -> e D | d D | &#949; | c; <br>
         </p>
-        
+        <p style="text-align: center">Selecciona el archivo de entrada</p>
+        <div class="uplod-file">
+            <input type="file" id="file-input-grammar"/>
+            <label for="file-input-grammar" class="btn-2">Subir Archivo</label>
+        </div>
+        <section class="create-table-result" id="grammar-ll1">
+            <!-- ADD TABLE WITH JS -->
+        </section>
+
+
 
     </main>
 
     <script src="js/vendor/modernizr-3.7.1.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
-    <script src="js/plugins.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/grammar.js"></script>
     <!-- You can also require other files to run in this process -->
     <script src="./renderer.js"></script>
   

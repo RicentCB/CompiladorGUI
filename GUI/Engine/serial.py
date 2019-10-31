@@ -2,7 +2,7 @@ import pickle
 
 # data = []
 
-file_name = "/home/ricardo/ESCOM/5 Semestre/Compiladores/CompiladorGUI/GUI/Engine/AFNS.txt"
+file_name = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/AFNS.txt"
 # fileObject = open(file_name, 'wb')
 
 #Escribir el objeto
