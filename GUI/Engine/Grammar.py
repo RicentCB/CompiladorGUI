@@ -331,7 +331,8 @@ class Grammar():
     def set_table_LL1(self): 
         terminales = list(self.simbolosTerminales())
         terminales.append('$')
-        terminales.remove('Epsilon')
+        if 'Epsilon' in terminales:
+            terminales.remove('Epsilon')
         no_terminales = list(self.simbolos_NoTerminales())
         no_terminales.append('$')
         #Llenamos la tabla con los no terminales en la cabecera y los terminales en el principio
