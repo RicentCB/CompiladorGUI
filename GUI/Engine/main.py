@@ -51,7 +51,7 @@ else:   #Numero de argumentos valido
         #Enviar Ultimo Id a la Clase Estado
         setLastIdState(fileAFN)
         if (sys.argv[2] == "Inicializar"):  #Inicializa Arreglo de Automtas
-            array = []
+            array = list()
             fileObjWrite = open(fileAFN, 'wb')
             pickle.dump(array,fileObjWrite)
             fileObjWrite.close()
@@ -136,7 +136,7 @@ else:   #Numero de argumentos valido
         if(sys.argv[2] == "Path"):
             #Creamos un objeto gramatica y lo serializamos
             gram = Grammar(sys.argv[3])
-            head, body = gram.set_table_LL1()
+            head, body = gram.creatTableLL1()
             print(json.dumps({"Head":head, "Body":body, "message": True}))
         
         else:

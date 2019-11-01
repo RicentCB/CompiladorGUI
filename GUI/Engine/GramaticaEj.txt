@@ -1,4 +1,5 @@
-Ep -> Er;
-Er -> Epa fg | Ta Fo Fi Fila Numero | Fila De Numeros;
-Ta -> T1 F1 | Fila | Fila de Numeros22;
-F1 -> Epa eeee; 
+E  -> T E';
+E' -> + T E' | Epsilon;
+T  -> F T' ;
+T' -> * F T' | Epsilon;
+F  -> a | ( E );
