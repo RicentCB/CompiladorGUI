@@ -56,11 +56,15 @@ $(document).ready(function(){
                     for (let i = 0; i < jsonString.Body.length; i++) {
                         strTable += "<tr>";
                         for (let j = 0; j < jsonString.Body[0].length; j++) {
-                            if(jsonString.Body[i][j] == " "){
+                            if (j == jsonString.Body[0].length -1 && i==jsonString.Body.length-1){
+                                strTable += "<td class='td-accept'>Aceptar</td>"
+                            }
+                            else if(jsonString.Body[i][j] == " "){
                                 strTable += "<td class='td-white'></td>"
                             }else{
                                 strTable += "<td>"+jsonString.Body[i][j]+"</td>";                
                             }
+
                         }
                         strTable += "</tr>";
                         

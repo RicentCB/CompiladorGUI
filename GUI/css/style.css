@@ -276,7 +276,6 @@ table{
     background-color: rgb(114, 114, 114);
     color: white;
     text-align: center;
-    text-transform: uppercase;
     font-weight: bold;
     font-size: 1.1em;
 }
@@ -291,9 +290,14 @@ table{
 .create-table-result table tbody td{
     background-color: rgb(211, 211, 211);
     padding: 4px 20px;
+    text-align: center;
 }
 .create-table-result table tbody td.td-white{
     background-color: rgb(241, 241, 241);
+}
+.create-table-result table tbody td.td-accept{
+    background-color: rgb(15, 150, 15);
+    color: white;
 }
 .create-table-result table tbody tr td:first-child{
     background-color: #575757;
