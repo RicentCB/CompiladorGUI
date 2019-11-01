@@ -11,6 +11,10 @@ class Alphabet():
     symbol_CONC = '&'   #  &
     symbol_PARI = '('   #  (
     symbol_PARD = ')'   #  )
+    #Gramatica
+    # symbol_EPSILON = "ε"
+    symbol_EPSILON = "Epsilon"
+    symbol_STRINGEND = "$"
 
 
 class Token():
