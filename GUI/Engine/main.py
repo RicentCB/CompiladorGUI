@@ -153,7 +153,7 @@ else:   #Numero de argumentos valido
             #Analizar la cadena
             # arrayRegExStr = sys.argv[4]
             arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
-            stack, string, action = gramObj.analizeStr(sys.argv[3], arrayRegExStr)
+            stack, string, action = gramObj.analizeStr(sys.argv[3])
             print(json.dumps({"Stack":stack, "String":string, "Action":action, "message":True}))
         else:
             print(json.dumps({"message": "Error opcion Grammar no valida"}));
