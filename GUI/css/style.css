@@ -51,6 +51,30 @@ body{
     overflow: hidden;
     display: flex;
 }
+section input{
+    font-family: 'Quicksand', sans-serif;
+}
+
+section input[type="text"]{
+    padding: 10px;
+    margin: 10px 0;
+    width: 40%;
+}
+section input[type="submit"]{
+    background-color: #22a5f1;
+    border: 0;
+    border-radius: 2em;
+    cursor: pointer;
+    color: #fff;
+    font-size:16px;
+    font-weight: bold;
+    line-height: 1.4;
+    padding: 10px;
+    width: 20%;
+}
+section{
+    padding-bottom: 25px;
+}
 /* ----------------  A S I D E   M E N U  ---------------- */
 aside.menu-side{
     flex: 1;
@@ -267,11 +291,9 @@ table{
     font-family: 'Quicksand', sans-serif;
     border-color: black;
     border-width: 5px;
-}
-.create-table-result table{
     width: 100%;
 }
-.create-table-result table thead{
+table thead{
     width: 100%;
     background-color: rgb(114, 114, 114);
     color: white;
@@ -279,15 +301,19 @@ table{
     font-weight: bold;
     font-size: 1.1em;
 }
-.create-table-result table thead td{
+table.title-upper th{
+    font-size: 1.2em;
+    text-transform: uppercase;
+}
+table thead td{
     padding: 7px 0;
 }
-.create-table-result table tbody{
+table tbody{
     width: 100%;
     background-color: rgb(247, 252, 221);
     text-align: right;
 }
-.create-table-result table tbody td{
+table tbody td{
     background-color: rgb(211, 211, 211);
     padding: 4px 20px;
     text-align: center;
@@ -305,6 +331,23 @@ table{
     text-align: center;
     font-weight: bold;
     font-size: 1.1em;
+}
+.one-input{
+    text-align: center;
+}
+.one-input label{
+    margin-right: 10px;
+}
+.one-input input[type="submit"]{
+    margin-left: 25px;
+}
+
+#regsAnalizeString table{
+    width: 80%;
+    margin: 0 auto;
+}
+table.title-upper th{
+    text-transform: uppercase;
 }
 /*  -----------------------------  H E L P E R    C L A S S  -----------------------------  */
 p.col-50{

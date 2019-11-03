@@ -24,23 +24,27 @@ $(document).ready(function(){
 
     let btnGetFile = $("main#grammar #file-input-grammar");
     let containerTable = $("main#grammar .create-table-result#grammar-ll1");
+    let containerAnString = $("#analizeStr")
     
     btnGetFile.change(function (e){
         let fileIn = e.target.files[0];
+        containerTable.html("")
+        containerAnString.slideUp();
         if(fileIn.type != "text/plain"){
             swal.fire("Error", "Solo archivos (*.txt)", "error");
         }else{
             //NO hay error en el tipo de archivo
-            console.log()
             //Llamamos al metodo de Python
             optionsPython.args = ["Grammar", "Path", fileIn.path]
-
             let resultPython = new PythonShell('main.py', optionsPython);
             resultPython.on('message', function (jsonString) {
                 //Insertar JSON en Arreglo
                 console.log(jsonString);
                 if (jsonString["message"] == true){
                     Swal.fire("Gramatica Aceptada", "", "success");
+                    containerAnString.slideDown();
+                    containerAnString.find("#regsAnalizeString").html("")
+                    containerAnString.find("#inStringAnGrammar").val("")
                     //Creamos la tabla
                     
                     //Construir la tabla con json generado
@@ -83,6 +87,54 @@ $(document).ready(function(){
             });
         }
         
+    })
+    //-------------- ANALIZAR CADENA --------------------
+    let sectionAnString = containerAnString.find("#inputString")
+    let btnAnString = sectionAnString.find("#btnStringAnGrammar")
+    btnAnString.click(function(e){
+        e.preventDefault();
+        let valString = sectionAnString.find("#inStringAnGrammar").val();
+        optionsPython.args = ["Grammar", "String", valString]
+
+        let resultPython = new PythonShell('main.py', optionsPython);
+        resultPython.on('message', function (jsonString) {
+            if (jsonString["message"] == true){
+                let tableString = containerAnString.find("#regsAnalizeString");
+                Swal.fire("Cadena Aceptada", "", "success");
+                //Construir la tabla con json generado
+                let strTable = "<table class='title-upper'>";
+                //Agregar Encabezado
+                strTable += "<thead><tr>";
+                    strTable += "<th>Pila</th>"
+                    strTable += "<th>Cadena</th>"
+                    strTable += "<th>Accion</th>"
+                    
+                strTable += "</tr></thead>";
+                //Agregar cuerpo
+                strTable += "<tbody>";
+                for (let i = 0; i < jsonString.Action.length; i++) {
+                    strTable += "<tr>";
+                        strTable += "<td>"+jsonString.Stack[i]+"</td>"
+                        strTable += "<td>"+jsonString.String[i]+"</td>"
+                        strTable += "<td>"+jsonString.Action[i]+"</td>"
+                    strTable += "</tr>";
+                }
+                strTable += "</tbody>";
+                strTable += "</table>";
+                //Insertar el Nodo
+                tableString.html("");
+                tableString.append(strTable);
+                
+            }
+            else{
+                swal.fire("Error en la gramatica", "", "error");
+                console.log(jsonString["message"])
+            }
+        });
+        
+                
+            
+            
     })
 
 })
