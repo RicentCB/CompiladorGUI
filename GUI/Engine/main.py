@@ -47,7 +47,7 @@ if len(sys.argv) > 5:
 else:   #Numero de argumentos valido
     if(sys.argv[1] == "AFN"):
         #Leer el archivo de objetos serializados
-        fileAFN = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/AFNS.txt"
+        fileAFN = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/AFNS.txt"
         #Enviar Ultimo Id a la Clase Estado
         setLastIdState(fileAFN)
         if (sys.argv[2] == "Inicializar"):  #Inicializa Arreglo de Automtas
@@ -133,11 +133,27 @@ else:   #Numero de argumentos valido
             print(json.dumps({"message": "Error opcion AFN no valida"}));
     #Opciones de Gramatica
     elif(sys.argv[1] == "Grammar"):
+        fileGrammar = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/grammar.txt"
         if(sys.argv[2] == "Path"):
-            #Creamos un objeto gramatica y lo serializamos
-            gram = Grammar(sys.argv[3])
-            head, body = gram.creatTableLL1()
+            #Creamos un objeto gramatica y guardamos 
+            fileObjectGrammar = open(fileGrammar, 'wb')
+            gramObject = Grammar(sys.argv[3])
+            pickle.dump(sys.argv[3], fileObjectGrammar)
+            fileObjectGrammar.close()
+            #Crear tabla ll1 y mostrarla
+            head, body = gramObject.creatTableLL1()
             print(json.dumps({"Head":head, "Body":body, "message": True}))
-        
+        #Analizar una cadena
+        elif(sys.argv[2] == "String"):
+            fileObjRead = open(fileGrammar, 'rb')
+            pathStringGrammar = pickle.load(fileObjRead) 
+            fileObjRead.close()
+            #Creamos la gramatica
+            gramObj = Grammar(pathStringGrammar)
+            #Analizar la cadena
+            # arrayRegExStr = sys.argv[4]
+            arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
+            stack, string, action = gramObj.analizeStr(sys.argv[3], arrayRegExStr)
+            print(json.dumps({"Stack":stack, "String":string, "Action":action, "message":True}))
         else:
             print(json.dumps({"message": "Error opcion Grammar no valida"}));

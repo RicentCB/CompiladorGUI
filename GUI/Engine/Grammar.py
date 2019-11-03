@@ -28,7 +28,7 @@ class Grammar():
                     if car != "\n":
                         self.strGrammar += car
             #Modificar de acuerdo a la ruta especifica
-            pathLexAn = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/analizadorLexicoGramatica.txt"
+            pathLexAn = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/analizadorLexicoGramatica.txt"
             #pathLexAn = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/analizadorLexicoGramatica.txt"
             #Crear Analizador Lexico para Gramaticas
             # regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
@@ -361,6 +361,45 @@ class Grammar():
             body.append(tabla_ll1[cont])
         return tabla_ll1[0], body
     
+    #Metodo que crea un analizador un AFD que servirara para el analziador lexico
+    #  dado simbolos terminales de la gramatica
+    def createAFDGram(self, arrayTermSym):
+        arrayRegExp = list()
+        arrayToken = list()
+        cont = 10
+        for elem in arrayTermSym:
+            if elem == Alphabet.symbol_INTER:
+                arrayRegExp.append("(\?)")
+            elif elem == Alphabet.symbol_CONC:
+                arrayRegExp.append("(\&)")
+            elif elem == Alphabet.symbol_PLUS:
+                arrayRegExp.append("(\+)")
+            elif elem == Alphabet.symbol_STAR:
+                arrayRegExp.append("(\*)")
+            elif elem == Alphabet.symbol_MINUS:
+                arrayRegExp.append("(-)")
+            elif elem == Alphabet.symbol_PARI:
+                arrayRegExp.append("(\()")
+            elif elem == Alphabet.symbol_PARD:
+                arrayRegExp.append("(\)")
+            elif elem == Alphabet.ENUM_NUM:
+                arrayRegExp.append("(0-9)")
+            elif elem == Alphabet.ENUM_MIN:
+                arrayRegExp.append("(a-z)")
+            elif elem == Alphabet.ENUM_MAY:
+                arrayRegExp.append("(A-Z)")
+            elif elem == Alphabet.ENUM_LETT:
+                arrayRegExp.append("(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)*))")
+            else:
+                arrayRegExp.append("({0})".format(elem))
+            #Token
+            arrayToken.append(cont)
+            cont += 10
+        #Crear AFD
+        AFDMain = AFD.createSuperAFD(arrayRegExp, arrayToken)
+        return AFDMain, arrayToken
+
+    
     #Metodo que devuelve la "accion" dado el simbolo NO terminal, y otro simbolo
     def findAction(self, notTermSym, thermSym, table):    
         for row in table[1]:
@@ -381,79 +420,88 @@ class Grammar():
         #No se encontro el simbolo no terminal
         return False
     
-
     #Funcion que analiza una cadena de la gramatica, 
     # devolvera 3 arreglos de "historial" (Pila, cadena, accion)
     def analizeStr(self, stringAn, arrayRegExp):
+        #Pedir Tabla de acciones
+        headTb, bodyTb = self.creatTableLL1()
+        tableAction = [headTb, bodyTb]
         #Crear el analizador lexico para la cadena a anlizar
-        arraySymTerminal = list(self.simbolosTerminales())
-        if len(arrayRegExp) != len(arraySymTerminal):
-            return False
-        else:
-            arrayTokenRegEx = list()
-            for i in range(0, len(arraySymTerminal)):
-                arrayTokenRegEx.append((i+1)*10)
-            #Craer Analizador Lexico
-            AFDStrLex = AFD.createSuperAFD(arrayRegExp, arrayTokenRegEx)
-            anLexStr = LexAnalizer(AFDStrLex, stringAn)
-            #Pedir Tabla de acciones
-            headTb, bodyTb = self.creatTableLL1()
-            tableAction = [headTb, bodyTb]
-            # self.findAction("S", "g", [headTb, bodyTb])
-            regStack = list()         #Columna de "registro"
-            regString = list()         #Columna de la cadena
-            regAction = list()         #Columna de Accion
-            #Insertar Datos Iniciales
-            stringAn += Alphabet.symbol_STRINGEND
-            regString.append(stringAn)
-            regStack.append([Alphabet.symbol_STRINGEND,self.rules[0][0]])
-            regAction.append(self.findAction(self.rules[0][0], stringAn[0], tableAction))
-            
-            while len(regString[len(regString)-1]) >0:
-                lastSymStack = ""
-                #Colocar la "accion" en la pila
-                lastAction = regAction[len(regAction)-1][0]   #Conseguimos la ultima accion insertada en el registro
-                lastStack = regStack[len(regStack) - 1].copy()     #Conseguir el ultimo arreglo de la pila
-                firstCar = regString[len(regString)-1][0]                      #Primer caracter de la cadena
-                if isinstance(lastAction, list) and (lastAction[0] != Alphabet.symbol_EPSILON):
-                        lastAction = regAction[len(regAction)-1][0].copy()
-                        lastAction.reverse()
-                        lastStack.pop()
-                        for elem in lastAction:
-                            lastStack.append(elem)
-                        lastSymStack = lastStack[len(lastStack)-1]
-                    
-                else:
-                    lastStack.pop()
-                    lastSymStack = lastStack[len(lastStack)-1]  #Ultimo elemento en el arreglo pila
-                if lastSymStack in arraySymTerminal:
-                    #Hay un simbolo terminal
-                    if lastSymStack == firstCar:
-                        #Es el mismo que el inicio de la cadena (Accion pop)
-                        listStr =list(regString[len(regString)-1])
-                        listStr.pop(0)
-                        stringOut = ""
-                        for car in listStr:
-                            stringOut += car
-                        regStack.append(lastStack)
-                        regString.append(stringOut)
-                        regAction.append(["pop"])
-                    else:
-                        self.error("Error en la cadena de la gramatica")
-                else:   #Hay un simbolo NO terminal
-                    #Buscamos la accion en la tabla
-                    if ((lastSymStack == Alphabet.symbol_STRINGEND) and (firstCar == Alphabet.symbol_STRINGEND)):
-                        regStack.append(Alphabet.symbol_STRINGEND)
-                        regString.append(Alphabet.symbol_STRINGEND)
-                        regAction.append("Aceptar")
-                        break;
-                    else:
-                        auxAction = self.findAction(lastSymStack, firstCar, tableAction)
-                        regStack.append(lastStack)
-                        regString.append(regString[len(regString)-1])
-                        regAction.append(auxAction)
+        arraySymTerminal = self.simbolosTerminales()
+        arraySymTerminal.remove(Alphabet.symbol_EPSILON)
+        AFDString, tokenString = self.createAFDGram(sorted(arraySymTerminal))
+        #Crear Diccionario de Token y simbolo terminal
+        dicTokTerm = dict(zip(tokenString, arraySymTerminal))
+        
+        #Creamos Objeto Analizador
+        stringLexAn = LexAnalizer(AFDString, stringAn)
+        #Registros
+        regStack = list()         #Columna de "registro"
+        regString = list()         #Columna de la cadena
+        regAction = list()         #Columna de Accion
+        #Insertar Datos Iniciales
+        stringAn += Alphabet.symbol_STRINGEND
+        regString.append(stringAn)
+        regStack.append([Alphabet.symbol_STRINGEND,self.rules[0][0]])
+        regAction.append(self.findAction(self.rules[0][0], stringAn[0], tableAction))
+        
+        while len(regString[len(regString)-1]) >0:
+            lastSymStack = ""
+            #Colocar la "accion" en la pila
+            lastAction = regAction[len(regAction)-1][0]   #Conseguimos la ultima accion insertada en el registro
+            lastStack = regStack[len(regStack) - 1].copy()     #Conseguir el ultimo arreglo de la pila
+            firstCar = regString[len(regString)-1][0]                      #Primer caracter de la cadena
+            if isinstance(lastAction, list) and (lastAction[0] != Alphabet.symbol_EPSILON):
+                lastAction = regAction[len(regAction)-1][0].copy()
+                lastAction.reverse()
+                lastStack.pop()
+                for elem in lastAction:
+                    lastStack.append(elem)
+                lastSymStack = lastStack[len(lastStack)-1]
+                
+            else:
+                lastStack.pop()
+                lastSymStack = lastStack[len(lastStack)-1]  #Ultimo elemento en el arreglo pila
 
-            return regStack, regString, regAction 
+            if lastSymStack in arraySymTerminal:
+                #Hay un simbolo terminal
+                auxLexem = stringLexAn.yylex()
+                auxPosTok = tokenString.index(auxLexem[0])
+                lexem = dicTokTerm[auxLexem[0]]
+                auxPosSymbTerm = arraySymTerminal.index(lexem)
+
+                # if auxPosSymbTerm == auxPosTok:
+                if firstCar == lastSymStack:
+                    #Es el mismo que el inicio de la cadena (Accion pop)
+                    listStr = list(regString[len(regString)-1])
+                    listStr.pop(0)
+                    stringOut = ""
+                    for car in listStr:
+                        stringOut += car
+                    regStack.append(lastStack)
+                    regString.append(stringOut)
+                    regAction.append(["pop"])
+                else:
+                    #Error
+                    return False, False, False
+                    # self.error("Error en la cadena de la gramatica")
+            else:   #Hay un simbolo NO terminal
+                #Buscamos la accion en la tabla
+                if ((lastSymStack == Alphabet.symbol_STRINGEND) and (firstCar == Alphabet.symbol_STRINGEND)):
+                    regStack.append(Alphabet.symbol_STRINGEND)
+                    regString.append(Alphabet.symbol_STRINGEND)
+                    regAction.append("Aceptar")
+                    break;
+                else:
+                    # statusLexAn = stringLexAn.statusLex()
+                    # tokenLex = stringLexAn.yylex()
+                    # auxAction = self.findAction(lastSymStack, dicTokTerm[tokenLex[0]], tableAction)
+                    # stringLexAn.statusLex(statusLexAn)
+                    auxAction = self.findAction(lastSymStack, firstCar, tableAction)
+                    regStack.append(lastStack)
+                    regString.append(regString[len(regString)-1])
+                    regAction.append(auxAction)
+        return regStack, regString, regAction 
 
 def insertar(tabla,no_terminal, simbolos, num_regla,regla):
     for tupla in tabla:
@@ -487,9 +535,10 @@ if __name__ == "__main__":
     print("-------ll1--------")
     g1.G()
     termSym = list(g1.simbolosTerminales())
+    print(termSym)
     termSym.remove(Alphabet().symbol_EPSILON)
-    arrayRegExStr = ["(\()", "(\))", "(\*)", "(\*)", "(\+)", "(a)"]
-    anString = "(a*a)+(a*a)"
+    arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
+    anString = "(1*2)+(3*4)"
     #Analizar Cadena
     reg1, reg2, reg3 = g1.analizeStr(anString, arrayRegExStr)
     print(reg1)

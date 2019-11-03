@@ -15,6 +15,13 @@ class Alphabet():
     # symbol_EPSILON = "ε"
     symbol_EPSILON = "Epsilon"
     symbol_STRINGEND = "$"
+    #Expresiones regulares (ENUM)
+    ENUM_NUM = "NUM"
+    ENUM_MIN = "MINS"
+    ENUM_MAY = "MAYS"
+    ENUM_LETT = "LETT"
+
+
 
 
 class Token():
