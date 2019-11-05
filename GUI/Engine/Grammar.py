@@ -28,7 +28,7 @@ class Grammar():
                     if car != "\n":
                         self.strGrammar += car
             #Modificar de acuerdo a la ruta especifica
-            pathLexAn = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/analizadorLexicoGramatica.txt"
+            pathLexAn = "Engine/files/analizadorLexicoGramatica.txt"
             #pathLexAn = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/analizadorLexicoGramatica.txt"
             #Crear Analizador Lexico para Gramaticas
             # regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
@@ -349,7 +349,12 @@ class Grammar():
         #Obtenemos el contenido de la tabla
         n_regla = 1
         for rule in self.rules:
-            first_aux = self.first(rule[1])
+            first_aux1 = self.first(rule[1])
+            first_aux = []
+            if isinstance(first_aux1,str):
+                first_aux.append(first_aux1)
+            else:
+                first_aux = first_aux + first_aux1
             if 'Epsilon' in first_aux:
                 follow_aux = self.follow(rule[0])
                 insertar(tabla_ll1,rule[0], follow_aux,n_regla,rule[1])
@@ -535,7 +540,7 @@ def insertar(tabla,no_terminal, simbolos, num_regla,regla):
             
 
 if __name__ == "__main__":
-    path = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/GramaticaEj.txt" #Belmont
+    path = "Engine/GramaticaEj.txt" #Belmont
     #path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
     g1 = Grammar(path)
     # print("---first----")
@@ -543,16 +548,23 @@ if __name__ == "__main__":
     #     print(f"First de {simbolo}: {g1.follow(simbolo)}")
     print("-------ll1--------")
     g1.G()
-    termSym = list(g1.simbolosTerminales())
-    print(termSym)
-    termSym.remove(Alphabet().symbol_EPSILON)
-    arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
-    anString = "(a*a)+(a*a)"
-    #Analizar Cadena
-    reg1, reg2, reg3 = g1.analizeStr(anString)
-    print(reg1)
-    print()
-    print(reg2)
-    print()
-    print(reg3)
+    hola = g1.creatTableLL1()
+    # for rul in g1.rules:
+    #     print(f"Regla {rul}")
+    for t in hola:
+        print(t)
+    # print("---Terminales---")
+    # print(g1.first(['num']))
+    # termSym = list(g1.simbolosTerminales())
+    # print(termSym)
+    # termSym.remove(Alphabet().symbol_EPSILON)
+    # arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
+    # anString = "(a*a)+(a*a)"
+    # #Analizar Cadena
+    # reg1, reg2, reg3 = g1.analizeStr(anString)
+    # print(reg1)
+    # print()
+    # print(reg2)
+    # print()
+    # print(reg3)
     
