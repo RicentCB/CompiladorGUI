@@ -543,16 +543,14 @@ if __name__ == "__main__":
     #     print(f"First de {simbolo}: {g1.follow(simbolo)}")
     print("-------ll1--------")
     g1.G()
+    for rule in g1.rules:
+        print(rule)
     termSym = list(g1.simbolosTerminales())
-    print(termSym)
-    termSym.remove(Alphabet().symbol_EPSILON)
-    arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
-    anString = "(a*a)+(a*a)"
-    #Analizar Cadena
-    reg1, reg2, reg3 = g1.analizeStr(anString)
-    print(reg1)
-    print()
-    print(reg2)
-    print()
-    print(reg3)
+    
+    # print(termSym)
+    # termSym.remove(Alphabet().symbol_EPSILON)
+    # arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
+    # anString = "(a*a)+(a*a)"
+    # #Analizar Cadena
+    # reg1, reg2, reg3 = g1.analizeStr(anString)
     
