@@ -57,10 +57,10 @@
             D -> b E | &#949; ; <br>
             E -> e D | d D | &#949; | c; <br>
         </p>
-        <p style="text-align: center">Selecciona el archivo de entrada</p>
         <div class="uplod-file">
+            <p style="text-align: center" id="title-in-grammar">Selecciona el archivo de entrada</p>
             <input type="file" id="file-input-grammar"/>
-            <label for="file-input-grammar" class="btn-2">Subir Archivo</label>
+            <label for="file-input-grammar" class="btn-2">Subir Gramatica</label>
         </div>
         <section class="create-table-result" id="grammar-ll1">
             <!-- ADD TABLE WITH JS -->
@@ -69,8 +69,18 @@
             <h2>Analizar Cadena con la gramatica</h2>
             <div class="one-input" id="inputString">
                 <form>
+                    <div class="uplod-file col-50">
+                        <p style="text-align: center" id="title-lexAn">Selecciona el archivo del analizador lexico</p>
+                        <input type="file" id="file-input-lexAn"/>
+                        <label for="file-input-lexAn" class="btn-2">Subir Analizador</label>
+                    </div>
+                    <div class="uplod-file col-50">
+                        <p style="text-align: center" id="title-symb">Selecciona el archivo de asociacion de Simbolos terminales</p>
+                        <input type="file" id="file-input-symb"/>
+                        <label for="file-input-symb" class="btn-2">Subir Simbolos</label>
+                    </div>
                     <label for="stringAnGrammar">Introduce la cadena a analizar:</label>
-                    <input type="text" id="inStringAnGrammar" placeholder="12.5+983*(123-5)">
+                    <input type="text" id="inStringAnGrammar" placeholder="12.5+983*(123-5)" disabled>
                     <input type="submit" value="Analizar" id="btnStringAnGrammar">
                 </form>
             </div>

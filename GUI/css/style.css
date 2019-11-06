@@ -350,9 +350,12 @@ table.title-upper th{
     text-transform: uppercase;
 }
 /*  -----------------------------  H E L P E R    C L A S S  -----------------------------  */
-p.col-50{
+.col-50{
     width: 50%;
     float: left;
-    padding: 35px;
+    padding: 10px;
     box-sizing: border-box;
+}
+p.col-50{
+    padding: 35px;
 }

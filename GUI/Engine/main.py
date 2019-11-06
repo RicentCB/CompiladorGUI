@@ -4,6 +4,7 @@ import pickle
 from AFN import AFN
 from state import State
 from Grammar import Grammar
+from analizadorLexico import LexAnalizer
 
 
 #Funcion que retorna el id mas grande de todos los AFNS insertados
@@ -38,11 +39,24 @@ def pushArrayAFN(arrayAFN, objAFN, pathFile):
     pickle.dump(arrayAFN, fileObjWrite)
     fileObjWrite.close()
     return len(arrayAFN)
+
+#Crea un diccionario dado un archivo 
+def createDictFile(pathFile):
+    symbArray = list()
+    tokenArray = list()
+    dictFile = open(pathFile, "r")
+    fileLines = dictFile.readlines()
+    for line in fileLines:
+        auxArray = line.split()
+        symbArray.append(auxArray[0])
+        tokenArray.append(auxArray[1])
+    dictOut = dict(zip(symbArray, tokenArray))
+    return dictOut
         
 
 #Main que se conecta con los archivos de python por medio de nodejs
 #Recibe argumentos por medio de la "consola"
-if len(sys.argv) > 5:
+if len(sys.argv) > 7:
     print(json.dumps({"message":"Error en numero de argumentos"}))
 else:   #Numero de argumentos valido
     if(sys.argv[1] == "AFN"):
@@ -150,10 +164,13 @@ else:   #Numero de argumentos valido
             fileObjRead.close()
             #Creamos la gramatica
             gramObj = Grammar(pathStringGrammar)
+            #Crear analizador Lexico
+            pathLex = sys.argv[4]
+            lexAn = LexAnalizer.createLexFile(pathLex, sys.argv[3])
+            #Crear diccinario
+            dictStr = createDictFile(sys.argv[5])
             #Analizar la cadena
-            # arrayRegExStr = sys.argv[4]
-            arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
-            stack, string, action = gramObj.analizeStr(sys.argv[3])
+            stack, string, action = gramObj.analizeStr(sys.argv[3], lexAn, dictStr)
             print(json.dumps({"Stack":stack, "String":string, "Action":action, "message":True}))
         else:
             print(json.dumps({"message": "Error opcion Grammar no valida"}));

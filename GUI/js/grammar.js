@@ -22,24 +22,49 @@ $(document).ready(function(){
     }
     
 
-    let btnGetFile = $("main#grammar #file-input-grammar");
+    let btnGetFileGrammar = $("main#grammar #file-input-grammar");
     let containerTable = $("main#grammar .create-table-result#grammar-ll1");
     let containerAnString = $("#analizeStr")
     
-    btnGetFile.change(function (e){
+    let pathLexAn = "";
+    let btnGetFileLex = $("main#grammar #file-input-lexAn");
+    let pathSymb = "";
+    let btnGetFileSymb = $("main#grammar #file-input-symb");
+
+    btnGetFileLex.change(function(e){
+        let fileIn = e.target.files[0];
+        $(this).parent().find("p#title-lexAn").html("Archivo Cargado: '"+fileIn.name+"'")
+        pathLexAn = fileIn.path;
+        //Comprabar archivos
+        if (pathSymb != "")
+            containerAnString.find("#inStringAnGrammar").prop("disabled", false)
+    })
+
+    btnGetFileSymb.change(function(e){
+        let fileIn = e.target.files[0];
+        $(this).parent().find("p#title-symb").html("Archivo Cargado: '"+fileIn.name+"'")
+        pathSymb = fileIn.path;
+        //Comprabar archivos
+        if (pathLexAn != "")
+            containerAnString.find("#inStringAnGrammar").prop("disabled", false)
+    })
+
+
+    btnGetFileGrammar.change(function (e){
         let fileIn = e.target.files[0];
         containerTable.html("")
         containerAnString.slideUp();
+        $(this).parent().find("#title-in-grammar").html("Archivo Cargado: '"+fileIn.name+"'")
         if(fileIn.type != "text/plain"){
             swal.fire("Error", "Solo archivos (*.txt)", "error");
         }else{
             //NO hay error en el tipo de archivo
             //Llamamos al metodo de Python
             optionsPython.args = ["Grammar", "Path", fileIn.path]
+
             let resultPython = new PythonShell('main.py', optionsPython);
             resultPython.on('message', function (jsonString) {
                 //Insertar JSON en Arreglo
-                console.log(jsonString);
                 if (jsonString["message"] == true){
                     Swal.fire("Gramatica Aceptada", "", "success");
                     containerAnString.slideDown();
@@ -94,10 +119,11 @@ $(document).ready(function(){
     btnAnString.click(function(e){
         e.preventDefault();
         let valString = sectionAnString.find("#inStringAnGrammar").val();
-        optionsPython.args = ["Grammar", "String", valString]
+        optionsPython.args = ["Grammar", "String", valString, pathLexAn, pathSymb]
 
         let resultPython = new PythonShell('main.py', optionsPython);
         resultPython.on('message', function (jsonString) {
+            console.log(jsonString)
             if (jsonString["message"] == true){
                 let tableString = containerAnString.find("#regsAnalizeString");
                 Swal.fire("Cadena Aceptada", "", "success");
@@ -133,7 +159,6 @@ $(document).ready(function(){
         });
         
                 
-            
             
     })
 

@@ -364,45 +364,6 @@ class Grammar():
             body.append(tabla_ll1[cont])
         return tabla_ll1[0], body
     
-    #Metodo que crea un analizador un AFD que servirara para el analziador lexico
-    #  dado simbolos terminales de la gramatica
-    def createAFDGram(self, arrayTermSym):
-        arrayRegExp = list()
-        arrayToken = list()
-        cont = 10
-        for elem in arrayTermSym:
-            if elem == Alphabet.symbol_INTER:
-                arrayRegExp.append("(\?)")
-            elif elem == Alphabet.symbol_CONC:
-                arrayRegExp.append("(\&)")
-            elif elem == Alphabet.symbol_PLUS:
-                arrayRegExp.append("(\+)")
-            elif elem == Alphabet.symbol_STAR:
-                arrayRegExp.append("(\*)")
-            elif elem == Alphabet.symbol_MINUS:
-                arrayRegExp.append("(-)")
-            elif elem == Alphabet.symbol_PARI:
-                arrayRegExp.append("(\()")
-            elif elem == Alphabet.symbol_PARD:
-                arrayRegExp.append("(\)")
-            elif elem == Alphabet.ENUM_NUM:
-                arrayRegExp.append("(0-9)+")
-            elif elem == Alphabet.ENUM_MIN:
-                arrayRegExp.append("(a-z)")
-            elif elem == Alphabet.ENUM_MAY:
-                arrayRegExp.append("(A-Z)")
-            elif elem == Alphabet.ENUM_LETT:
-                arrayRegExp.append("(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)*))")
-            else:
-                arrayRegExp.append("({0})".format(elem))
-            #Token
-            arrayToken.append(cont)
-            cont += 10
-        #Crear AFD
-        AFDMain = AFD.createSuperAFD(arrayRegExp, arrayToken)
-        return AFDMain, arrayToken
-
-    
     #Metodo que devuelve la "accion" dado el simbolo NO terminal, y otro simbolo
     def findAction(self, notTermSym, thermSym, table):    
         for row in table[1]:
@@ -425,19 +386,11 @@ class Grammar():
     
     #Funcion que analiza una cadena de la gramatica, 
     # devolvera 3 arreglos de "historial" (Pila, cadena, accion)
-    def analizeStr(self, stringAn):
+    def analizeStr(self, stringAn, lexAnString, dicSymbTerm):
+        arraySymTerminal = dicSymbTerm.keys()
         #Pedir Tabla de acciones
         headTb, bodyTb = self.creatTableLL1()
         tableAction = [headTb, bodyTb]
-        #Crear el analizador lexico para la cadena a anlizar
-        arraySymTerminal = self.simbolosTerminales()
-        arraySymTerminal.remove(Alphabet.symbol_EPSILON)
-        AFDString, tokenString = self.createAFDGram(sorted(arraySymTerminal))
-        #Crear Diccionario de Token y simbolo terminal
-        dicTokTerm = dict(zip(tokenString, arraySymTerminal))
-        
-        #Creamos Objeto Analizador
-        stringLexAn = LexAnalizer(AFDString, stringAn)
         #Registros
         regStack = list()         #Columna de "registro"
         regString = list()         #Columna de la cadena
@@ -446,13 +399,15 @@ class Grammar():
         stringAn += Alphabet.symbol_STRINGEND
         regString.append(stringAn)
         regStack.append([Alphabet.symbol_STRINGEND,self.rules[0][0]])
-        statusLexStr = stringLexAn.statusLex()
-        auxLexem = stringLexAn.yylex()
-        regAction.append(self.findAction(self.rules[0][0], dicTokTerm[auxLexem[0]], tableAction))
-        stringLexAn.statusLex(statusLexStr)
+        statusLexStr = lexAnString.statusLex()
+        auxLexem = lexAnString.yylex()
+        invertDict = dict(map(reversed, dicSymbTerm.items()))
+        regAction.append(self.findAction(self.rules[0][0], invertDict[auxLexem[0]], tableAction))
+        lexAnString.statusLex(statusLexStr)
         #Variable que almacena el ultimo lexema con token encontrado
         lastLexemFound = list()
-        while len(regString[len(regString)-1]) >0:
+        complete = False
+        while not complete:
             #Solicitar ulitmos elementos en los registros
             auxStack = regStack[len(regStack)-1].copy()
 
@@ -462,7 +417,7 @@ class Grammar():
 
             auxString = regString[len(regString)-1]
             #Ultimo item encontrado
-            lastItemStack = auxStack.pop()
+            auxStack.pop()
             if auxAction[0] == "pop":
                 #Accion POP
                 stringOut = ""
@@ -476,16 +431,8 @@ class Grammar():
                 regStack.append(auxStack)
                 regString.append(stringOut)
 
-                lastItemStack = auxStack[len(auxStack)-1]
-
             elif auxAction[0] == Alphabet.symbol_EPSILON:
-                if lastItemStack == Alphabet.symbol_STRINGEND and regString[len(regString)-1][0] == Alphabet.symbol_STRINGEND:
-                    regStack.append(Alphabet.symbol_STRINGEND)
-                    regString.append(Alphabet.symbol_STRINGEND)
-                    regAction.append("Aceptar")
-                    break;
-                else:
-                    regStack.append(auxStack)
+                regStack.append(auxStack)
                 auxString = regString[len(regString)-1]
                 regString.append(auxString)
             
@@ -495,28 +442,31 @@ class Grammar():
                 for elem in auxAction:
                     auxStack.append(elem)
                 regStack.append(auxStack)
-
-                lastItemStack = auxStack[len(auxStack)-1]
                 regString.append(auxString)
-
-            #Encontrar si es o no simbolo terminal
+                
+            #Ultimo simbolo
+            lastItemStack = auxStack[len(auxStack)-1]
+            #Encontrar si el ulitmo simbolo de la pila es o no simbolo terminal
             if lastItemStack in arraySymTerminal:
-                auxLexem = stringLexAn.yylex()
+                auxLexem = lexAnString.yylex()
                 lastLexemFound = auxLexem.copy()
-                auxPosToken = tokenString.index(auxLexem[0])
-                auxPosSymb = arraySymTerminal.index(lastItemStack)
-                if auxPosSymb == auxPosToken:
+                tokenDict = dicSymbTerm[lastItemStack]
+                if tokenDict == auxLexem[0]:
                     regAction.append(["pop"])
                 else:
                     return False, False, False
             elif regString[len(regString)-1][0] == Alphabet.symbol_STRINGEND:
-                regAction.append(self.findAction(lastItemStack, Alphabet.symbol_STRINGEND, tableAction))
+                if (lastItemStack == Alphabet.symbol_STRINGEND):
+                    regAction.append("Aceptar")
+                    complete = True
+                else:
+                    regAction.append(self.findAction(lastItemStack, Alphabet.symbol_STRINGEND, tableAction))
             else:
                 #Buscar siguiente accion
-                statusLexStr = stringLexAn.statusLex()
-                auxLexem = stringLexAn.yylex()
-                regAction.append(self.findAction(lastItemStack, dicTokTerm[auxLexem[0]], tableAction))
-                stringLexAn.statusLex(statusLexStr)
+                statusLexStr = lexAnString.statusLex()
+                auxLexem = lexAnString.yylex()
+                regAction.append(self.findAction(lastItemStack, invertDict[auxLexem[0]], tableAction))
+                lexAnString.statusLex(statusLexStr)
 
         return regStack, regString, regAction 
 
@@ -537,21 +487,28 @@ def insertar(tabla,no_terminal, simbolos, num_regla,regla):
         tabla[indice1][indice] = (cad)
 
 
-
-        
-
-            
-
 if __name__ == "__main__":
     path = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/GramaticaEj.txt" #Belmont
+    pathDict = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/dictFile.txt" #Belmont
     #path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
     g1 = Grammar(path)
     print("-------ll1--------")
     # termSym.remove(Alphabet().symbol_EPSILON)
     # arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
-    anString = "(025*110)+(2010*3012)"
+    anString = "(025*110)"
+    lexAnString = LexAnalizer.createLexFile("/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/lex.txt", anString)
+    #Crear diccionario
+    symbArray = list()
+    tokenArray = list()
+    dictFile = open(pathDict, "r")
+    fileLines = dictFile.readlines()
+    for line in fileLines:
+        auxArray = line.split()
+        symbArray.append(auxArray[0])
+        tokenArray.append(auxArray[1])
+    dictTerm = dict(zip(symbArray, tokenArray))
     #Analizar Cadena
-    reg1, reg2, reg3 = g1.analizeStr(anString)
+    reg1, reg2, reg3 = g1.analizeStr(anString, lexAnString, dictTerm)
     print(reg1)
     print()
     print(reg2)
