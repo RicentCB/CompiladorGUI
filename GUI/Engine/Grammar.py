@@ -28,7 +28,7 @@ class Grammar():
                     if car != "\n":
                         self.strGrammar += car
             #Modificar de acuerdo a la ruta especifica
-            pathLexAn = "Engine/files/analizadorLexicoGramatica.txt"
+            pathLexAn = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/analizadorLexicoGramatica.txt"
             #pathLexAn = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/analizadorLexicoGramatica.txt"
             #Crear Analizador Lexico para Gramaticas
             # regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
@@ -386,7 +386,7 @@ class Grammar():
             elif elem == Alphabet.symbol_PARD:
                 arrayRegExp.append("(\)")
             elif elem == Alphabet.ENUM_NUM:
-                arrayRegExp.append("(0-9)")
+                arrayRegExp.append("(0-9)+")
             elif elem == Alphabet.ENUM_MIN:
                 arrayRegExp.append("(a-z)")
             elif elem == Alphabet.ENUM_MAY:
@@ -450,6 +450,8 @@ class Grammar():
         auxLexem = stringLexAn.yylex()
         regAction.append(self.findAction(self.rules[0][0], dicTokTerm[auxLexem[0]], tableAction))
         stringLexAn.statusLex(statusLexStr)
+        #Variable que almacena el ultimo lexema con token encontrado
+        lastLexemFound = list()
         while len(regString[len(regString)-1]) >0:
             #Solicitar ulitmos elementos en los registros
             auxStack = regStack[len(regStack)-1].copy()
@@ -465,7 +467,9 @@ class Grammar():
                 #Accion POP
                 stringOut = ""
                 stringPop = list(auxString)
-                stringPop.pop(0)
+                #Funcion pop
+                for i in range(0, len(lastLexemFound[1])):
+                    stringPop.pop(0)
                 for car in stringPop:
                     stringOut += car
                 #Insertar en los registros
@@ -494,9 +498,11 @@ class Grammar():
 
                 lastItemStack = auxStack[len(auxStack)-1]
                 regString.append(auxString)
+
             #Encontrar si es o no simbolo terminal
             if lastItemStack in arraySymTerminal:
                 auxLexem = stringLexAn.yylex()
+                lastLexemFound = auxLexem.copy()
                 auxPosToken = tokenString.index(auxLexem[0])
                 auxPosSymb = arraySymTerminal.index(lastItemStack)
                 if auxPosSymb == auxPosToken:
@@ -537,31 +543,18 @@ def insertar(tabla,no_terminal, simbolos, num_regla,regla):
             
 
 if __name__ == "__main__":
-    path = "Engine/GramaticaEj.txt" #Belmont
+    path = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/GramaticaEj.txt" #Belmont
     #path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
     g1 = Grammar(path)
-    # print("---first----")
-    # for simbolo in no_terminales:
-    #     print(f"First de {simbolo}: {g1.follow(simbolo)}")
     print("-------ll1--------")
-    g1.G()
-    hola = g1.creatTableLL1()
-    # for rul in g1.rules:
-    #     print(f"Regla {rul}")
-    for t in hola:
-        print(t)
-    # print("---Terminales---")
-    # print(g1.first(['num']))
-    # termSym = list(g1.simbolosTerminales())
-    # print(termSym)
     # termSym.remove(Alphabet().symbol_EPSILON)
     # arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
-    # anString = "(a*a)+(a*a)"
-    # #Analizar Cadena
-    # reg1, reg2, reg3 = g1.analizeStr(anString)
-    # print(reg1)
-    # print()
-    # print(reg2)
-    # print()
-    # print(reg3)
+    anString = "(025*110)+(2010*3012)"
+    #Analizar Cadena
+    reg1, reg2, reg3 = g1.analizeStr(anString)
+    print(reg1)
+    print()
+    print(reg2)
+    print()
+    print(reg3)
     
