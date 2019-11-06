@@ -227,7 +227,7 @@ class Grammar():
         c_first = []
         terminales = self.simbolosTerminales()
         #print("En first: "+regla[0])
-        if(regla[0]=="Epsilon"):    
+        if(regla[0]==Alphabet.symbol_EPSILON):    
             #c_first.append(regla[0])
             return regla[0]
         elif regla[0] in terminales:
@@ -265,12 +265,9 @@ class Grammar():
                                     c_first.append(first_auxiliar)
                                 else:
                                     c_first = c_first + first_auxiliar
-                        # print(f"Afuera: {eliminar_epsilon}")
-                        # print(f"Antes de eliminar: {c_first}")
-                        # print(f"Despues de eliminar: {auxiliar2}")
                         if eliminar_epsilon is True:
                             auxiliar1 = set(c_first)
-                            auxiliar1.discard('Epsilon')
+                            auxiliar1.discard(Alphabet.symbol_EPSILON)
                             auxiliar2 = list(auxiliar1)
                             #print(f"En cond {auxiliar2}")
                             c_first = auxiliar2  
@@ -288,7 +285,7 @@ class Grammar():
         nullable = False
         for rule in self.rules:
             if rule[0] == regla[0]:
-                if 'Epsilon' in rule[1]:
+                if Alphabet.symbol_EPSILON in rule[1]:
                     nullable = True
         return nullable
     def follow(self, s_noTerminal):
@@ -325,7 +322,7 @@ class Grammar():
                     else:
                         c_follow = c_follow + first_auxiliar
                 if eliminar_epsilon:
-                    c_follow.remove('Epsilon')
+                    c_follow.remove(Alphabet.symbol_EPSILON)
                 return c_follow
             elif s_noTerminal in rule[1] and rule[1].index(s_noTerminal) == len(rule[1])-1:
                 auxiliar = self.follow(rule[0])
@@ -339,8 +336,8 @@ class Grammar():
         self.G()
         terminales = list(self.simbolosTerminales())
         terminales.append('$')
-        if 'Epsilon' in terminales:
-            terminales.remove('Epsilon')
+        if Alphabet.symbol_EPSILON in terminales:
+            terminales.remove(Alphabet.symbol_EPSILON)
         no_terminales = list(self.simbolos_NoTerminales())
         no_terminales.append('$')
         #Llenamos la tabla con los no terminales en la cabecera y los terminales en el principio
@@ -355,7 +352,7 @@ class Grammar():
                 first_aux.append(first_aux1)
             else:
                 first_aux = first_aux + first_aux1
-            if 'Epsilon' in first_aux:
+            if Alphabet.symbol_EPSILON in first_aux:
                 follow_aux = self.follow(rule[0])
                 insertar(tabla_ll1,rule[0], follow_aux,n_regla,rule[1])
             else:

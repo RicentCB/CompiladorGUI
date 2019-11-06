@@ -21,6 +21,24 @@ class LexAnalizer:
                 print("El argumento debe ser un entero")
                 sys.exit()
 
+    #Metodo que retornara un objeto de tipo analizador lexico,
+    # dado un archivo con tokens y expresiones regulares
+    # y la cadena para anlizar
+    def createLexFile(path, stringAn):
+        #Declarar listas
+        liRegExp = list()
+        liToken = list()
+        #Abrir Archivo
+        lexFile = open(path, "r")
+        fileLines = lexFile.readlines()
+        for line in fileLines:
+            auxArray = line.split(" ")
+            liRegExp.append(auxArray[0])
+            liToken.append(auxArray[1])
+        #Crear AFD
+        AFDMain = AFD.createSuperAFD(liRegExp, liToken)
+        #Crear Analizador
+        return LexAnalizer(AFDMain, stringAn)
 
 
     #Metodo que escannea la cadena dada como arugmento y 
@@ -66,7 +84,6 @@ class LexAnalizer:
         #Retorna el arreglo de token con su lexema
         return returnToken
 
-
     def analizeStr(self):
         self.apCarActual = 0
         arrayTokenLexema = []
@@ -85,28 +102,26 @@ class LexAnalizer:
 
 
 def main():
-    RegExp1 = "(\+|-)&(0-9)+"
-    RegExp2 = "(\+|-)&(0-9)+&.&(0-9)+"
-    RegExp3 = "L&(L|D)*"
-    RegExp4 = "(S|T)+"
-    RegExp5 = "(\+)&(\+)"
-    RegExp6 = "(\+)"
-    arrayTokens = [10,20,30,40,50,60]
-    regExp = [RegExp1, RegExp2, RegExp3, RegExp4, RegExp5,RegExp6]
-    AFDMain = AFD.createSuperAFD(regExp, [10,20, 30, 40, 50, 60])
+    # RegExp1 = "(\+|-)&(0-9)+"
+    # RegExp2 = "(\+|-)&(0-9)+&.&(0-9)+"
+    # RegExp3 = "L&(L|D)*"
+    # RegExp4 = "(S|T)+"
+    # RegExp5 = "(\+)&(\+)"
+    # RegExp6 = "(\+)"
+    # arrayTokens = [10,20,30,40,50,60]
+    # regExp = [RegExp1, RegExp2, RegExp3, RegExp4, RegExp5,RegExp6]
+    # AFDMain = AFD.createSuperAFD(regExp, [10,20, 30, 40, 50, 60])
     
-    stringAn = "SSS+965+TTT+74.96STTSLDLDSSLDDDT+++179SSLDLLL"
-    analizador = LexAnalizer(AFDMain, stringAn)
-    print(analizador.AFD.printMinimizeTable(['+','-','0-9','.','L','D','T','S']))
+    # stringAn = "SSS+965+TTT+74.96STTSLDLDSSLDDDT+++179SSLDLLL"
+    # analizador = LexAnalizer(AFDMain, stringAn)
+    # print(analizador.AFD.printMinimizeTable(['+','-','0-9','.','L','D','T','S']))
     # print(analizador.AFD.printTransitionTable())
-    print(analizador.yylex())
-    print(analizador.yylex())
-    print(analizador.yylex())
-    print(analizador.yylex())
-    print(analizador.yylex())
-    print(analizador.yylex())
 
     # analizador.analizeStr()
+
+    anLex1 = LexAnalizer.createLexFile("GUI/Engine/Examples/lex.txt", "SS+965+TT+74")
+    print(anLex1.yylex())
+    print(anLex1.yylex())
 
 
 if __name__ == '__main__':

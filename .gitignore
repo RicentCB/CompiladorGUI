@@ -4,3 +4,4 @@ npm-debug.log
 /GUI/node_modules
 /GUI/Engine/__pycache__
 /GUI/plugins/gojs/
+/GUI/plugins/sweetalert
