@@ -13,7 +13,9 @@ class Alphabet():
     symbol_PARD = ')'   #  )
     #Gramatica
     # symbol_EPSILON = "ε"
+    # symbol_EPSILON = "Epsilon"
     symbol_EPSILON = "Epsilon"
+    
     symbol_STRINGEND = "$"
     #Expresiones regulares (ENUM)
     ENUM_NUM = "NUM"
