@@ -1,4 +1,5 @@
 from Grammar import Grammar
+from alphabet import Alphabet
 
 class LR0:
     def __init__(self, grammar):
@@ -7,7 +8,7 @@ class LR0:
     #Metodo cerradura, dado una regla con "punto" (indice)
     #regresara una lista con las reglas y sus "pintos"
     # Regresa lista de tuplas
-    def C(self, rule, index):
+    def closure(self, rule, index):
         # print(rule[1][index])
         # print(self.grammar.termSymbs)
         if (index == len(rule[1])) or (rule[1][index] in self.grammar.termSymbs):
@@ -16,10 +17,12 @@ class LR0:
                 #Calculara la misma Cerradura
             auxRules = list()
             auxRules.append((rule, index))
+            nonTerm = rule[1][index]
             for ruleAux in self.grammar.rules:
-                if (ruleAux[0] == rule[1][index]) and (ruleAux != rule):
-                    arAux = self.C(ruleAux, 0)
-                    auxRules.extend(arAux)
+                if nonTerm == ruleAux[0]:
+                    if (ruleAux == rule and index != 0) or (ruleAux != rule):
+                        arAux = self.closure(ruleAux, 0)
+                        auxRules.extend(arAux)
             #Eliminar reglas repetidas
             outRules = list()
             for ruleAux in auxRules:
@@ -27,6 +30,31 @@ class LR0:
                     outRules.append(ruleAux)
             return outRules
     
+    
+    
+    #Funcion ir, recivbe un "estado" (lista de regla con punto) y un elemento,
+    #devuleve otro "estado"
+    def moveTo(self, state, symbol):
+        auxPairs = list()
+        for pair in state:
+            if len(pair[0][1]) > pair[1]:
+                if symbol == pair[0][1][pair[1]]:
+                    auxPairs.append((pair[0], pair[1]+1))
+        #Calcular cerradura de cada nueva regla con punto
+        newRules = list()
+        for pair in auxPairs:
+            newRules.extend(self.closure(pair[0], pair[1]))
+        #Eliminar elementos repetidos
+        finalRules = list()
+        for rule in newRules:
+            if rule not in finalRules:
+                finalRules.append(rule)
+        return finalRules
+    
+    def printArray(self,array):
+        for elem in array:
+            print(elem)
+
     #Funcion que devuelve el conjunto de items para aplicar la operacion "Ir"
     # Recibe un conjunto de reglas con punto (Estado)
     def getItemsMove(self, state):
@@ -35,32 +63,42 @@ class LR0:
             #pair = ([NT,[r,e,g,l,a]], punto)
             if pair[1] < len(pair[0][1]):
                 outItmes.append(pair[0][1][pair[1]])
-        return sorted(list(set(outItmes)))
-    
-    #Funcion ir, recivbe un "estado" (lista de regla con punto) y un elemento,
-    #devuleve otro "estado"
-    def moveTo(self, state, symbol):
-        auxPairs = list()
-        for pair in state:
-            #pair = ([NT,[r,e,g,l,a]], punto)
-            if symbol == pair[0][1][pair[1]]:
-                auxPairs.append((pair[0], pair[1]+1))
-        #Calcular cerradura de cada nueva regla con punto
-        newRules = list()
-        for pair in auxPairs:
-            newRules.extend(self.C(pair[0], pair[1]))
-        #Eliminar elementos repetidos
-        finalRules = list()
-        for rule in newRules:
-            if rule not in finalRules:
-                finalRules.append(rule)
-        return finalRules
-    
+        order = self.grammar.nonTermSymbs
+        order.extend(self.grammar.termSymbs)
+        order = ["E", "T", "F", "(", "num", "+", "*", ")"]
+        return sorted(list(set(outItmes)), key=order.index)
+
+    # def printState(self, state):
+    #     for tup in state:
+    #         print(tup[0][0],"->",tup[0][1], tup[1])
+
     #Funcion que crea los desplazamientos LR0
     def createTableMoves(self):
         states = list()
-        states.append(self.C(self.grammar.rules[0], 0))
-        print(states)
+        transtions = list()
+        #Crear el primer "estado"
+        states.append(self.closure(self.grammar.rules[0], 0))
+        apunt = 0
+        while apunt < len(states):
+            #Traer Itmes del estado
+            items = self.getItemsMove(states[apunt])
+            #Verificar transciones (IrA)
+            for item in items:
+                newState = self.moveTo(states[apunt], item)
+                #Verificar au no existe ese estado
+                if newState not in states:  #Aun no existe
+                    states.append(newState)
+                #Crear trasicion
+                indexStateTo = states.index(newState)
+                transtions.append((apunt, item, indexStateTo))
+            apunt += 1
+        #Una vez creada todas las transiciones "llenamos la tabla"
+        headTb = self.grammar.termSymbs
+        headTb.append(Ala)
+
+        self.printArray(states)
+        print(len(states))
+        
 
 
 

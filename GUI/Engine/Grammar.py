@@ -50,6 +50,9 @@ class Grammar():
             #Asignacion
             lexAnal = LexAnalizer(objectSerialAFD, self.strGrammar)
             self.lexAn = lexAnal
+            self.G()
+            self.nonTermSymbs = self.simbolos_NoTerminales()
+            self.termSymbs = self.simbolosTerminales()
 
         else:
             sys.exit()
@@ -333,7 +336,6 @@ class Grammar():
                 return c_follow
     
     def creatTableLL1(self): 
-        self.G()
         terminales = list(self.simbolosTerminales())
         terminales.append('$')
         if Alphabet.symbol_EPSILON in terminales:
@@ -495,23 +497,19 @@ if __name__ == "__main__":
     print("-------ll1--------")
     # termSym.remove(Alphabet().symbol_EPSILON)
     # arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
-    anString = "(025*110)"
-    lexAnString = LexAnalizer.createLexFile("/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/lex.txt", anString)
-    #Crear diccionario
-    symbArray = list()
-    tokenArray = list()
-    dictFile = open(pathDict, "r")
-    fileLines = dictFile.readlines()
-    for line in fileLines:
-        auxArray = line.split()
-        symbArray.append(auxArray[0])
-        tokenArray.append(auxArray[1])
-    dictTerm = dict(zip(symbArray, tokenArray))
-    #Analizar Cadena
-    reg1, reg2, reg3 = g1.analizeStr(anString, lexAnString, dictTerm)
-    print(reg1)
-    print()
-    print(reg2)
-    print()
-    print(reg3)
+    # anString = "(025*110)"
+    # lexAnString = LexAnalizer.createLexFile("/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/lex.txt", anString)
+    # #Crear diccionario
+    # symbArray = list()
+    # tokenArray = list()
+    # dictFile = open(pathDict, "r")
+    # fileLines = dictFile.readlines()
+    # for line in fileLines:
+    #     auxArray = line.split()
+    #     symbArray.append(auxArray[0])
+    #     tokenArray.append(auxArray[1])
+    # dictTerm = dict(zip(symbArray, tokenArray))
+    # #Analizar Cadena
+    # reg1, reg2, reg3 = g1.analizeStr(anString, lexAnString, dictTerm)
+
     
