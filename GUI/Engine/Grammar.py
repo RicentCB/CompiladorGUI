@@ -28,7 +28,7 @@ class Grammar():
                     if car != "\n":
                         self.strGrammar += car
             #Modificar de acuerdo a la ruta especifica
-            pathLexAn = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/analizadorLexicoGramatica.txt"
+            pathLexAn = "Engine/files/analizadorLexicoGramatica.txt"
             #pathLexAn = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/analizadorLexicoGramatica.txt"
             #Crear Analizador Lexico para Gramaticas
             # regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
@@ -322,14 +322,13 @@ class Grammar():
                         c_follow = c_follow + first_auxiliar
                 if eliminar_epsilon:
                     c_follow.remove(Alphabet.symbol_EPSILON)
-                return c_follow
             elif s_noTerminal in rule[1] and rule[1].index(s_noTerminal) == len(rule[1])-1:
                 auxiliar = self.follow(rule[0])
                 if isinstance(auxiliar,str):
                     c_follow.append(auxiliar)
                 else:
                     c_follow = c_follow + auxiliar
-                return c_follow
+        return c_follow
     
     def creatTableLL1(self): 
         terminales = list(self.simbolosTerminales())
@@ -483,7 +482,7 @@ def insertar(tabla,no_terminal, simbolos, num_regla,regla):
 
 
 if __name__ == "__main__":
-    path = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/GramaticaEj.txt" #Belmont
+    path = "Engine/Examples/gramLR0.txt" #Belmont
     pathDict = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/dictFile.txt" #Belmont
     #path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
     g1 = Grammar(path)
