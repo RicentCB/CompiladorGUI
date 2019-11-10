@@ -96,23 +96,36 @@ class LR0:
         return states, transitions
     
     def getReduction(self, state):
-        print("\t",self.grammar.rules[0])
         for item in state:
+            #Econtrar elemento con . al final
             if item [1] == len(item[0][1]):
                 #Regla "Aceptar"
                 if (item[0] == self.grammar.rules[0]):
-                        return Alphabet.symbol_ACCEPT
+                        return ([Alphabet.symbol_STRINGEND], Alphabet.symbol_ACCEPT)
                 #Calcular reducciones
                 else:
-                    return self.grammar.follow(item[0][0])
-    
+                    return (self.grammar.follow(item[0][0]), "r{}".format(self.grammar.rules.index(item[0])))
+
+    def popItemReduction(self, reduction, symbol):
+        if isinstance(reduction, tuple):
+            elements = reduction[0]
+            strOut = reduction[1]
+            for elem in elements:
+                if elem == symbol:
+                    reduction[0].pop(reduction[0].index(elem))
+                    return strOut
+            return ""
+        else:
+            return ""
+
+
     def createTableLR1(self):
         #Creamos los conjuntos de "reglas"
         states, transitions = self.createSets()
         #Crear cabecera con simboloes terminales y no-terminales
         headTb = list()
         headTb.append("")
-        headTb .extend(self.grammar.termSymbs.copy())
+        headTb .extend(sorted(self.grammar.termSymbs.copy()))
         headTb.append(Alphabet.symbol_STRINGEND)
         headTb.extend(self.grammar.nonTermSymbs.copy())
         bodyTb = list()
@@ -120,25 +133,20 @@ class LR0:
             rowAux = list()
             idState = states.index(state)
             rowAux.append(idState)
-            red = self.getReduction(state)
+            reduction = self.getReduction(state)
             for elem in headTb:
                 getElemTo =self.findTransition(transitions, idState, elem) 
                 if getElemTo == -1:
-                    rowAux.append("")
+                    if reduction == None or len(reduction[0]) == 0:
+                        rowAux.append("")
+                    else:
+                        rowAux.append(self.popItemReduction(reduction, elem))
                 else:
-                    rowAux.append(getElemTo)
+                    rowAux.append("d{}".format(getElemTo))
             #Insertar la Fila
             bodyTb.append(rowAux)
 
-        # print(headTb)
-        # for row in bodyTb:
-        #     print(row)
-        # print()
-        print("T", self.grammar.follow("T"))
-
-        
-
-
+        return headTb, bodyTb
 
 def main():
     pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/gramLR0.txt"
