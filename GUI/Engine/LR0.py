@@ -75,7 +75,7 @@ class LR0:
 
     def createSets(self):
         states = list()
-        transtions = list()
+        transitions = list()
         #Crear el primer "estado"
         states.append(self.closure(self.grammar.rules[0], 0))
         apunt = 0
@@ -90,15 +90,26 @@ class LR0:
                     states.append(newState)
                 #Crear trasicion
                 indexStateTo = states.index(newState)
-                transtions.append((apunt, item, indexStateTo))
+                transitions.append((apunt, item, indexStateTo))
             apunt += 1
         #Una vez creada todas las transiciones "llenamos la tabla"
-        return states, transtions
+        return states, transitions
+    
+    def getReduction(self, state):
+        print("\t",self.grammar.rules[0])
+        for item in state:
+            if item [1] == len(item[0][1]):
+                #Regla "Aceptar"
+                if (item[0] == self.grammar.rules[0]):
+                        return Alphabet.symbol_ACCEPT
+                #Calcular reducciones
+                else:
+                    return self.grammar.follow(item[0][0])
     
     def createTableLR1(self):
         #Creamos los conjuntos de "reglas"
         states, transitions = self.createSets()
-
+        #Crear cabecera con simboloes terminales y no-terminales
         headTb = list()
         headTb.append("")
         headTb .extend(self.grammar.termSymbs.copy())
@@ -109,21 +120,22 @@ class LR0:
             rowAux = list()
             idState = states.index(state)
             rowAux.append(idState)
+            red = self.getReduction(state)
             for elem in headTb:
-                getElemTo =self.findTransition(transtions, idState, elem) 
+                getElemTo =self.findTransition(transitions, idState, elem) 
                 if getElemTo == -1:
                     rowAux.append("")
                 else:
                     rowAux.append(getElemTo)
             #Insertar la Fila
             bodyTb.append(rowAux)
-        
 
-        print(headTb)
-        for row in bodyTb:
-            print(row)
-        print()
-        print(transtions)
+        # print(headTb)
+        # for row in bodyTb:
+        #     print(row)
+        # print()
+        print("T", self.grammar.follow("T"))
+
         
 
 
@@ -132,7 +144,7 @@ def main():
     pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/gramLR0.txt"
     gr = Grammar(pathGR)
     LRTest = LR0(gr)
-    LRTest.createSets()
+    LRTest.createTableLR1()
     # for rule in LRTest.grammar.rules:
     #     print(rule)
     # print()
