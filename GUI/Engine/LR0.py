@@ -63,7 +63,6 @@ class LR0:
                 outItmes.append(pair[0][1][pair[1]])
         order = self.grammar.nonTermSymbs.copy()
         order.extend(self.grammar.termSymbs)
-        order = ["E", "T", "F", "(", "num", "+", "*", ")"]
         return sorted(list(set(outItmes)), key=order.index)
 
 
@@ -149,7 +148,7 @@ class LR0:
         return headTb, bodyTb
 
 def main():
-    pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/gramLR0.txt"
+    pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/gram2LR0.txt"
     gr = Grammar(pathGR)
     LRTest = LR0(gr)
     LRTest.createTableLR1()
