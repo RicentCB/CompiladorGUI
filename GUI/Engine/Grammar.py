@@ -105,7 +105,6 @@ class Grammar():
         if self.Regla():
             token = self.getToken()
             if token == Token.grammar_PC:
-                # print("--Ultima regla", self.rules[len(self.rules)-1])
                 if self.ListaReglasP():
                     return True
                 return False
@@ -213,23 +212,23 @@ class Grammar():
 
     # --- TERMINA DESCENO RECURSIVO ----
     def simbolos_NoTerminales(self):
-        terminales = list()
+        nonTermSymb = list()
         for rule in self.rules:
-            terminales.append(rule[0])
-        return sorted(set(terminales))
+            nonTermSymb.append(rule[0])
+        return sorted(list(set(nonTermSymb)))
 
     def simbolosTerminales(self):
-        no_terminales = list()
+        termSym = list()
+        nonTermSymb = self.nonTermSymbs
         for regla in self.rules:
             for simbolo in regla[1]:
-                if simbolo not in self.simbolos_NoTerminales():
-                    no_terminales.append(simbolo)
-        return sorted(set(no_terminales))
+                if simbolo not in nonTermSymb:
+                    termSym.append(simbolo)
+        return sorted(set(termSym))
     
     def first(self, regla, regla_anterior=[]):        
         c_first = []
         terminales = self.simbolosTerminales()
-        #print("En first: "+regla[0])
         if(regla[0]==Alphabet.symbol_EPSILON):    
             #c_first.append(regla[0])
             return regla[0]
@@ -248,7 +247,6 @@ class Grammar():
                         else:
                             c_first = c_first + first_auxiliar
                     elif self.is_nullable(regla[0]) and (regla[0] in self.simbolos_NoTerminales()):
-                        #print(f"Regla 0 : {regla[0]}")
                         eliminar_epsilon = False 
                         first_auxiliar2 = self.first(rule[1])
                         c_first.append(first_auxiliar2)
@@ -261,7 +259,6 @@ class Grammar():
                                 else:
                                     break
                             for i in range(contador+1):
-                                #print(i)
                                 indice = regla_anterior.index(regla[0])+i
                                 first_auxiliar = self.first(regla_anterior[indice])
                                 if isinstance(first_auxiliar, str):
@@ -272,7 +269,6 @@ class Grammar():
                             auxiliar1 = set(c_first)
                             auxiliar1.discard(Alphabet.symbol_EPSILON)
                             auxiliar2 = list(auxiliar1)
-                            #print(f"En cond {auxiliar2}")
                             c_first = auxiliar2  
             #Quitamos elementos repetidos
             auxiliar = []
@@ -481,9 +477,6 @@ def insertar(tabla,no_terminal, simbolos, num_regla,regla):
         for simbolo in simbolos:
             if terminal == simbolo:
                 indice2.append(tabla[0].index(terminal))
-    # print(f"Indice de {no_terminal}: {indice1}")
-    # print(f"Indices de {simbolos}: {indice2}")
-    # cad = "{0},{1}".format(regla,num_regla)
     cad = (regla,num_regla)
     for indice in indice2:
         tabla[indice1][indice] = (cad)

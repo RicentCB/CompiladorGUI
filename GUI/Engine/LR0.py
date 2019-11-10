@@ -9,8 +9,6 @@ class LR0:
     #regresara una lista con las reglas y sus "pintos"
     # Regresa lista de tuplas
     def closure(self, rule, index):
-        # print(rule[1][index])
-        # print(self.grammar.termSymbs)
         if (index == len(rule[1])) or (rule[1][index] in self.grammar.termSymbs):
             return [(rule, index)]
         else:   #Simbolo es NO terminal
@@ -34,7 +32,7 @@ class LR0:
     
     #Funcion ir, recivbe un "estado" (lista de regla con punto) y un elemento,
     #devuleve otro "estado"
-    def moveTo(self, state, symbol):
+    def goTo(self, state, symbol):
         auxPairs = list()
         for pair in state:
             if len(pair[0][1]) > pair[1]:
@@ -63,17 +61,19 @@ class LR0:
             #pair = ([NT,[r,e,g,l,a]], punto)
             if pair[1] < len(pair[0][1]):
                 outItmes.append(pair[0][1][pair[1]])
-        order = self.grammar.nonTermSymbs
+        order = self.grammar.nonTermSymbs.copy()
         order.extend(self.grammar.termSymbs)
         order = ["E", "T", "F", "(", "num", "+", "*", ")"]
         return sorted(list(set(outItmes)), key=order.index)
 
-    # def printState(self, state):
-    #     for tup in state:
-    #         print(tup[0][0],"->",tup[0][1], tup[1])
 
-    #Funcion que crea los desplazamientos LR0
-    def createTableMoves(self):
+    def findTransition(self, arrayTrans, elemIni, objTrans):
+        for trans in arrayTrans:
+            if (elemIni == trans[0]) and (objTrans == trans[1]):
+                return trans[2]
+        return -1
+
+    def createSets(self):
         states = list()
         transtions = list()
         #Crear el primer "estado"
@@ -84,7 +84,7 @@ class LR0:
             items = self.getItemsMove(states[apunt])
             #Verificar transciones (IrA)
             for item in items:
-                newState = self.moveTo(states[apunt], item)
+                newState = self.goTo(states[apunt], item)
                 #Verificar au no existe ese estado
                 if newState not in states:  #Aun no existe
                     states.append(newState)
@@ -93,11 +93,37 @@ class LR0:
                 transtions.append((apunt, item, indexStateTo))
             apunt += 1
         #Una vez creada todas las transiciones "llenamos la tabla"
-        headTb = self.grammar.termSymbs
-        headTb.append(Ala)
+        return states, transtions
+    
+    def createTableLR1(self):
+        #Creamos los conjuntos de "reglas"
+        states, transitions = self.createSets()
 
-        self.printArray(states)
-        print(len(states))
+        headTb = list()
+        headTb.append("")
+        headTb .extend(self.grammar.termSymbs.copy())
+        headTb.append(Alphabet.symbol_STRINGEND)
+        headTb.extend(self.grammar.nonTermSymbs.copy())
+        bodyTb = list()
+        for state in states:
+            rowAux = list()
+            idState = states.index(state)
+            rowAux.append(idState)
+            for elem in headTb:
+                getElemTo =self.findTransition(transtions, idState, elem) 
+                if getElemTo == -1:
+                    rowAux.append("")
+                else:
+                    rowAux.append(getElemTo)
+            #Insertar la Fila
+            bodyTb.append(rowAux)
+        
+
+        print(headTb)
+        for row in bodyTb:
+            print(row)
+        print()
+        print(transtions)
         
 
 
@@ -106,7 +132,7 @@ def main():
     pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/gramLR0.txt"
     gr = Grammar(pathGR)
     LRTest = LR0(gr)
-    LRTest.createTableMoves()
+    LRTest.createSets()
     # for rule in LRTest.grammar.rules:
     #     print(rule)
     # print()
@@ -117,7 +143,7 @@ def main():
     # for tupla in state0:
     #     print(tupla)
     # print()
-    # state1 = LRTest.moveTo(state0, "(")
+    # state1 = LRTest.goTo(state0, "(")
     # for pair in state1:
     #     print(pair)
 if __name__ == "__main__":
