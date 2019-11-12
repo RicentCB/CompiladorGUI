@@ -1,5 +1,7 @@
 from Grammar import Grammar
 from alphabet import Alphabet
+from analizadorLexico import LexAnalizer
+import sys
 
 class LR0:
     def __init__(self, grammar):
@@ -144,26 +146,113 @@ class LR0:
                     rowAux.append("d{}".format(getElemTo))
             #Insertar la Fila
             bodyTb.append(rowAux)
-
         return headTb, bodyTb
+    
+    def findAction(self, state, symbol, table):
+        idSymbol = table[0].index(symbol)
+        #Recorrer filas de la tabla
+        action = table[1][int(state)][idSymbol+1]    #El primer indice es del estado 
+        if action == '':
+            return (-1)
+        elif action[0] == "d":
+            return [action]
+        elif action[0] == "r": #Reduccion:
+            return [action, self.grammar.rules[int(action[1])]]
+        elif action == Alphabet.symbol_ACCEPT:
+            return [action]
+        return [-1]
+    
+
+    def analizeStr(self, stringAn, lexAnString, dicSymbTerm):
+        #Crear tabla de transcion
+        headTb, bodyTb = self.createTableLR1()
+        #Crear tabla de accion
+        actionTable = (headTb, bodyTb)
+        stringAn += Alphabet.symbol_STRINGEND
+        invertDict = dict(map(reversed, dicSymbTerm.items()))
+        #registros
+        regStack = list()
+        regString = list()
+        regAction = list()
+        #Inicializar los registros
+        regStack.append([0])
+        regString.append(stringAn)
+        #Pedir Accion
+        statusLexStr = lexAnString.statusLex()
+        auxLexem = lexAnString.yylex()
+        regAction.append(self.findAction(0, invertDict[auxLexem[0]], actionTable))
+        lexAnString.statusLex(statusLexStr)
+        #Variable para el ultimo lexema
+        lastLexemFound = list()
+        complete = False
+        while not complete:
+            #Socilicar ulmtima informacion en las pilas
+            auxStack = regStack[-1].copy()
+            auxAction = regAction[-1].copy()
+            auxString = regString[-1]
+            if auxAction[0] == -1:
+                print("Error en la cadena analizada por LRO")
+                sys.exit()
+            #Accion Valida
+            if auxAction[0][0] == "r":    #Reduccion
+                #Sacar elementos de la pila
+                for cont in range(2*len(auxAction[1][1])):  #Pop a la |Regla|   
+                    auxStack.pop()
+                lastState = auxStack[-1]
+                auxStack.append(auxAction[1][0])
+                getAction = self.findAction(lastState,auxAction[1][0], actionTable)
+                auxState = getAction[0]
+                auxStack.append(int(auxState[1::]))  #Insertar el "estado" 
+                regString.append(auxString)
+            elif auxAction[0][0] == "d":  #Desplazamiento
+                auxLexem = lexAnString.yylex()
+                lastLexemFound = auxLexem.copy()
+                #Pop a la cadena
+                stringOut = ""
+                stringPop = list(auxString)
+                #Funcion pop
+                for i in range(0, len(lastLexemFound[1])):
+                    stringPop.pop(0)
+                for car in stringPop:   #Reconstruir la cadena
+                    stringOut += car
+                #Insertar en los registros
+                auxStack.append(invertDict[lastLexemFound[0]])
+                auxState = auxAction[0]
+                auxStack.append(auxState[1::])    #Estado
+                regString.append(stringOut)
+            #Ultimo en la pila
+            regStack.append(auxStack)   
+            #Buscar Accion
+            if regString[-1][0] == Alphabet.symbol_STRINGEND:
+                regAction.append(self.findAction(auxStack[-1], Alphabet.symbol_STRINGEND, actionTable))            
+                if regAction[-1][0] == Alphabet.symbol_ACCEPT:
+                    complete = True
+            else:
+                statusLexStr = lexAnString.statusLex()
+                auxLexem = lexAnString.yylex()
+                regAction.append(self.findAction(auxStack[-1], invertDict[auxLexem[0]], actionTable))
+                lexAnString.statusLex(statusLexStr)
+        return regStack, regString, regAction
 
 def main():
-    pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/gram2LR0.txt"
+    pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/gramLR0.txt"
     gr = Grammar(pathGR)
     LRTest = LR0(gr)
-    LRTest.createTableLR1()
-    # for rule in LRTest.grammar.rules:
-    #     print(rule)
-    # print()
-    # rule = LRTest.grammar.rules[0]
-    # print(rule)
-    # print()
-    # state0 = LRTest.C(rule, 0)
-    # for tupla in state0:
-    #     print(tupla)
-    # print()
-    # state1 = LRTest.goTo(state0, "(")
-    # for pair in state1:
-    #     print(pair)
+    anString = "025*(025+110)"
+    lexAnString = LexAnalizer.createLexFile("/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/lex.txt", anString)
+    #Diccionario
+    pathDict = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/dictFile.txt" #Belmont
+    #Crear diccionario
+    symbArray = list()
+    tokenArray = list()
+    dictFile = open(pathDict, "r")
+    fileLines = dictFile.readlines()
+    for line in fileLines:
+        auxArray = line.split()
+        symbArray.append(auxArray[0])
+        tokenArray.append(auxArray[1])
+    dictTerm = dict(zip(symbArray, tokenArray))
+
+    reg1, reg2, reg3 = LRTest.analizeStr(anString, lexAnString, dictTerm)
 if __name__ == "__main__":
     main()
