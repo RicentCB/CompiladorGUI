@@ -28,7 +28,7 @@ class Grammar():
                     if car != "\n":
                         self.strGrammar += car
             #Modificar de acuerdo a la ruta especifica
-            pathLexAn = "Engine/files/analizadorLexicoGramatica.txt"
+            pathLexAn = "GUI/Engine/files/analizadorLexicoGramatica.txt"
             #pathLexAn = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/analizadorLexicoGramatica.txt"
             #Crear Analizador Lexico para Gramaticas
             # regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
@@ -301,34 +301,25 @@ class Grammar():
         if(s_noTerminal==self.rules[0][0]):
             c_follow.append("$")
         for rule in reglas_auxiliar:
-            if s_noTerminal in rule[1] and rule[1].index(s_noTerminal) < len(rule[1])-1:
-                indice = rule[1].index(s_noTerminal)+1
-                first_auxiliar = self.first([rule[1][indice]])
-                if self.is_nullable([rule[1][indice]]):
-                    follow_auxiliar = self.follow(rule[1][indice])
-                    if isinstance(first_auxiliar,str):
-                        c_follow.append(first_auxiliar)
-                    else:
-                        c_follow = c_follow + first_auxiliar
-                    if isinstance(follow_auxiliar,str):
-                        c_follow.append(follow_auxiliar)
-                    else:
-                        c_follow = c_follow + follow_auxiliar
-                    eliminar_epsilon = True
+            indice_s_noTerminal = rule[1].index(s_noTerminal)
+            sub_lista = rule[1][indice_s_noTerminal+1:]
+            if(len(sub_lista)>0):
+                f_aux1 = self.first(sub_lista)
+                if Alphabet.symbol_EPSILON in f_aux1:
+                    f_aux1.remove(Alphabet.symbol_EPSILON)
+                    c_follow = agregar(f_aux1,c_follow)
+                    # c_follow = c_follow + (self.follow(rule[0]))
+                    c_follow = agregar(self.follow(rule[0]), c_follow)
                 else:
-                    if isinstance(first_auxiliar,str):
-                        c_follow.append(first_auxiliar)
-                    else:
-                        c_follow = c_follow + first_auxiliar
-                if eliminar_epsilon:
-                    c_follow.remove(Alphabet.symbol_EPSILON)
-            elif s_noTerminal in rule[1] and rule[1].index(s_noTerminal) == len(rule[1])-1:
-                auxiliar = self.follow(rule[0])
-                if isinstance(auxiliar,str):
-                    c_follow.append(auxiliar)
+                    c_follow = agregar(f_aux1,c_follow)
+            else:
+                if rule[0] == s_noTerminal:
+                    return c_follow
                 else:
-                    c_follow = c_follow + auxiliar
-        return c_follow
+                    c_follow = agregar(self.follow(rule[0]), c_follow)
+        #Eliminamos los elementos repetidos
+            aux = set(c_follow)
+        return list(aux)
     
     def creatTableLL1(self): 
         terminales = list(self.simbolosTerminales())
@@ -467,6 +458,7 @@ class Grammar():
 
         return regStack, regString, regAction 
 
+#Esta función inserta la regla y el numero de regla en la tabla LL1
 def insertar(tabla,no_terminal, simbolos, num_regla,regla):
     for tupla in tabla:
         if no_terminal == tupla[0]:
@@ -479,14 +471,25 @@ def insertar(tabla,no_terminal, simbolos, num_regla,regla):
     cad = (regla,num_regla)
     for indice in indice2:
         tabla[indice1][indice] = (cad)
-
+#Esta funcion agrega elementos a una lista, si es una cadena
+#la agrega, si es una lista la une
+def agregar(elementos, lista):
+    if isinstance(elementos,str):
+        lista.append(elementos)
+    else:
+        lista = lista + elementos
+    return lista
 
 if __name__ == "__main__":
-    path = "Engine/Examples/gramLR0.txt" #Belmont
+    path = "GUI/Engine/Examples/gramLR0.txt" #Belmont
     pathDict = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/dictFile.txt" #Belmont
     #path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
     g1 = Grammar(path)
     print("-------ll1--------")
+    for rule in g1.rules:
+        print(rule)
+    for simbolo in g1.simbolos_NoTerminales():
+        print(f"Follow de {simbolo}: {g1.follow(simbolo)}")
     # termSym.remove(Alphabet().symbol_EPSILON)
     # arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
     # anString = "(025*110)"
