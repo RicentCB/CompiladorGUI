@@ -50,10 +50,6 @@ class LR0:
             if rule not in finalRules:
                 finalRules.append(rule)
         return finalRules
-    
-    def printArray(self,array):
-        for elem in array:
-            print(elem)
 
     #Funcion que devuelve el conjunto de items para aplicar la operacion "Ir"
     # Recibe un conjunto de reglas con punto (Estado)
@@ -153,7 +149,7 @@ class LR0:
         #Recorrer filas de la tabla
         action = table[1][int(state)][idSymbol+1]    #El primer indice es del estado 
         if action == '':
-            return (-1)
+            return [-1]
         elif action[0] == "d":
             return [action]
         elif action[0] == "r": #Reduccion:
@@ -171,9 +167,7 @@ class LR0:
         stringAn += Alphabet.symbol_STRINGEND
         invertDict = dict(map(reversed, dicSymbTerm.items()))
         #registros
-        regStack = list()
-        regString = list()
-        regAction = list()
+        regString, regStack, regAction = list(), list(), list()
         #Inicializar los registros
         regStack.append([0])
         regString.append(stringAn)
@@ -232,6 +226,7 @@ class LR0:
                 auxLexem = lexAnString.yylex()
                 regAction.append(self.findAction(auxStack[-1], invertDict[auxLexem[0]], actionTable))
                 lexAnString.statusLex(statusLexStr)
+
         return regStack, regString, regAction
 
 def main():
