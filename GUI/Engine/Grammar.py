@@ -294,7 +294,7 @@ class Grammar():
         reglas_auxiliar = []
         for rule in self.rules:
             if s_noTerminal in rule[1]:
-                ocurrencias = ocurrencias+1
+                ocurrencias += 1
                 reglas_auxiliar.append(rule)
         if(s_noTerminal==self.rules[0][0] and ocurrencias == 0):
             return ['$']
@@ -386,7 +386,7 @@ class Grammar():
         #Insertar Datos Iniciales
         stringAn += Alphabet.symbol_STRINGEND
         regString.append(stringAn)
-        regStack.append([Alphabet.symbol_STRINGEND,self.rules[0][0]])
+        regStack.append([Alphabet.symbol_STRINGEND, self.rules[0][0]])
         statusLexStr = lexAnString.statusLex()
         auxLexem = lexAnString.yylex()
         invertDict = dict(map(reversed, dicSymbTerm.items()))

@@ -1,5 +1,7 @@
 from Grammar import Grammar
 from alphabet import Alphabet
+from analizadorLexico import LexAnalizer
+import sys
 
 class LR0:
     def __init__(self, grammar):
@@ -48,10 +50,6 @@ class LR0:
             if rule not in finalRules:
                 finalRules.append(rule)
         return finalRules
-    
-    def printArray(self,array):
-        for elem in array:
-            print(elem)
 
     #Funcion que devuelve el conjunto de items para aplicar la operacion "Ir"
     # Recibe un conjunto de reglas con punto (Estado)
@@ -63,7 +61,6 @@ class LR0:
                 outItmes.append(pair[0][1][pair[1]])
         order = self.grammar.nonTermSymbs.copy()
         order.extend(self.grammar.termSymbs)
-        order = ["E", "T", "F", "(", "num", "+", "*", ")"]
         return sorted(list(set(outItmes)), key=order.index)
 
 
@@ -96,23 +93,36 @@ class LR0:
         return states, transitions
     
     def getReduction(self, state):
-        print("\t",self.grammar.rules[0])
         for item in state:
+            #Econtrar elemento con . al final
             if item [1] == len(item[0][1]):
                 #Regla "Aceptar"
                 if (item[0] == self.grammar.rules[0]):
-                        return Alphabet.symbol_ACCEPT
+                        return ([Alphabet.symbol_STRINGEND], Alphabet.symbol_ACCEPT)
                 #Calcular reducciones
                 else:
-                    return self.grammar.follow(item[0][0])
-    
+                    return (self.grammar.follow(item[0][0]), "r{}".format(self.grammar.rules.index(item[0])))
+
+    def popItemReduction(self, reduction, symbol):
+        if isinstance(reduction, tuple):
+            elements = reduction[0]
+            strOut = reduction[1]
+            for elem in elements:
+                if elem == symbol:
+                    reduction[0].pop(reduction[0].index(elem))
+                    return strOut
+            return ""
+        else:
+            return ""
+
+
     def createTableLR1(self):
         #Creamos los conjuntos de "reglas"
         states, transitions = self.createSets()
         #Crear cabecera con simboloes terminales y no-terminales
         headTb = list()
         headTb.append("")
-        headTb .extend(self.grammar.termSymbs.copy())
+        headTb .extend(sorted(self.grammar.termSymbs.copy()))
         headTb.append(Alphabet.symbol_STRINGEND)
         headTb.extend(self.grammar.nonTermSymbs.copy())
         bodyTb = list()
@@ -120,43 +130,124 @@ class LR0:
             rowAux = list()
             idState = states.index(state)
             rowAux.append(idState)
-            red = self.getReduction(state)
+            reduction = self.getReduction(state)
             for elem in headTb:
                 getElemTo =self.findTransition(transitions, idState, elem) 
                 if getElemTo == -1:
-                    rowAux.append("")
+                    if reduction == None or len(reduction[0]) == 0:
+                        rowAux.append("")
+                    else:
+                        rowAux.append(self.popItemReduction(reduction, elem))
                 else:
-                    rowAux.append(getElemTo)
+                    rowAux.append("d{}".format(getElemTo))
             #Insertar la Fila
             bodyTb.append(rowAux)
+        return headTb, bodyTb
+    
+    def findAction(self, state, symbol, table):
+        idSymbol = table[0].index(symbol)
+        #Recorrer filas de la tabla
+        action = table[1][int(state)][idSymbol+1]    #El primer indice es del estado 
+        if action == '':
+            return [-1]
+        elif action[0] == "d":
+            return [action]
+        elif action[0] == "r": #Reduccion:
+            return [action, self.grammar.rules[int(action[1])]]
+        elif action == Alphabet.symbol_ACCEPT:
+            return [action]
+        return [-1]
+    
 
-        # print(headTb)
-        # for row in bodyTb:
-        #     print(row)
-        # print()
-        print("T", self.grammar.follow("T"))
+    def analizeStr(self, stringAn, lexAnString, dicSymbTerm):
+        #Crear tabla de transcion
+        headTb, bodyTb = self.createTableLR1()
+        #Crear tabla de accion
+        actionTable = (headTb, bodyTb)
+        stringAn += Alphabet.symbol_STRINGEND
+        invertDict = dict(map(reversed, dicSymbTerm.items()))
+        #registros
+        regString, regStack, regAction = list(), list(), list()
+        #Inicializar los registros
+        regStack.append([0])
+        regString.append(stringAn)
+        #Pedir Accion
+        statusLexStr = lexAnString.statusLex()
+        auxLexem = lexAnString.yylex()
+        regAction.append(self.findAction(0, invertDict[auxLexem[0]], actionTable))
+        lexAnString.statusLex(statusLexStr)
+        #Variable para el ultimo lexema
+        lastLexemFound = list()
+        complete = False
+        while not complete:
+            #Socilicar ulmtima informacion en las pilas
+            auxStack = regStack[-1].copy()
+            auxAction = regAction[-1].copy()
+            auxString = regString[-1]
+            if auxAction[0] == -1:
+                print("Error en la cadena analizada por LRO")
+                sys.exit()
+            #Accion Valida
+            if auxAction[0][0] == "r":    #Reduccion
+                #Sacar elementos de la pila
+                for cont in range(2*len(auxAction[1][1])):  #Pop a la |Regla|   
+                    auxStack.pop()
+                lastState = auxStack[-1]
+                auxStack.append(auxAction[1][0])
+                getAction = self.findAction(lastState,auxAction[1][0], actionTable)
+                auxState = getAction[0]
+                auxStack.append(int(auxState[1::]))  #Insertar el "estado" 
+                regString.append(auxString)
+            elif auxAction[0][0] == "d":  #Desplazamiento
+                auxLexem = lexAnString.yylex()
+                lastLexemFound = auxLexem.copy()
+                #Pop a la cadena
+                stringOut = ""
+                stringPop = list(auxString)
+                #Funcion pop
+                for i in range(0, len(lastLexemFound[1])):
+                    stringPop.pop(0)
+                for car in stringPop:   #Reconstruir la cadena
+                    stringOut += car
+                #Insertar en los registros
+                auxStack.append(invertDict[lastLexemFound[0]])
+                auxState = auxAction[0]
+                auxStack.append(auxState[1::])    #Estado
+                regString.append(stringOut)
+            #Ultimo en la pila
+            regStack.append(auxStack)   
+            #Buscar Accion
+            if regString[-1][0] == Alphabet.symbol_STRINGEND:
+                regAction.append(self.findAction(auxStack[-1], Alphabet.symbol_STRINGEND, actionTable))            
+                if regAction[-1][0] == Alphabet.symbol_ACCEPT:
+                    complete = True
+            else:
+                statusLexStr = lexAnString.statusLex()
+                auxLexem = lexAnString.yylex()
+                regAction.append(self.findAction(auxStack[-1], invertDict[auxLexem[0]], actionTable))
+                lexAnString.statusLex(statusLexStr)
 
-        
-
-
+        return regStack, regString, regAction
 
 def main():
     pathGR = "/Examples/gramLR0.txt"
     gr = Grammar(pathGR)
     LRTest = LR0(gr)
-    LRTest.createTableLR1()
-    # for rule in LRTest.grammar.rules:
-    #     print(rule)
-    # print()
-    # rule = LRTest.grammar.rules[0]
-    # print(rule)
-    # print()
-    # state0 = LRTest.C(rule, 0)
-    # for tupla in state0:
-    #     print(tupla)
-    # print()
-    # state1 = LRTest.goTo(state0, "(")
-    # for pair in state1:
-    #     print(pair)
+    anString = "025*(025+110)"
+    lexAnString = LexAnalizer.createLexFile("/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/lex.txt", anString)
+    #Diccionario
+    pathDict = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/dictFile.txt" #Belmont
+    #Crear diccionario
+    symbArray = list()
+    tokenArray = list()
+    dictFile = open(pathDict, "r")
+    fileLines = dictFile.readlines()
+    for line in fileLines:
+        auxArray = line.split()
+        symbArray.append(auxArray[0])
+        tokenArray.append(auxArray[1])
+    dictTerm = dict(zip(symbArray, tokenArray))
+
+    reg1, reg2, reg3 = LRTest.analizeStr(anString, lexAnString, dictTerm)
 if __name__ == "__main__":
     main()
