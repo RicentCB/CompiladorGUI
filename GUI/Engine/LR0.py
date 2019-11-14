@@ -141,7 +141,7 @@ class LR0:
 
 
 def main():
-    pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/gramLR0.txt"
+    pathGR = "/Examples/gramLR0.txt"
     gr = Grammar(pathGR)
     LRTest = LR0(gr)
     LRTest.createTableLR1()
