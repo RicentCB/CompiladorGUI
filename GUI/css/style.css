@@ -155,7 +155,6 @@ main h1.main-title{
     width: 0;
 }
 .uplod-file [type="file"] + label {
-    background: #f15d22;
     border: none;
     border-radius: 5px;
     color: #fff;
@@ -191,7 +190,7 @@ main h1.main-title{
 }
 
 .uplod-file [type="file"] + label.btn-2:hover {
-    background-color: #22a5f1;
+    background-color: #4e88aa;
 }
 .uplod-file [type="file"] + label.btn-2:hover::before {
     right: 75%;
@@ -348,6 +347,37 @@ table tbody td{
 }
 table.title-upper th{
     text-transform: uppercase;
+}
+/*----------------------------------    T  A  B  S   ----------------------------------------*/
+#tabs{
+    width: 100%;
+    background-color: #e2e2e2;
+    clear: left;
+}
+#tabs #nav-tab-menu{
+    width: 100%;
+    background-color: #ffffff;
+    display: flex;
+}
+#tabs #nav-tab-menu .nav-tab.item{
+    color: rgb(173, 173, 173);
+    font-weight: bold;
+    flex: 1;
+    padding: 12px 0;
+    text-align: center;
+    letter-spacing: 1px;
+    border-bottom: 2px solid rgb(173, 173, 173);
+}
+#tabs #nav-tab-menu .nav-tab.item.active{
+    border-bottom: 2px solid #4e88aa;
+    background-color: #4e88aa;
+    box-shadow: -2px -3px 10px#4e88aa;
+    color: white;
+    border-radius: 5px 5px 0 0;
+
+}
+#tabs .container-tab{
+    padding-top: 20px;
 }
 /*  -----------------------------  H E L P E R    C L A S S  -----------------------------  */
 .col-50{

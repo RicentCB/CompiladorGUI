@@ -10,17 +10,52 @@ var path = require("path");
 
 $(document).ready(function(){
 
-    const { PythonShell } = require("python-shell");
+    //Botones de Tabs
+    let tabContainer = $("main #tabs");
+    let tabMenuLl1 = tabContainer.find(".nav-tab#item-ll1");
+    let tabMenuLr0 = tabContainer.find(".nav-tab#item-lr0");
+    let tabMenuLr1 = tabContainer.find(".nav-tab#item-lr1");
 
-    let JSONTable = {
-        Head :["SIM1", "SIM2", "SIM3", "SIM4", "SIM5", "SIM6"],
-        Body : [
-            ["1","2","3", "4","5", "6"],
-            ["1","2","3", "4","5", "6"],
-            ["1","2","3", "4","5", "6"],
-        ]
+    let tabContainerLl1 = tabContainer.find(".container-tab#ll1");
+    let tabContainerLr0 = tabContainer.find(".container-tab#lr0");
+    let tabContainerLr1 = tabContainer.find(".container-tab#lr1");
+
+    function activeItemNavTab(obj){
+        //Clase active
+        allItems = $(obj).parent().find(".nav-tab");
+        for (let i = 0; i < allItems.length; i++) 
+            $(allItems[i]).removeClass("active")
+        $(obj).addClass("active");
+        //Mostrar contenido del item selccionado
+        let objId = $(obj).attr("id")
+        if (objId == $(tabMenuLl1).attr("id")){
+            tabContainerLl1.slideDown(500)
+            tabContainerLr0.css({"display": "none"})
+            tabContainerLr1.css({"display": "none"})
+        }else if(objId == $(tabMenuLr0).attr("id")){
+            tabContainerLl1.css({"display": "none"})
+            tabContainerLr0.slideDown(500)
+            tabContainerLr1.css({"display": "none"})
+        }else if(objId == $(tabMenuLr1).attr("id")){
+            tabContainerLl1.css({"display": "none"});
+            tabContainerLr0.css({"display": "none"})
+            tabContainerLr1.slideDown(500)
+        }
     }
-    
+
+    tabMenuLl1.click(function(e){
+        e.preventDefault();
+        activeItemNavTab($(this))
+    })
+    tabMenuLr0.click(function(e){
+        e.preventDefault();
+        activeItemNavTab($(this))
+    })
+    tabMenuLr1.click(function(e){
+        e.preventDefault();
+        activeItemNavTab($(this))
+    })
+    const { PythonShell } = require("python-shell");
 
     let btnGetFileGrammar = $("main#grammar #file-input-grammar");
     let containerTable = $("main#grammar .create-table-result#grammar-ll1");

@@ -57,37 +57,66 @@
             D -> b E | &#949; ; <br>
             E -> e D | d D | &#949; | c; <br>
         </p>
-        <div class="uplod-file">
-            <p style="text-align: center" id="title-in-grammar">Selecciona el archivo de entrada</p>
-            <input type="file" id="file-input-grammar"/>
-            <label for="file-input-grammar" class="btn-2">Subir Gramatica</label>
+        <div class="one-input" id="inputString">
+            <form>
+                <div class="uplod-file col-50">
+                    <p style="text-align: center" id="title-lexAn">Selecciona el archivo del analizador lexico</p>
+                    <input type="file" id="file-input-lexAn"/>
+                    <label for="file-input-lexAn" class="btn-2">Subir Analizador</label>
+                </div>
+                <div class="uplod-file col-50">
+                    <p style="text-align: center" id="title-symb">Selecciona el archivo de asociacion de Simbolos terminales</p>
+                    <input type="file" id="file-input-symb"/>
+                    <label for="file-input-symb" class="btn-2">Subir Simbolos</label>
+                </div>
+                
+            </form>
         </div>
-        <section class="create-table-result" id="grammar-ll1">
-            <!-- ADD TABLE WITH JS -->
-        </section>
-        <section id="analizeStr" style="display: none">
-            <h2>Analizar Cadena con la gramatica</h2>
-            <div class="one-input" id="inputString">
-                <form>
-                    <div class="uplod-file col-50">
-                        <p style="text-align: center" id="title-lexAn">Selecciona el archivo del analizador lexico</p>
-                        <input type="file" id="file-input-lexAn"/>
-                        <label for="file-input-lexAn" class="btn-2">Subir Analizador</label>
-                    </div>
-                    <div class="uplod-file col-50">
-                        <p style="text-align: center" id="title-symb">Selecciona el archivo de asociacion de Simbolos terminales</p>
-                        <input type="file" id="file-input-symb"/>
-                        <label for="file-input-symb" class="btn-2">Subir Simbolos</label>
-                    </div>
-                    <label for="stringAnGrammar">Introduce la cadena a analizar:</label>
-                    <input type="text" id="inStringAnGrammar" placeholder="12.5+983*(123-5)" disabled>
-                    <input type="submit" value="Analizar" id="btnStringAnGrammar">
-                </form>
+        <div id="tabs" >
+            <div id="nav-tab-menu">
+                <a href="#" id="item-ll1" class="nav-tab item active">ANALIZADOR LL(1)</a>
+                <a href="#" id="item-lr0" class="nav-tab item">ANALIZADOR LR(0)</a>
+                <a href="#" id="item-lr1" class="nav-tab item">ANALIZADOR LR(1)</a>
             </div>
-            <section class="table" id="regsAnalizeString">
-                <!-- ADD TABLE WITH JS -->
-            </section>
-        </section>
+            <div id="container-all-tabs">
+                <div class="container-tab" id="ll1">
+                    <div class="uplod-file">
+                        <p style="text-align: center" id="title-in-grammar">Selecciona el archivo de entrada para LL1</p>
+                        <input type="file" id="file-input-grammar-ll1"/>
+                        <label for="file-input-grammar" class="btn-2">Subir Gramatica LL1</label>
+                    </div>
+                    <section class="create-table-result" id="grammar-ll1">
+                        <!-- ADD TABLE WITH JS -->
+                    </section>
+                    <section id="analizeStr" style="display: none">
+                        <h2>Analizar Cadena con la gramatica</h2>
+                        
+                        <label for="stringAnGrammar">Introduce la cadena a analizar:</label>
+                                <input type="text" id="inStringAnGrammar" placeholder="12.5+983*(123-5)" disabled>
+                                <input type="submit" value="Analizar" id="btnStringAnGrammar">
+                        <section class="table" id="regsAnalizeString">
+                            <!-- ADD TABLE WITH JS -->
+                        </section>
+                    </section>
+                            
+                </div>
+                <div class="container-tab" style="display: none;" id="lr0">
+                    <div class="uplod-file">
+                        <p style="text-align: center" id="title-in-grammar">Selecciona el archivo de entrada para LR0</p>
+                        <input type="file" id="file-input-grammar-lr0"/>
+                        <label for="file-input-grammar" class="btn-2">Subir Gramatica LR0</label>
+                    </div>
+                </div>
+                <div class="container-tab" style="display: none;" id="lr1">
+                    <div class="uplod-file">
+                        <p style="text-align: center" id="title-in-grammar">Selecciona el archivo de entrada para LR1</p>
+                        <input type="file" id="file-input-grammar-lr1"/>
+                        <label for="file-input-grammar" class="btn-2">Subir Gramatica LR1</label>
+                    </div>                   
+                </div>
+            </div>
+        </div>
+
         
 
 
