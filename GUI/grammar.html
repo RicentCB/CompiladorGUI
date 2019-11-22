@@ -57,6 +57,7 @@
             D -> b E | &#949; ; <br>
             E -> e D | d D | &#949; | c; <br>
         </p>
+        <!-- F  I  L  E    I  N  P  U  T -->
         <div class="one-input" id="inputString">
             <form>
                 <div class="uplod-file col-50">
@@ -72,6 +73,7 @@
                 
             </form>
         </div>
+        <!-- T   A   B   S -->
         <div id="tabs" >
             <div id="nav-tab-menu">
                 <a href="#" id="item-ll1" class="nav-tab item active">ANALIZADOR LL(1)</a>
@@ -81,19 +83,18 @@
             <div id="container-all-tabs">
                 <div class="container-tab" id="ll1">
                     <div class="uplod-file">
-                        <p style="text-align: center" id="title-in-grammar">Selecciona el archivo de entrada para LL1</p>
+                        <p style="text-align: center" id="title-in-grammar-ll1">Selecciona el archivo de entrada para LL1</p>
                         <input type="file" id="file-input-grammar-ll1"/>
-                        <label for="file-input-grammar" class="btn-2">Subir Gramatica LL1</label>
+                        <label for="file-input-grammar-ll1" class="btn-2">Subir Gramatica LL1</label>
                     </div>
                     <section class="create-table-result" id="grammar-ll1">
                         <!-- ADD TABLE WITH JS -->
                     </section>
-                    <section id="analizeStr" style="display: none">
+                    <section id="analizeStr-ll1" style="display: none">
                         <h2>Analizar Cadena con la gramatica</h2>
-                        
                         <label for="stringAnGrammar">Introduce la cadena a analizar:</label>
-                                <input type="text" id="inStringAnGrammar" placeholder="12.5+983*(123-5)" disabled>
-                                <input type="submit" value="Analizar" id="btnStringAnGrammar">
+                                <input type="text" id="inStringAnGrammarLL1" placeholder="12.5+983*(123-5)">
+                                <input type="submit" value="Analizar" id="btnStringAnGrammarLL1">
                         <section class="table" id="regsAnalizeString">
                             <!-- ADD TABLE WITH JS -->
                         </section>
@@ -102,16 +103,16 @@
                 </div>
                 <div class="container-tab" style="display: none;" id="lr0">
                     <div class="uplod-file">
-                        <p style="text-align: center" id="title-in-grammar">Selecciona el archivo de entrada para LR0</p>
+                        <p style="text-align: center" id="title-in-grammar-lr0">Selecciona el archivo de entrada para LR0</p>
                         <input type="file" id="file-input-grammar-lr0"/>
-                        <label for="file-input-grammar" class="btn-2">Subir Gramatica LR0</label>
+                        <label for="file-input-grammar-lr0" class="btn-2">Subir Gramatica LR0</label>
                     </div>
                 </div>
                 <div class="container-tab" style="display: none;" id="lr1">
                     <div class="uplod-file">
-                        <p style="text-align: center" id="title-in-grammar">Selecciona el archivo de entrada para LR1</p>
+                        <p style="text-align: center" id="title-in-grammar-lr1">Selecciona el archivo de entrada para LR1</p>
                         <input type="file" id="file-input-grammar-lr1"/>
-                        <label for="file-input-grammar" class="btn-2">Subir Gramatica LR1</label>
+                        <label for="file-input-grammar-lr1" class="btn-2">Subir Gramatica LR1</label>
                     </div>                   
                 </div>
             </div>

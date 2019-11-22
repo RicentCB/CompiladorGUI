@@ -157,7 +157,6 @@ class LR0:
         elif action == Alphabet.symbol_ACCEPT:
             return [action]
         return [-1]
-    
 
     def analizeStr(self, stringAn, lexAnString, dicSymbTerm):
         #Crear tabla de transcion

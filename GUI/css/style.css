@@ -353,6 +353,7 @@ table.title-upper th{
     width: 100%;
     background-color: #e2e2e2;
     clear: left;
+    margin-top: 30px;
 }
 #tabs #nav-tab-menu{
     width: 100%;
@@ -377,7 +378,7 @@ table.title-upper th{
 
 }
 #tabs .container-tab{
-    padding-top: 20px;
+    padding: 30px 40px;
 }
 /*  -----------------------------  H E L P E R    C L A S S  -----------------------------  */
 .col-50{

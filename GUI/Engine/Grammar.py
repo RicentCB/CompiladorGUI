@@ -28,8 +28,8 @@ class Grammar():
                     if car != "\n":
                         self.strGrammar += car
             #Modificar de acuerdo a la ruta especifica
-            pathLexAn = "GUI/Engine/files/analizadorLexicoGramatica.txt"
-            #pathLexAn = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/analizadorLexicoGramatica.txt"
+            # pathLexAn = "GUI/Engine/files/analizadorLexicoGramatica.txt"
+            pathLexAn = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/analizadorLexicoGramatica.txt"
             #Crear Analizador Lexico para Gramaticas
             # regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
             # regExp2 = "(-)&(>)"
@@ -307,7 +307,7 @@ class Grammar():
                 f_aux1 = self.first(sub_lista)
                 if Alphabet.symbol_EPSILON in f_aux1:
                     f_aux1.remove(Alphabet.symbol_EPSILON)
-                    c_follow = agregar(fgit_aux1,c_follow)
+                    c_follow = agregar(f_aux1,c_follow)
                     # c_follow = c_follow + (self.follow(rule[0]))
                     c_follow = agregar(self.follow(rule[0]), c_follow)
                 else:
@@ -481,15 +481,12 @@ def agregar(elementos, lista):
     return lista
 
 if __name__ == "__main__":
-    path = "GUI/Engine/Examples/gram2LR0.txt" #Belmont
+    path = "GUI/Engine/Examples/GramaticaEj.txt" #Belmont
     pathDict = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/dictFile.txt" #Belmont
     #path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
     g1 = Grammar(path)
     print("-------ll1--------")
-    for rule in g1.rules:
-        print(rule)
-    for simbolo in g1.simbolos_NoTerminales():
-        print(f"Follow de {simbolo}: {g1.follow(simbolo)}")
+    print(g1.creatTableLL1())
     # termSym.remove(Alphabet().symbol_EPSILON)
     # arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
     # anString = "(025*110)"
