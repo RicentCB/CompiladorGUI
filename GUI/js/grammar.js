@@ -181,7 +181,7 @@ $(document).ready(function(){
                 strTable += "<tbody>";
                 for (let i = 0; i < jsonString.Action.length; i++) {
                     strTable += "<tr>";
-                        strTable += "<td>"+i+"</td>";
+                        strTable += "<td>"+(i+1)+"</td>";
                         strTable += "<td>"+jsonString.Stack[i]+"</td>"
                         strTable += "<td>"+jsonString.String[i]+"</td>"
                         strTable += "<td>"+jsonString.Action[i]+"</td>"
@@ -309,7 +309,7 @@ $(document).ready(function(){
                     strTable += "<tbody>";
                     for (let i = 0; i < jsonString.Action.length; i++) {
                         strTable += "<tr>";
-                            strTable += "<td>"+i+"</td>";
+                            strTable += "<td>"+(i+1)+"</td>";
                             strTable += "<td>"+jsonString.Stack[i]+"</td>"
                             strTable += "<td>"+jsonString.String[i]+"</td>"
                             strTable += "<td>"+jsonString.Action[i]+"</td>"
