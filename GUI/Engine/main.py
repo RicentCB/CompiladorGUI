@@ -181,7 +181,7 @@ else:   #Numero de argumentos valido
             fileObjectGrammar.close()
             #Crear tabla ll1 y mostrarla
             LR0Obj = LR0(gramObject)
-            head, body = LR0Obj.createTableLR1()
+            head, body = LR0Obj.createTableLR0()
             print(json.dumps({"Head":head, "Body":body, "message": True}))
         #Analizar una cadena con LR0
         elif(sys.argv[2] == "StringLR0"):

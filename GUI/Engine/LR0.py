@@ -116,7 +116,7 @@ class LR0:
             return ""
 
 
-    def createTableLR1(self):
+    def createTableLR0(self):
         #Creamos los conjuntos de "reglas"
         states, transitions = self.createSets()
         #Crear cabecera con simboloes terminales y no-terminales
@@ -132,14 +132,15 @@ class LR0:
             rowAux.append(idState)
             reduction = self.getReduction(state)
             for elem in headTb:
-                getElemTo =self.findTransition(transitions, idState, elem) 
-                if getElemTo == -1:
-                    if reduction == None or len(reduction[0]) == 0:
-                        rowAux.append("")
+                if(elem != ""):
+                    getElemTo =self.findTransition(transitions, idState, elem) 
+                    if getElemTo == -1:
+                        if reduction == None or len(reduction[0]) == 0:
+                            rowAux.append("")
+                        else:
+                            rowAux.append(self.popItemReduction(reduction, elem))
                     else:
-                        rowAux.append(self.popItemReduction(reduction, elem))
-                else:
-                    rowAux.append("d{}".format(getElemTo))
+                        rowAux.append("d{}".format(getElemTo))
             #Insertar la Fila
             bodyTb.append(rowAux)
         return headTb, bodyTb
@@ -160,7 +161,7 @@ class LR0:
 
     def analizeStr(self, stringAn, lexAnString, dicSymbTerm):
         #Crear tabla de transcion
-        headTb, bodyTb = self.createTableLR1()
+        headTb, bodyTb = self.createTableLR0()
         #Crear tabla de accion
         actionTable = (headTb, bodyTb)
         stringAn += Alphabet.symbol_STRINGEND
