@@ -12,7 +12,7 @@ class LR1:
     # Regresa lista de tuplas
     def closure(self, rule, index, items):
         if (index == len(rule[1])) or (rule[1][index] in self.grammar.termSymbs):
-            return [(rule, index. items)]
+            return [(rule, index, items)]
         else:   #Simbolo es NO terminal
                 #Calculara la misma Cerradura
             auxRules = list()
@@ -21,7 +21,16 @@ class LR1:
             for ruleAux in self.grammar.rules:
                 if nonTerm == ruleAux[0]:
                     if (ruleAux == rule and index != 0) or (ruleAux != rule):
-                        arAux = self.closure(ruleAux, 0)
+                        #Calcular conjunto de items para el first {Alfa}
+                        firstItems = list()
+                        for i in range(index+1,len(ruleAux[1])):
+                            firstItems.append(ruleAux[1][i])
+                        #Llamar funcion first
+                        first = set()
+                        if len(firstItems) > 0:
+                            first = set(self.grammar.first(firstItems))
+                        first = first.union({Alphabet.symbol_STRINGEND})
+                        arAux = self.closure(ruleAux, 0, first)
                         auxRules.extend(arAux)
             #Eliminar reglas repetidas
             outRules = list()
@@ -61,18 +70,11 @@ class LR1:
         order.extend(self.grammar.termSymbs)
         return sorted(list(set(outItmes)), key=order.index)
 
-
-    def findTransition(self, arrayTrans, elemIni, objTrans):
-        for trans in arrayTrans:
-            if (elemIni == trans[0]) and (objTrans == trans[1]):
-                return trans[2]
-        return -1
-
     def createSets(self):
         states = list()
         transitions = list()
         #Crear el primer "estado"
-        states.append(self.closure(self.grammar.rules[0], 0. {Alphabet.symbol_STRINGEND}))
+        states.append(self.closure(self.grammar.rules[0], 0, {Alphabet.symbol_STRINGEND}))
         apunt = 0
         while apunt < len(states):
             #Traer Itmes del estado
@@ -89,6 +91,15 @@ class LR1:
             apunt += 1
         #Una vez creada todas las transiciones "llenamos la tabla"
         return states, transitions
+
+    #================================================
+    #   ==============  Tabla LRO  ==============  
+    #================================================
+    def findTransition(self, arrayTrans, elemIni, objTrans):
+        for trans in arrayTrans:
+            if (elemIni == trans[0]) and (objTrans == trans[1]):
+                return trans[2]
+        return -1
     
     def getReduction(self, state):
         for item in state:
@@ -230,7 +241,7 @@ class LR1:
 def main():
     pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine//Examples/gramLR0.txt"
     gr = Grammar(pathGR)
-    LRTest = LR1(gr)
+    LR1Test = LR1(gr)
     print(LR1Test.createSets())
     '''
     anString = "025*(025+110)"
