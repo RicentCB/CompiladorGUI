@@ -1,45 +1,45 @@
 from sly import Lexer
+from sly import Parser
 
-class CalcLexer(Lexer):
+#=========================================================
+# --------- A N A L I Z A D O R    L E X I C O ---------
+#=========================================================
+class BasicLexer(Lexer):
     # Set of token names.   This is always required
-    tokens = { NUMBER, ID, WHILE, IF, ELSE, PRINT,
-               PLUS, MINUS, TIMES, DIVIDE, ASSIGN,
-               EQ, LT, LE, GT, GE, NE }
+    tokens = { NUMBER, NAME, ALL,
+        PLUS, MINUS, ASSIGN, EQUAL,
+        WHILE, IF, THEN, ELSE,
+        FOR, TO }
 
 
-    literals = { '(', ')', '{', '}', ';' }
+    literals = { '(', ')', '{', '}', ';'}   #Se ecriben entre "" en el parser
 
     # String containing ignored characters
     ignore = ' \t'
+    #Palabras Reservadas
+    NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
+    WHILE = r'WHILE'
+    IF = r'IF'
+    THEN = r'THEN'
+    ELSE = r'ELSE'
+    FOR = r'FOR'
+    TO = r'TO'
+    #Simbolos
+    PLUS = r'\+'
+    MINUS = r'\-'
+    EQUAL = r'=='
+    ASSIGN = r'='
 
-    # Regular expression rules for tokens
-    PLUS    = r'\+'
-    MINUS   = r'-'
-    TIMES   = r'\*'
-    DIVIDE  = r'/'
-    EQ      = r'=='
-    ASSIGN  = r'='
-    LE      = r'<='
-    LT      = r'<'
-    GE      = r'>='
-    GT      = r'>'
-    NE      = r'!='
+    ALL = r'\".*?\"'
+
+    ignore_comment = r'//.*'
 
     @_(r'\d+')
     def NUMBER(self, t):
         t.value = int(t.value)
         return t
 
-    # Identifiers and keywords
-    ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
-    ID['if'] = IF
-    ID['else'] = ELSE
-    ID['while'] = WHILE
-    ID['print'] = PRINT
-
-    ignore_comment = r'\#.*'
-
-    # Line number tracking
+    # Salto de Linea
     @_(r'\n+')
     def ignore_newline(self, t):
         self.lineno += t.value.count('\n')
@@ -47,11 +47,15 @@ class CalcLexer(Lexer):
     def error(self, t):
         print('Linea %d: Caracter erroneo %r' % (self.lineno, t.value[0]))
         self.index += 1
-
+#=========================================================
+# ---------          P A R S E R         ---------
+#=========================================================
+# class BasicParser(Parser):
+    
 if __name__ == '__main__':
 
     data = '''
-        # Counting
+        // Counting
         x = 0;
         while (x < 10) {
             print x:
@@ -59,6 +63,6 @@ if __name__ == '__main__':
         }
         '''
 
-    lexer = CalcLexer()
+    lexer = BasicLexer()
     for tok in lexer.tokenize(data):
         print(tok)
