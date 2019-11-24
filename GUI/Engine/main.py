@@ -196,9 +196,9 @@ else:   #Numero de argumentos valido
             #Crear diccinario
             dictStr = createDictFile(sys.argv[5])
             #Crear LRO
-            LR = LR0(gramObj)
+            LRAn = LR0(gramObj)
             #Analizar la cadena
-            stack, string, action = LR.analizeStr(sys.argv[3], lexAn, dictStr)
+            stack, string, action = LRAn.analizeStr(sys.argv[3], lexAn, dictStr)
             print(json.dumps({"Stack":stack, "String":string, "Action":action, "message":True}))
         else:
             print(json.dumps({"message": "Error opcion Grammar no valida"}));

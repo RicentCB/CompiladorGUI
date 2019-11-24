@@ -148,7 +148,7 @@ class LR0:
     def findAction(self, state, symbol, table):
         idSymbol = table[0].index(symbol)
         #Recorrer filas de la tabla
-        action = table[1][int(state)][idSymbol+1]    #El primer indice es del estado 
+        action = table[1][int(state)][idSymbol]    #El primer indice es del estado 
         if action == '':
             return [-1]
         elif action[0] == "d":
@@ -230,7 +230,7 @@ class LR0:
         return regStack, regString, regAction
 
 def main():
-    pathGR = "/Examples/gramLR0.txt"
+    pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine//Examples/gramLR0.txt"
     gr = Grammar(pathGR)
     LRTest = LR0(gr)
     anString = "025*(025+110)"

@@ -80,8 +80,9 @@ $(document).ready(function(){
     /* ======================================================================== */
     let btnGetFileGrammarLL1 = $("main#grammar #file-input-grammar-ll1");
     let containerTableLL1 = $("main#grammar .create-table-result#grammar-ll1");
+    
     let sectionAnStringLL1 = $("#analizeStr-ll1")
-    let containerAnStringLL1 = sectionAnStringLL1.find("#analizeStrLL1");
+    let containerAnStringLL1 = sectionAnStringLL1.find("#analizeStr-ll1");
     let btnAnStringLL1 = sectionAnStringLL1.find("#btnStringAnGrammarLL1")
     let inputStringLL1 = sectionAnStringLL1.find("#inStringAnGrammarLL1");
     let tableStringLL1 = sectionAnStringLL1.find("#regsAnalizeStringLL1");
@@ -151,7 +152,6 @@ $(document).ready(function(){
     })
     //Escribir cadena LL1
     inputStringLL1.click(function(e){
-        console.log("inputStr");
         if (pathSymb == "" || pathLexAn == ""){
             Swal.fire("Faltan Archivos", "Por favor eliga primero, el analizador lexico y la relacion simbolos terminales", "warning");
         }
@@ -172,15 +172,16 @@ $(document).ready(function(){
                 let strTable = "<table class='title-upper'>";
                 //Agregar Encabezado
                 strTable += "<thead><tr>";
+                    strTable += "<th>#</th>"
                     strTable += "<th>Pila</th>"
                     strTable += "<th>Cadena</th>"
                     strTable += "<th>Accion</th>"
-                    
                 strTable += "</tr></thead>";
                 //Agregar cuerpo
                 strTable += "<tbody>";
                 for (let i = 0; i < jsonString.Action.length; i++) {
                     strTable += "<tr>";
+                        strTable += "<td>"+i+"</td>";
                         strTable += "<td>"+jsonString.Stack[i]+"</td>"
                         strTable += "<td>"+jsonString.String[i]+"</td>"
                         strTable += "<td>"+jsonString.Action[i]+"</td>"
@@ -208,11 +209,16 @@ $(document).ready(function(){
     let sectionLRO = $(".container-tab#lr0");
     let btnGetFileGrammarLR0 = sectionLRO.find("#file-input-grammar-lr0");
     let containerTableLR0 = sectionLRO.find(".create-table-result#grammar-lr0");
+
+    let sectionAnStringLR0 = $("#analizeStr-lr0")
+    let btnAnStringLR0 = sectionAnStringLR0.find("#btnStringAnGrammarLR0")
+    let inputStringLR0 = sectionAnStringLR0.find("#inStringAnGrammarLR0");
+    let tableStringLR0 = sectionAnStringLR0.find("#regsAnalizeStringLR0");
    
     btnGetFileGrammarLR0.change(function(e){
         let fileIn = e.target.files[0];
         containerTableLR0.html("")
-        containerAnStringLL1.slideUp();
+        sectionAnStringLR0.slideUp();
         $(this).parent().find("#title-in-grammar-ll1").html("Archivo Cargado: '"+fileIn.name+"'")
         if(fileIn.type != "text/plain"){
             swal.fire("Error", "Solo archivos (*.txt)", "error");
@@ -223,11 +229,10 @@ $(document).ready(function(){
 
             let resultPython = new PythonShell('main.py', optionsPython);
             resultPython.on('message', function (jsonString) {
-                //Insertar JSON en Arreglo
-                console.log(jsonString);
+                //Leer JSON
                 if (jsonString["message"] == true){
                     Swal.fire("Gramatica LR0 Aceptada", "", "success");
-                    containerAnString.slideDown();
+                    sectionAnStringLR0.slideDown();
                     //Construir la tabla con json generado
                     let strTable = "<table>";
                     //Agregar Encabezado
@@ -259,8 +264,6 @@ $(document).ready(function(){
                     //Insertar el Nodo
                     containerTableLR0.html("");
                     containerTableLR0.append(strTable);
-                    //Seccion para analizar Cadena
-                    // sectionAnStringLR0.slideDown()
                     
                 }
                 else{
@@ -272,6 +275,61 @@ $(document).ready(function(){
         }
     });
     //Escribir Cadena LR0
-    
+    inputStringLR0.click(function(e){
+        if (pathSymb == "" || pathLexAn == ""){
+            Swal.fire("Faltan Archivos", "Por favor eliga primero, el analizador lexico y la relacion simbolos terminales", "warning");
+        }
+    })
+    //  -------------- ANALIZAR CADENA -------------------- 
+    btnAnStringLR0.click(function(e){
+        e.preventDefault();
+        let valString = sectionAnStringLR0.find("#inStringAnGrammarLR0").val();
+        if (valString != ""){
 
+            console.log(valString)
+            optionsPython.args = ["Grammar", "StringLR0", valString, pathLexAn, pathSymb]
+            
+            let resultPython = new PythonShell('main.py', optionsPython);
+            resultPython.on('message', function (jsonString) {
+                console.log(jsonString)
+                
+                if (jsonString["message"] == true){
+                    Swal.fire("Cadena Aceptada", "", "success");
+                    //Construir la tabla con json generado
+                    let strTable = "<table class='title-upper'>";
+                    //Agregar Encabezado
+                    strTable += "<thead><tr>";
+                        strTable += "<th>#</th>"
+                        strTable += "<th>Pila</th>"
+                        strTable += "<th>Cadena</th>"
+                        strTable += "<th>Accion</th>"
+
+                        strTable += "</tr></thead>";
+                        //Agregar cuerpo
+                    strTable += "<tbody>";
+                    for (let i = 0; i < jsonString.Action.length; i++) {
+                        strTable += "<tr>";
+                            strTable += "<td>"+i+"</td>";
+                            strTable += "<td>"+jsonString.Stack[i]+"</td>"
+                            strTable += "<td>"+jsonString.String[i]+"</td>"
+                            strTable += "<td>"+jsonString.Action[i]+"</td>"
+                        strTable += "</tr>";
+                    }
+                    strTable += "</tbody>";
+                    strTable += "</table>";
+                    //Insertar el Nodo
+                    tableStringLR0.html("");
+                    tableStringLR0.append(strTable);
+                    
+                }
+                else{
+                    swal.fire("Error en la gramatica", "", "error");
+                    console.log(jsonString["message"])
+                }
+                
+            });     
+        }
+        
+    })
+    
 })
