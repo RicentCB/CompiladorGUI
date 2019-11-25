@@ -4,28 +4,40 @@ from sly import Parser
 class Hoc5Lexer(Lexer):
     tokens = { 
         NAME, NUMBER, STRING,
-        ENDSTMT,
-        IF, THEN, ELSE, 
-        FOR, FUN, TO, ARROW, 
-        EQEQ }
-    ignore = '\t \n'
+        ENDSTMT, ASSIGN, 
+        IF, THEN, ELSE, ENDIF,
+        EQ, GT, GE, LT, LE, NE,
+        PAR_L, PAR_D, PLUS, MINUS, TIMES, DIVIDE }
 
-    literals = { '=', '+', '-', '/', '*', '(', ')', ',', ';' }
+    ignore = '\t ' #Ignora Espacios y tabulaciones
+    # ignore_newline = r'\n+'
+
+    literals = {'/', '*', ';' }
 
     # Define tokens
     IF = r'IF'
     THEN = r'THEN'
     ELSE = r'ELSE'
-    FOR = r'FOR'
-    FUN = r'FUN'
-    TO = r'TO'
-    ARROW = r'->'
+    ENDIF = r'ENDIF'
     NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
     STRING = r'\".*?\"'
     # S I M B O L O S
     ENDSTMT = r';'
+    ASSIGN = r'='
+    PAR_L = r'\('
+    PAR_D = r'\)'
+    PLUS = r'\+'
+    MINUS = r'-'
+    TIMES = r'\*'
+    DIVIDE = r'/'
     # C O N D I C I O N E S
-    EQEQ = r'=='
+    EQ = r'=='
+    GT = r'>'
+    GE = r'>='
+    LT = r'<'
+    LE = r'<='
+    NE = r'!='
+    
 
     @_(r'\d+')
     def NUMBER(self, t):
@@ -37,41 +49,29 @@ class Hoc5Lexer(Lexer):
         pass
 
     @_(r'\n+')
-    def newline(self,t ):
-        self.lineno = t.value.count('\n')
+    def newignore_newline(self, t):
+        self.lineno += len(t.value)
+
+    def error(self, t):
+        print("Illegal character '%s'" % t.value[0])
+        self.index += 1
 
 class Hoc5Parser(Parser):
     tokens = Hoc5Lexer.tokens
 
     precedence = (
-        ('left', '+', '-'),
-        ('left', '*', '/'),
-        ('right', 'UMINUS'),
+        ('left', PLUS, MINUS),
+        ('left', TIMES, DIVIDE),
         )
 
     def __init__(self):
         self.env = { }
+    
     @_('')
     def statement(self, p):
         pass
 
-    @_('FOR var_assign TO expr THEN statement')
-    def statement(self, p):
-        return ('for_loop', ('for_loop_setup', p.var_assign, p.expr), p.statement)
-
-    @_('IF condition THEN statement ELSE statement')
-    def statement(self, p):
-        return ('if_stmt', p.condition, ('branch', p.statement0, p.statement1))
-
-    @_('FUN NAME "(" ")" ARROW statement')
-    def statement(self, p):
-        return ('fun_def', p.NAME, p.statement)
-
-    @_('NAME "(" ")"')
-    def statement(self, p):
-        return ('fun_call', p.NAME)
-
-    @_('expr EQEQ expr')
+    @_('expr EQ expr')
     def condition(self, p):
         return ('condition_eqeq', p.expr0, p.expr1)
 
@@ -79,37 +79,44 @@ class Hoc5Parser(Parser):
     def statement(self, p):
         return p.var_assign
 
-    @_('NAME "=" expr')
+    @_('NAME ASSIGN expr')
     def var_assign(self, p):
         return ('var_assign', p.NAME, p.expr)
 
-    @_('NAME "=" STRING')
+    @_('NAME ASSIGN STRING')
     def var_assign(self, p):
         return ('var_assign', p.NAME, p.STRING)
+    @_('IF condition THEN statement ENDIF')
+    def statement(self, p):
+        return ('if_statement', p.condition, ('branch', p.statement0))
+    @_('IF condition THEN statement ELSE statement ENDIF')
+    def statement(self, p):
+        return ('if_statement', p.condition, ('branch', p.statement0, p.statement1))
+
+    # C O N D I T I O N S
+    @_('PAR_L expr PAR_D')
+    def condition(self, p):
+        return ('condition')
 
     @_('expr')
     def statement(self, p):
         return (p.expr)
 
-    @_('expr "+" expr')
+    @_('expr PLUS expr')
     def expr(self, p):
         return ('add', p.expr0, p.expr1)
 
-    @_('expr "-" expr')
+    @_('expr MINUS expr')
     def expr(self, p):
         return ('sub', p.expr0, p.expr1)
 
-    @_('expr "*" expr')
+    @_('expr TIMES expr')
     def expr(self, p):
         return ('mul', p.expr0, p.expr1)
 
-    @_('expr "/" expr')
+    @_('expr DIVIDE expr')
     def expr(self, p):
         return ('div', p.expr0, p.expr1)
-
-    @_('"-" expr %prec UMINUS')
-    def expr(self, p):
-        return p.expr
 
     @_('NAME')
     def expr(self, p):
@@ -125,6 +132,8 @@ if __name__ == '__main__':
     fileProgram = open('GUI/Engine/compiler/programEx.txt', 'r')
     # flines = fileProgram.readlines()
     text = fileProgram.read()
+    # for line in flines:
+    #     text += line
     print(text)
     # while True:
     #     try:
@@ -132,5 +141,8 @@ if __name__ == '__main__':
     #     except EOFError:
     #         break
     #     if text:
-    tree = parser.parse(lexer.tokenize(text))
+    lex = lexer.tokenize(text)
+    # for token in lex:
+    #     print(token)
+    tree = parser.parse(lex)
     print(tree)
