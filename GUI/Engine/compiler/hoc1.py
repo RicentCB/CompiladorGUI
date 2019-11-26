@@ -67,6 +67,28 @@ class Hoc1Execute:
 
     def __init__(self, parser):
         self.parser = parser
+        for line in self.parser.lines:
+            result = self.walkTree(line)
+            print(result)
+
+    def walkTree(self, node):
+        if isinstance(node, int):
+            return node
+        if node is None:
+            return None
+
+        if node[0] == 'num':
+            return node[1]
+        
+        if node[0] == 'add':
+            return self.walkTree(node[1]) + self.walkTree(node[2])
+        elif node[0] == 'sub':
+            return self.walkTree(node[1]) - self.walkTree(node[2])
+        elif node[0] == 'mul':
+            return self.walkTree(node[1]) * self.walkTree(node[2])
+        elif node[0] == 'div':
+            return self.walkTree(node[1]) / self.walkTree(node[2])
+
         
 
 if __name__ == '__main__':
@@ -78,7 +100,5 @@ if __name__ == '__main__':
     print(text)
     lex = lexer.tokenize(text)
     tree = parser.parse(lex)
-    for line in parser.lines:
-        print(line)
-
-    # print(parser.lines)
+    
+    hoc1 = Hoc1Execute(parser)
