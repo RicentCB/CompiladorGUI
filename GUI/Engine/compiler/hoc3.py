@@ -94,7 +94,7 @@ class Hoc3Parser(Parser):
     #CONSTANTES
     @_('PI', 'N_E', 'GAMMA', 'PHI', 'DEG')
     def expr(self, p):
-        return p[0]
+        return ('numf', p[0])
 
     # EXPRESIONES
     # Funciones Artimeticas
@@ -115,7 +115,7 @@ class Hoc3Parser(Parser):
 
     @_('NUMBER_F')
     def expr(self, p):
-        return ('num', p.NUMBER_F)
+        return ('numf', p.NUMBER_F)
 
     @_('NAME')
     def expr(self, p):
@@ -160,9 +160,10 @@ class Hoc3Execute:
         self.parser = parser
         self.vars = {}
         for line in self.parser.lines:
-            result = self.walkTree(line)
-            if result is not None and isinstance(result, int):
-                print(result)
+                result = self.walkTree(line)
+                if result is not None and (isinstance(result, float)):
+                    if line[0] == 'var':
+                        print(result)
 
     def walkTree(self, node):
         if isinstance(node, int):
@@ -171,6 +172,8 @@ class Hoc3Execute:
             return None
 
         if node[0] == 'num':
+            return node[1]
+        elif node[0] == 'numf':
             return node[1]
         elif node[0] == 'neg':   #Empieza con signo negativo
             return -1 * self.walkTree(node[1])
@@ -183,17 +186,25 @@ class Hoc3Execute:
             return self.walkTree(node[1]) * self.walkTree(node[2])
         elif node[0] == 'div':
             return self.walkTree(node[1]) / self.walkTree(node[2])
+        elif node[0] == 'exp':
+            return math.pow(self.walkTree(node[1]), self.walkTree(node[2]))
         #Funciones
-        if node[0] == "SIN":
-            return math.sin(self.walkTree(node[1]))
-        # 'SIN "(" expr ")"', 
-        # 'COS "(" expr ")"',
-        # 'ATAN "(" expr ")"',
-        # 'EXP "(" expr ")"',
-        # 'LOG "(" expr ")"',
-        # 'LOG10 "(" expr ")"',
-        # 'SQRT "(" expr ")"',
-        # 'ABS
+        if node[0] == 'SIN':
+            return round(math.sin(self.walkTree(node[1])), 6)
+        elif node[0] == 'COS':
+            return round(math.cos(self.walkTree(node[1])), 6)
+        elif node[0] == 'ATAN':
+            return math.atan(self.walkTree(node[1]))
+        elif node[0] == 'EXP':
+            return math.exp(self.walkTree(node[1]))
+        elif node[0] == 'LOG':
+            return math.log(self.walkTree(node[1]))
+        elif node[0] == 'LOG10':
+            return math.log10(self.walkTree(node[1]))
+        elif node[0] == 'SQRT':
+            return math.sqrt(self.walkTree(node[1]))
+        elif node[0] == 'ABS':
+            return math.fabs(self.walkTree(node[1]))
         #Variables
         if node[0] == 'var_assign':
             self.vars[node[1]] = self.walkTree(node[2])
@@ -219,7 +230,7 @@ if __name__ == '__main__':
     #     print(token)
     parser.parse(lex)
     print()
-    for line in parser.lines:
-        print(line)
+    # for line in parser.lines:
+    #     print(line)
 
-    # hoc2 = Hoc2Execute(parser)
+    hoc3 = Hoc3Execute(parser)
