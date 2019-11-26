@@ -12,6 +12,7 @@ class Hoc3Lexer(Lexer):
     tokens = {NUMBER,NUMBER_F, NAME, 
         SM_EXP,
         SIN, COS, ATAN, EXP, LOG, LOG10, SQRT, ABS,
+        PI, N_E, GAMMA, DEG, PHI,
         BRANCH}
 
     ignore = '\t '
@@ -35,7 +36,7 @@ class Hoc3Lexer(Lexer):
         t.value = math.pi
         return t
     @_(r'E')
-    def E(self, t):
+    def N_E(self, t):
         t.value = math.e
         return t
     @_(r'GAMMA')
@@ -89,7 +90,12 @@ class Hoc3Parser(Parser):
     def listStmt(self, p):
         self.lines.append(p.expr)
         return p.listStmt
-    
+
+    #CONSTANTES
+    @_('PI', 'N_E', 'GAMMA', 'PHI', 'DEG')
+    def expr(self, p):
+        return p[0]
+
     # EXPRESIONES
     # Funciones Artimeticas
     @_('SIN "(" expr ")"', 
@@ -138,7 +144,11 @@ class Hoc3Parser(Parser):
     @_('expr "/" expr')
     def expr(self, p):
         return ('div', p.expr0, p.expr1)
-
+        
+    @_('expr SM_EXP expr')
+    def expr(self, p):
+        return ('exp', p.expr0, p.expr1)
+    
     @_('"(" expr ")"')
     def expr(self, p):
         return (p.expr)
@@ -173,6 +183,17 @@ class Hoc3Execute:
             return self.walkTree(node[1]) * self.walkTree(node[2])
         elif node[0] == 'div':
             return self.walkTree(node[1]) / self.walkTree(node[2])
+        #Funciones
+        if node[0] == "SIN":
+            return math.sin(self.walkTree(node[1]))
+        # 'SIN "(" expr ")"', 
+        # 'COS "(" expr ")"',
+        # 'ATAN "(" expr ")"',
+        # 'EXP "(" expr ")"',
+        # 'LOG "(" expr ")"',
+        # 'LOG10 "(" expr ")"',
+        # 'SQRT "(" expr ")"',
+        # 'ABS
         #Variables
         if node[0] == 'var_assign':
             self.vars[node[1]] = self.walkTree(node[2])
@@ -194,11 +215,11 @@ if __name__ == '__main__':
     text = fileProgram.read()
     # print(text)
     lex = lexer.tokenize(text)
-    for token in lex:
-        print(token)
-    # parser.parse(lex)
-    # print()
-    # for line in parser.lines:
-    #     print(line)
+    # for token in lex:
+    #     print(token)
+    parser.parse(lex)
+    print()
+    for line in parser.lines:
+        print(line)
 
     # hoc2 = Hoc2Execute(parser)
