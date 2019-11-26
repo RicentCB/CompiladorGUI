@@ -2,3 +2,5 @@ a = -10
 b = 15
 y = SIN ( COS(a))
 x = ABS(y) + LOG( 5.5 )
+c = SIN (PI)
+d = LOG(E)

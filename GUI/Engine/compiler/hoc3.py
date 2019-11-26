@@ -29,6 +29,27 @@ class Hoc3Lexer(Lexer):
     LOG10 = r'LOG10'
     SQRT = r'SQRT'
     ABS = r'ABS'
+    # CONSTANTES
+    @_(r'PI')
+    def PI(self, t):
+        t.value = math.pi
+        return t
+    @_(r'E')
+    def E(self, t):
+        t.value = math.e
+        return t
+    @_(r'GAMMA')
+    def GAMMA(self, t):
+        t.value = 0.57721566490153286060
+        return t
+    @_(r'DEG')
+    def DEG(self, t):
+        t.value = 57.295777951308232048680
+        return t
+    @_(r'PHI')
+    def PHI(self, t):
+        t.value = 0.161803398874989484820
+        return t
 
     # NUMEROS
     @_(r'\d*\.\d+')
@@ -173,11 +194,11 @@ if __name__ == '__main__':
     text = fileProgram.read()
     # print(text)
     lex = lexer.tokenize(text)
-    # for token in lex:
-    #     print(token)
-    parser.parse(lex)
-    print()
-    for line in parser.lines:
-        print(line)
+    for token in lex:
+        print(token)
+    # parser.parse(lex)
+    # print()
+    # for line in parser.lines:
+    #     print(line)
 
     # hoc2 = Hoc2Execute(parser)
