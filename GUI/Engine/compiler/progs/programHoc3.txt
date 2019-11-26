@@ -1,6 +1,4 @@
 a = -10
 b = 15
-a
-b
-c = a + b
-c
+y = SIN ( COS(a))
+x = ABS(y) + LOG(5)

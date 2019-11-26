@@ -1,30 +1,60 @@
 from sly import Lexer
 from sly import Parser
+import math
 
 # CALCULADORA CON VARIABLES
+# Se integran las funciones:
+#   sin, cos, atan, exp, log, log10, sqrt, int, abs
+# Ademas de constantes:
+#   PI, E, GAMMA, DEG. PHI
 
 class Hoc3Lexer(Lexer):
     tokens = {NUMBER, NAME, 
-    BRANCH}
+        SM_EXP,
+        SIN, COS, ATAN, EXP, LOG, LOG10, SQRT, ABS,
+        BRANCH}
+
     ignore = '\t '
+    SM_EXP = r'\^'
 
     literals = { '+', '-', '/', '*', '(', ')', '='}
 
     BRANCH = '\n'
-    NAME = r'[a-zA-Z_][a-zA-Z0-9]*'
+    #Palabras Reservadas
+    SIN = r'SIN'
+    COS = r'COS'
+    ATAN = r'ATAN'
+    EXP = r'EXP'
+    LOG = r'LOG'
+    LOG10 = r'LOG10'
+    SQRT = r'SQRT'
+    ABS = r'ABS'
 
     @_(r'\d+')
     def NUMBER(self, t):
         t.value = int(t.value)
         return t
+    #Tabla de Ctes.
+    # CONST = {
+    #     "PI": math.pi,
+    #     "E" : math.e,
+    #     "GAMMA": math.gamma,
+    #     "DEG": math.degrees,
+    #     "PHI": 1.61803398887498
+    # }
+
+    #Defincion de Variables
+    NAME = r'[a-zA-Z_][a-zA-Z0-9]*'
+    
 
 class Hoc3Parser(Parser):
-    tokens = Hoc3Lexer.tokens
+    tokens = Hoc3Lexer().tokens
 
     precedence = (
         ('left', '+', '-'),
         ('left', '*', '/'),
-        ('right', 'UMINUS')
+        ('right', 'UMINUS'),
+        ('right', SM_EXP),
         )
 
     def __init__(self):
@@ -43,7 +73,19 @@ class Hoc3Parser(Parser):
         self.lines.append(p.expr)
         return p.listStmt
     
-    #EXPR
+    # EXPRESIONES
+    # Funciones Artimeticas
+    @_('SIN "(" expr ")"', 
+        'COS "(" expr ")"',
+        'ATAN "(" expr ")"',
+        'EXP "(" expr ")"',
+        'LOG "(" expr ")"',
+        'LOG10 "(" expr ")"',
+        'SQRT "(" expr ")"',
+        'ABS "(" expr ")"')
+    def expr(self, p):
+        return (p[0], p.expr)
+
     @_('NUMBER')
     def expr(self, p):
         return ('num', p.NUMBER)
@@ -79,8 +121,9 @@ class Hoc3Parser(Parser):
     @_('"(" expr ")"')
     def expr(self, p):
         return (p.expr)
+    
 
-class Hoc2Execute:
+class Hoc3Execute:
 
     def __init__(self, parser):
         self.parser = parser
@@ -130,7 +173,10 @@ if __name__ == '__main__':
     text = fileProgram.read()
     # print(text)
     lex = lexer.tokenize(text)
+    # for token in lex:
+    #     print(token)
     parser.parse(lex)
+    print()
     for line in parser.lines:
         print(line)
     # hoc2 = Hoc2Execute(parser)
