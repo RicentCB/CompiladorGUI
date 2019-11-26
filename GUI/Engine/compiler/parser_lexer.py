@@ -70,6 +70,9 @@ class Hoc5Parser(Parser):
     @_('')
     def statement(self, p):
         pass
+    @_('statement var_assign')
+    def statement(self, p):
+        return p.statement, p.var_assign
 
     @_('expr EQ expr')
     def condition(self, p):
@@ -86,6 +89,7 @@ class Hoc5Parser(Parser):
     @_('NAME ASSIGN STRING')
     def var_assign(self, p):
         return ('var_assign', p.NAME, p.STRING)
+
     @_('IF condition THEN statement ENDIF')
     def statement(self, p):
         return ('if_statement', p.condition, ('branch', p.statement0))

@@ -83,7 +83,7 @@ class HocParser(Parser):
     @_('NAME ASIGN expr')
     def var_assign(self, p):
         return('var_assign', p.NAME, p.expr)        
-    @_('NAME ADIASIGNGN ALL')
+    @_('NAME ASIGN ALL')
     def var_assign(self, p):
         return('var_assign', p.NAME, p.ALL)
     # EXPRESIONES
