@@ -9,7 +9,7 @@ import math
 #   PI, E, GAMMA, DEG. PHI
 
 class Hoc3Lexer(Lexer):
-    tokens = {NUMBER, NAME, 
+    tokens = {NUMBER,NUMBER_F, NAME, 
         SM_EXP,
         SIN, COS, ATAN, EXP, LOG, LOG10, SQRT, ABS,
         BRANCH}
@@ -30,19 +30,15 @@ class Hoc3Lexer(Lexer):
     SQRT = r'SQRT'
     ABS = r'ABS'
 
+    # NUMEROS
+    @_(r'\d*\.\d+')
+    def NUMBER_F(self, t):
+        t.value = float(t.value)
+        return t
     @_(r'\d+')
     def NUMBER(self, t):
         t.value = int(t.value)
         return t
-    #Tabla de Ctes.
-    # CONST = {
-    #     "PI": math.pi,
-    #     "E" : math.e,
-    #     "GAMMA": math.gamma,
-    #     "DEG": math.degrees,
-    #     "PHI": 1.61803398887498
-    # }
-
     #Defincion de Variables
     NAME = r'[a-zA-Z_][a-zA-Z0-9]*'
     
@@ -89,6 +85,10 @@ class Hoc3Parser(Parser):
     @_('NUMBER')
     def expr(self, p):
         return ('num', p.NUMBER)
+
+    @_('NUMBER_F')
+    def expr(self, p):
+        return ('num', p.NUMBER_F)
 
     @_('NAME')
     def expr(self, p):
@@ -179,4 +179,5 @@ if __name__ == '__main__':
     print()
     for line in parser.lines:
         print(line)
+
     # hoc2 = Hoc2Execute(parser)
