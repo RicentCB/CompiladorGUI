@@ -126,7 +126,7 @@ if __name__ == '__main__':
     lexer = Hoc2Lexer()
     parser = Hoc2Parser()
     
-    fileProgram = open('GUI/Engine/compiler/programHoc2.txt', 'r')
+    fileProgram = open('GUI/Engine/compiler/progs/programHoc2.txt', 'r')
     text = fileProgram.read()
     # print(text)
     lex = lexer.tokenize(text)

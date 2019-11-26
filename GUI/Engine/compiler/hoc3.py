@@ -1,28 +1,30 @@
 from sly import Lexer
 from sly import Parser
 
-# CALCULADORA
+# CALCULADORA CON VARIABLES
 
-
-class Hoc1Lexer(Lexer):
-    tokens = {NUMBER, BRANCH}
+class Hoc3Lexer(Lexer):
+    tokens = {NUMBER, NAME, 
+    BRANCH}
     ignore = '\t '
 
-    literals = { '+', '-', '/', '*', '(', ')'}
+    literals = { '+', '-', '/', '*', '(', ')', '='}
 
     BRANCH = '\n'
+    NAME = r'[a-zA-Z_][a-zA-Z0-9]*'
 
     @_(r'\d+')
     def NUMBER(self, t):
         t.value = int(t.value)
         return t
 
-class Hoc1Parser(Parser):
-    tokens = Hoc1Lexer.tokens
+class Hoc3Parser(Parser):
+    tokens = Hoc3Lexer.tokens
 
     precedence = (
         ('left', '+', '-'),
         ('left', '*', '/'),
+        ('right', 'UMINUS')
         )
 
     def __init__(self):
@@ -45,6 +47,18 @@ class Hoc1Parser(Parser):
     @_('NUMBER')
     def expr(self, p):
         return ('num', p.NUMBER)
+
+    @_('NAME')
+    def expr(self, p):
+        return ('var', p.NAME)
+    
+    @_('NAME "=" expr')
+    def expr(self, p):
+        return ('var_assign', p.NAME, p.expr)
+
+    @_('"-" expr %prec UMINUS')
+    def expr(self, p):
+        return ("neg", p.expr)
     
     @_('expr "+" expr')
     def expr(self, p):
@@ -66,13 +80,15 @@ class Hoc1Parser(Parser):
     def expr(self, p):
         return (p.expr)
 
-class Hoc1Execute:
+class Hoc2Execute:
 
     def __init__(self, parser):
         self.parser = parser
+        self.vars = {}
         for line in self.parser.lines:
             result = self.walkTree(line)
-            print(result)
+            if result is not None and isinstance(result, int):
+                print(result)
 
     def walkTree(self, node):
         if isinstance(node, int):
@@ -82,7 +98,9 @@ class Hoc1Execute:
 
         if node[0] == 'num':
             return node[1]
-        
+        elif node[0] == 'neg':   #Empieza con signo negativo
+            return -1 * self.walkTree(node[1])
+        #Operaciones Aritmeticas
         if node[0] == 'add':
             return self.walkTree(node[1]) + self.walkTree(node[2])
         elif node[0] == 'sub':
@@ -91,17 +109,28 @@ class Hoc1Execute:
             return self.walkTree(node[1]) * self.walkTree(node[2])
         elif node[0] == 'div':
             return self.walkTree(node[1]) / self.walkTree(node[2])
+        #Variables
+        if node[0] == 'var_assign':
+            self.vars[node[1]] = self.walkTree(node[2])
+            return node[1]
 
-        
+        if node[0] == 'var':
+            try:
+                return self.vars[node[1]]
+            except LookupError:
+                print("Variable indefinida '"+node[1]+"' no se econtro!")
+                return 0
+
 
 if __name__ == '__main__':
-    lexer = Hoc1Lexer()
-    parser = Hoc1Parser()
+    lexer = Hoc3Lexer()
+    parser = Hoc3Parser()
     
-    fileProgram = open('GUI/Engine/compiler/progs/programHoc1.txt', 'r')
+    fileProgram = open('GUI/Engine/compiler/progs/programHoc3.txt', 'r')
     text = fileProgram.read()
-    print(text)
+    # print(text)
     lex = lexer.tokenize(text)
-    tree = parser.parse(lex)
-    
-    hoc1 = Hoc1Execute(parser)
+    parser.parse(lex)
+    for line in parser.lines:
+        print(line)
+    # hoc2 = Hoc2Execute(parser)
