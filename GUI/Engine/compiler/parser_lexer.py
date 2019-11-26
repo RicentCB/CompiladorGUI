@@ -133,20 +133,12 @@ class Hoc5Parser(Parser):
 if __name__ == '__main__':
     lexer = Hoc5Lexer()
     parser = Hoc5Parser()
-    fileProgram = open('GUI/Engine/compiler/programEx.txt', 'r')
-    # flines = fileProgram.readlines()
-    text = fileProgram.read()
-    # for line in flines:
-    #     text += line
-    print(text)
-    # while True:
-    #     try:
-    #         text = input('basic > ')
-    #     except EOFError:
-    #         break
-    #     if text:
-    lex = lexer.tokenize(text)
-    # for token in lex:
-    #     print(token)
-    tree = parser.parse(lex)
-    print(tree)
+    while True:
+        try:
+            text = input('basic > ')
+        except EOFError:
+            break
+        if text:
+            lex = lexer.tokenize(text)
+            tree = parser.parse(lex)
+            print(tree)

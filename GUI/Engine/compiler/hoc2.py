@@ -4,12 +4,14 @@ from sly import Parser
 # CALCULADORA CON VARIABLES
 
 class Hoc2Lexer(Lexer):
-    tokens = {NUMBER, BRANCH}
+    tokens = {NUMBER, NAME, 
+    BRANCH}
     ignore = '\t '
 
-    literals = { '+', '-', '/', '*', '(', ')'}
+    literals = { '+', '-', '/', '*', '(', ')', '='}
 
     BRANCH = '\n'
+    NAME = r'[a-zA-Z_][a-zA-Z0-9]*'
 
     @_(r'\d+')
     def NUMBER(self, t):
@@ -22,6 +24,7 @@ class Hoc2Parser(Parser):
     precedence = (
         ('left', '+', '-'),
         ('left', '*', '/'),
+        ('right', 'UMINUS')
         )
 
     def __init__(self):
@@ -44,6 +47,18 @@ class Hoc2Parser(Parser):
     @_('NUMBER')
     def expr(self, p):
         return ('num', p.NUMBER)
+
+    @_('NAME')
+    def expr(self, p):
+        return ('var', p.NAME)
+    
+    @_('NAME "=" expr')
+    def expr(self, p):
+        return ('var_assign', p.NAME, p.expr)
+
+    @_('"-" expr %prec UMINUS')
+    def expr(self, p):
+        return ("neg", p.expr)
     
     @_('expr "+" expr')
     def expr(self, p):
@@ -91,16 +106,17 @@ class Hoc2Execute:
         elif node[0] == 'div':
             return self.walkTree(node[1]) / self.walkTree(node[2])
 
-        
 
 if __name__ == '__main__':
     lexer = Hoc2Lexer()
     parser = Hoc2Parser()
     
-    fileProgram = open('GUI/Engine/compiler/programHoc1.txt', 'r')
+    fileProgram = open('GUI/Engine/compiler/programHoc2.txt', 'r')
     text = fileProgram.read()
     print(text)
     lex = lexer.tokenize(text)
-    tree = parser.parse(lex)
+    parser.parse(lex)
+    for line in parser.lines:
+        print(line)
     
-    hoc2 = Hoc2Execute(parser)
+    # hoc2 = Hoc2Execute(parser)

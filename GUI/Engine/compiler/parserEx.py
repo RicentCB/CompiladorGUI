@@ -102,7 +102,8 @@ class BasicParser(Parser):
 
     @_('"-" expr %prec UMINUS')
     def expr(self, p):
-        return p.expr
+        print("MES")
+        return ("neg", p.expr)
 
     @_('NAME')
     def expr(self, p):
