@@ -1,10 +1,9 @@
 from sly import Lexer
 from sly import Parser
 
-# CALCULADORA
+# CALCULADORA CON VARIABLES
 
-
-class Hoc1Lexer(Lexer):
+class Hoc2Lexer(Lexer):
     tokens = {NUMBER, BRANCH}
     ignore = '\t '
 
@@ -17,8 +16,8 @@ class Hoc1Lexer(Lexer):
         t.value = int(t.value)
         return t
 
-class Hoc1Parser(Parser):
-    tokens = Hoc1Lexer.tokens
+class Hoc2Parser(Parser):
+    tokens = Hoc2Lexer.tokens
 
     precedence = (
         ('left', '+', '-'),
@@ -66,7 +65,7 @@ class Hoc1Parser(Parser):
     def expr(self, p):
         return (p.expr)
 
-class Hoc1Execute:
+class Hoc2Execute:
 
     def __init__(self, parser):
         self.parser = parser
@@ -95,8 +94,8 @@ class Hoc1Execute:
         
 
 if __name__ == '__main__':
-    lexer = Hoc1Lexer()
-    parser = Hoc1Parser()
+    lexer = Hoc2Lexer()
+    parser = Hoc2Parser()
     
     fileProgram = open('GUI/Engine/compiler/programHoc1.txt', 'r')
     text = fileProgram.read()
@@ -104,4 +103,4 @@ if __name__ == '__main__':
     lex = lexer.tokenize(text)
     tree = parser.parse(lex)
     
-    hoc1 = Hoc1Execute(parser)
+    hoc2 = Hoc2Execute(parser)
