@@ -84,9 +84,11 @@ class Hoc2Execute:
 
     def __init__(self, parser):
         self.parser = parser
+        self.vars = {}
         for line in self.parser.lines:
             result = self.walkTree(line)
-            print(result)
+            if result is not None and isinstance(result, int):
+                print(result)
 
     def walkTree(self, node):
         if isinstance(node, int):
@@ -96,7 +98,9 @@ class Hoc2Execute:
 
         if node[0] == 'num':
             return node[1]
-        
+        elif node[0] == 'neg':   #Empieza con signo negativo
+            return -1 * self.walkTree(node[1])
+        #Operaciones Aritmeticas
         if node[0] == 'add':
             return self.walkTree(node[1]) + self.walkTree(node[2])
         elif node[0] == 'sub':
@@ -105,6 +109,17 @@ class Hoc2Execute:
             return self.walkTree(node[1]) * self.walkTree(node[2])
         elif node[0] == 'div':
             return self.walkTree(node[1]) / self.walkTree(node[2])
+        #Variables
+        if node[0] == 'var_assign':
+            self.vars[node[1]] = self.walkTree(node[2])
+            return node[1]
+
+        if node[0] == 'var':
+            try:
+                return self.vars[node[1]]
+            except LookupError:
+                print("Variable indefinida '"+node[1]+"' no se econtro!")
+                return 0
 
 
 if __name__ == '__main__':
@@ -113,10 +128,7 @@ if __name__ == '__main__':
     
     fileProgram = open('GUI/Engine/compiler/programHoc2.txt', 'r')
     text = fileProgram.read()
-    print(text)
+    # print(text)
     lex = lexer.tokenize(text)
     parser.parse(lex)
-    for line in parser.lines:
-        print(line)
-    
-    # hoc2 = Hoc2Execute(parser)
+    hoc2 = Hoc2Execute(parser)
