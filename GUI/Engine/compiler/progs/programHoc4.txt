@@ -3,8 +3,3 @@ y = SIN ( a / 4)
 y
 c = LOG(E)
 c
-IF a == b THEN
-    d = a
-    d = d +1
-    d
-ENDIF

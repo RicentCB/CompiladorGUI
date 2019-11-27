@@ -15,14 +15,15 @@ class Hoc4Lexer(Lexer):
         IF, THEN, ENDIF, WHILE, ENDWHILE,
         NE, EQ, GT, GE, LT, LE, OR, AND, NOT,
         PI, N_E, GAMMA, DEG, PHI,
-        BRANCH}
+        BRANCH, PRINTEX}
 
     ignore = '\t '
     SM_EXP = r'\^'
 
-    literals = { '+', '-', '/', '*', '(', ')', '='}
+    literals = { '+', '-', '/', '*', '(', ')', '=', '{', '}'}
 
     BRANCH = '\n'
+    PRINTEX = 'PRINT'
     #Palabras Reservadas
     SIN = r'SIN'
     COS = r'COS'
@@ -85,6 +86,8 @@ class Hoc4Lexer(Lexer):
     
 
 class Hoc4Parser(Parser):
+    debugfile = 'Hoc4.out'
+
     tokens = Hoc4Lexer().tokens
 
     precedence = (
@@ -105,15 +108,63 @@ class Hoc4Parser(Parser):
     def listStmt(self, p):
         return p.listStmt
     
-    @_('listStmt expr')
+    @_('listStmt expr BRANCH')
     def listStmt(self, p):
         self.lines.append(p.expr)
         return p.listStmt
-
-    @_('listStmt ifStmt')
+    @_('listStmt statment BRANCH')
     def listStmt(self, p):
-        self.lines.append(p.ifStmt)
+        self.lines.append(p.assign)
         return p.listStmt    
+    @_('listStmt assign BRANCH')
+    def listStmt(self, p):
+        self.lines.append(p.assign)
+        return p.listStmt    
+
+    # ASIGNACION
+    # Funciones Artimeticas
+    @_('NAME "=" expr')
+    def assign(self, p):
+        return ('var_assign', p.NAME, p.expr)
+
+    # STATMENTS
+    @_('expr')
+    def statment(self, p):
+        return p.expr
+    @_('PRINTEX expr')
+    def statment(self, p):
+        return ('print', p.expr)
+    @_('whileCode conditionLogical statment end')
+    def statment(self, p):
+        return ('whileCode', ('condition', p.conditionLogical), ('statmentThen', p.statment))
+    @_('ifCode conditionLogical statment end')
+    def statment(self, p):
+        return ('ifCode', ('condition', p.conditionLogical), ('statmentThen', p.statment))
+    # @_('ifCode conditionLogical statment ELSE statment end')
+    # def statment(self, p):
+    #     return ('ifCodeElse', ('condition', p.conditionLogical), ('statmentThen', p.statment0), ('statmentElse', p.statment1))
+    @_('"{" statmentList "}"')
+    def statment(self, p):
+        return p.statmentList    
+    @_('WHILE')
+    def whileCode(self, p):
+        return p.WHILE
+    @_('IF')
+    def ifCode(self, p):
+        return p.IF
+    @_('ENDIF', 'ENDWHILE')
+    def end(self, p):
+        pass
+    @_('')
+    def statmentList(self, p):
+        pass
+    @_('statmentList BRANCH')
+    def statmentList(self, p):
+        return p.statmentList
+    @_('statmentList statment')
+    def statmentList(self, p):
+        return p.statmentList
+        
 
     #CONSTANTES
     @_('PI', 'N_E', 'GAMMA', 'PHI', 'DEG')
@@ -121,7 +172,6 @@ class Hoc4Parser(Parser):
         return ('numf', p[0])
 
     # EXPRESIONES
-    # Funciones Artimeticas
     @_('SIN "(" expr ")"', 
         'COS "(" expr ")"',
         'ATAN "(" expr ")"',
@@ -144,10 +194,6 @@ class Hoc4Parser(Parser):
     @_('NAME')
     def expr(self, p):
         return ('var', p.NAME)
-    
-    @_('NAME "=" expr')
-    def expr(self, p):
-        return ('var_assign', p.NAME, p.expr)
 
     @_('"-" expr %prec UMINUS')
     def expr(self, p):
@@ -197,7 +243,7 @@ class Hoc4Parser(Parser):
     def condition(self, p):
         return ('ne', p.expr0, p.expr1)
     
-    @_('condition')
+    @_('"(" condition ")"')
     def conditionLogical(self, p):
         return p.condition
 
@@ -211,11 +257,6 @@ class Hoc4Parser(Parser):
     def conditionLogical(self, p):
         return ('not', p.expr)
 
-    #BLOQUES DE CODIGO
-    @_('IF condition THEN BRANCH listStmt ENDIF')
-    def ifStmt(self, p):
-        print(p)
-        return('if_stmt', p.condition, ('listStmtThen'))
 
 class Hoc4Execute:
 
@@ -280,7 +321,6 @@ class Hoc4Execute:
                 print("Variable indefinida '"+node[1]+"' no se econtro!")
                 return 0
 
-
 if __name__ == '__main__':
     lexer = Hoc4Lexer()
     parser = Hoc4Parser()
@@ -292,8 +332,6 @@ if __name__ == '__main__':
     # for token in lex:
     #     print(token)
     parser.parse(lex)
-    print()
     for line in parser.lines:
         print(line)
-
     # hoc3 = Hoc4Execute(parser)
