@@ -275,11 +275,36 @@ class Hoc4Execute:
     def __init__(self, parser):
         self.parser = parser
         self.vars = {}
-        for line in self.parser.lines:
-                result = self.walkTree(line)
-                if result is not None and (isinstance(result,int) or isinstance(result, float)):
-                    if line[0] == 'var':
-                        print(result)
+        self.pc = 0
+        while self.pc < len(self.parser.lines)-1:
+            result = self.walkTree(self.parser.lines[self.pc])
+            if result is not None and (isinstance(result,int) or isinstance(result, float)):
+                if line[0] == 'var':
+                    print(result)
+            self.pc += 1
+        
+    def evaluateCondition(self, condition):
+        #Logicas
+        if condition[0] == "or":
+            return self.evaluateCondition(condition[1]) or self.evaluateCondition(condition[2])
+        elif condition[0] == "and":
+            return self.evaluateCondition(condition[1]) and self.evaluateCondition(condition[2])
+        elif condition[0] == "not":
+            return not self.evaluateCondition(condition[1])
+        #Comparacion
+        else:
+            if condition[0] == "gt":
+                return self.walkTree(condition[1]) > self.walkTree(condition[2])
+            elif condition[0] == "ge":
+                return self.walkTree(condition[1]) >= self.walkTree(condition[2])
+            elif condition[0] == "lt":
+                return self.walkTree(condition[1]) < self.walkTree(condition[2])
+            elif condition[0] == "le":
+                return self.walkTree(condition[1]) <= self.walkTree(condition[2])
+            elif condition[0] == "eq":
+                return self.walkTree(condition[1]) == self.walkTree(condition[2])
+            elif condition[0] == "ne":
+                return self.walkTree(condition[1]) != self.walkTree(condition[2])
 
     def walkTree(self, node):
         if isinstance(node, int):
@@ -321,6 +346,10 @@ class Hoc4Execute:
             return math.sqrt(self.walkTree(node[1]))
         elif node[0] == 'ABS':
             return math.fabs(self.walkTree(node[1]))
+        #Statments
+        if node[0] == 'ifCode': #Funcion if
+            condition = self.evaluateCondition(node[1])
+            print(condition)
         #Variables
         if node[0] == 'var_assign':
             self.vars[node[1]] = self.walkTree(node[2])
@@ -346,4 +375,4 @@ if __name__ == '__main__':
     parser.parse(lex)
     for line in parser.lines:
         print(line)
-    # hoc3 = Hoc4Execute(parser)
+    hoc3 = Hoc4Execute(parser)
