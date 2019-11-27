@@ -8,7 +8,7 @@ import math
 # Ademas de constantes:
 #   PI, E, GAMMA, DEG. PHI
 
-class Hoc3Lexer(Lexer):
+class Hoc4Lexer(Lexer):
     tokens = {NUMBER,NUMBER_F, NAME, 
         SM_EXP,
         SIN, COS, ATAN, EXP, LOG, LOG10, SQRT, ABS,
@@ -65,8 +65,8 @@ class Hoc3Lexer(Lexer):
     NAME = r'[a-zA-Z_][a-zA-Z0-9]*'
     
 
-class Hoc3Parser(Parser):
-    tokens = Hoc3Lexer().tokens
+class Hoc4Parser(Parser):
+    tokens = Hoc4Lexer().tokens
 
     precedence = (
         ('left', '+', '-'),
@@ -154,7 +154,7 @@ class Hoc3Parser(Parser):
         return (p.expr)
     
 
-class Hoc3Execute:
+class Hoc4Execute:
 
     def __init__(self, parser):
         self.parser = parser
@@ -219,8 +219,8 @@ class Hoc3Execute:
 
 
 if __name__ == '__main__':
-    lexer = Hoc3Lexer()
-    parser = Hoc3Parser()
+    lexer = Hoc4Lexer()
+    parser = Hoc4Parser()
     
     fileProgram = open('GUI/Engine/compiler/progs/programHoc3.txt', 'r')
     text = fileProgram.read()
@@ -233,4 +233,4 @@ if __name__ == '__main__':
     # for line in parser.lines:
     #     print(line)
 
-    hoc3 = Hoc3Execute(parser)
+    hoc3 = Hoc4Execute(parser)
