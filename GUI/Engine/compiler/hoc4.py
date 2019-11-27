@@ -12,7 +12,7 @@ class Hoc4Lexer(Lexer):
     tokens = {NUMBER,NUMBER_F, NAME, 
         SM_EXP,
         SIN, COS, ATAN, EXP, LOG, LOG10, SQRT, ABS,
-        IF, THEN, ENDIF, WHILE, ENDWHILE,
+        IF, ENDIF, ELSE, WHILE, ENDWHILE,
         NE, EQ, GT, GE, LT, LE, OR, AND, NOT,
         PI, N_E, GAMMA, DEG, PHI,
         BRANCH, PRINTEX}
@@ -35,7 +35,7 @@ class Hoc4Lexer(Lexer):
     ABS = r'ABS'
 
     IF = r'IF'
-    THEN = r'THEN'
+    ELSE = r'ELSE'
     ENDIF = r'ENDIF'
     WHILE = r'WHILE'
     ENDWHILE = r'ENDWHILE'
@@ -114,7 +114,7 @@ class Hoc4Parser(Parser):
         return p.listStmt
     @_('listStmt statment BRANCH')
     def listStmt(self, p):
-        self.lines.append(p.assign)
+        self.lines.append(p.statment)
         return p.listStmt    
     @_('listStmt assign BRANCH')
     def listStmt(self, p):
@@ -131,39 +131,48 @@ class Hoc4Parser(Parser):
     @_('expr')
     def statment(self, p):
         return p.expr
+    @_('assign')
+    def statment(self, p):
+        return p.assign
     @_('PRINTEX expr')
     def statment(self, p):
         return ('print', p.expr)
-    @_('whileCode conditionLogical statment end')
+
+    @_('whileCode superCondition statment end')
     def statment(self, p):
-        return ('whileCode', ('condition', p.conditionLogical), ('statmentThen', p.statment))
-    @_('ifCode conditionLogical statment end')
+        return ('whileCode', p.superCondition, ('branch', p.statment))
+    @_('ifCode superCondition statment end')
     def statment(self, p):
-        return ('ifCode', ('condition', p.conditionLogical), ('statmentThen', p.statment))
-    # @_('ifCode conditionLogical statment ELSE statment end')
-    # def statment(self, p):
-    #     return ('ifCodeElse', ('condition', p.conditionLogical), ('statmentThen', p.statment0), ('statmentElse', p.statment1))
+        return ('ifCode', p.superCondition, ('branch', p.statment))    
+    @_('ifCode superCondition statment ELSE statment end')
+    def statment(self, p):
+        return ('ifCodeElse', p.superCondition, ('branch', p.statment0, p.statment1))
+    
     @_('"{" statmentList "}"')
     def statment(self, p):
-        return p.statmentList    
+        return (p.statmentList)    
     @_('WHILE')
     def whileCode(self, p):
         return p.WHILE
     @_('IF')
     def ifCode(self, p):
-        return p.IF
-    @_('ENDIF', 'ENDWHILE')
+        return ("IF")
+    @_('')
     def end(self, p):
         pass
     @_('')
     def statmentList(self, p):
         pass
+
     @_('statmentList BRANCH')
     def statmentList(self, p):
         return p.statmentList
     @_('statmentList statment')
     def statmentList(self, p):
-        return p.statmentList
+        if p.statmentList == None:
+            return (p.statment)
+        else:
+            return (p.statmentList, p.statment)
         
 
     #CONSTANTES
@@ -243,20 +252,28 @@ class Hoc4Parser(Parser):
     def condition(self, p):
         return ('ne', p.expr0, p.expr1)
     
-    @_('"(" condition ")"')
-    def conditionLogical(self, p):
+    # @_('"(" conditionLogical ")"')
+    # def superCondition(self, p):
+    #     return p.conditionLogical
+    
+    @_(' "(" condition ")" ')
+    def superCondition(self, p):
         return p.condition
+    
 
-    @_('condition AND condition')  # Logica AND
-    def conditionLogical(self, p):
-        return ('and', p.expr0, p.expr1)
-    @_('condition OR condition')  # Logica OR
-    def conditionLogical(self, p):
-        return ('or', p.expr0, p.expr1)
-    @_('NOT condition')  # Logica NOT
-    def conditionLogical(self, p):
-        return ('not', p.expr)
+    # @_('condition AND condition')  # Logica AND
+    # def conditionLogical(self, p):
+    #     return ('and', p.condition0, p.condition1)
+    # @_('condition OR condition')  # Logica OR
+    # def conditionLogical(self, p):
+    #     return ('or', p.condition0, p.condition1)
+    # @_('NOT condition')  # Logica NOT
+    # def conditionLogical(self, p):
+    #     return ('not', p.condition)
 
+    # @_('condition')
+    # def conditionLogical(self, p):
+    #     return p.condition
 
 class Hoc4Execute:
 

@@ -1,5 +1,8 @@
 a = PI
-y = SIN ( a / 4)
-y
-c = LOG(E)
-c
+var1 = 0
+IF ( a == PI ) { 
+    a = a + 1 
+    b = a
+    }
+a
+b
