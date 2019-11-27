@@ -26,8 +26,8 @@ class Hoc3Lexer(Lexer):
     COS = r'COS'
     ATAN = r'ATAN'
     EXP = r'EXP'
-    LOG = r'LOG'
     LOG10 = r'LOG10'
+    LOG = r'LOG'
     SQRT = r'SQRT'
     ABS = r'ABS'
     # CONSTANTES
