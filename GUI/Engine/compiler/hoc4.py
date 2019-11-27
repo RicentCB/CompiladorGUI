@@ -1,6 +1,7 @@
 from sly import Lexer
 from sly import Parser
 import math
+import sys
 
 # CALCULADORA CON VARIABLES
 # Se integran las funciones:
@@ -170,11 +171,10 @@ class Hoc4Parser(Parser):
     @_('statmentList statment')
     def statmentList(self, p):
         if p.statmentList == None:
-            return (p.statment)
+            return ('stmt', p.statment)
         else:
-            return (p.statmentList, p.statment)
+            return ('stmtList', p.statmentList, ('stmt', p.statment))
         
-
     #CONSTANTES
     @_('PI', 'N_E', 'GAMMA', 'PHI', 'DEG')
     def expr(self, p):
@@ -276,13 +276,14 @@ class Hoc4Execute:
         self.parser = parser
         self.vars = {}
         self.pc = 0
-        while self.pc < len(self.parser.lines)-1:
+        while self.pc < len(self.parser.lines):
             result = self.walkTree(self.parser.lines[self.pc])
             if result is not None and (isinstance(result,int) or isinstance(result, float)):
                 if line[0] == 'var':
                     print(result)
             self.pc += 1
         
+    #funcion que evalua una condicion sea logica o no
     def evaluateCondition(self, condition):
         #Logicas
         if condition[0] == "or":
@@ -305,7 +306,9 @@ class Hoc4Execute:
                 return self.walkTree(condition[1]) == self.walkTree(condition[2])
             elif condition[0] == "ne":
                 return self.walkTree(condition[1]) != self.walkTree(condition[2])
+    #Funcion que ejecuta un nodo dado
 
+    #Funcion que reduce y evalua los nodos creads por el parser
     def walkTree(self, node):
         if isinstance(node, int):
             return node
@@ -349,7 +352,13 @@ class Hoc4Execute:
         #Statments
         if node[0] == 'ifCode': #Funcion if
             condition = self.evaluateCondition(node[1])
-            print(condition)
+            if condition:
+                self.walkTree(node[2][1])
+        elif node[0] == 'stmtList':
+            n1 = self.walkTree(node[1])
+            n2 = self.walkTree(node[2])
+        elif node[0] == 'stmt':
+            return self.walkTree(node[1])
         #Variables
         if node[0] == 'var_assign':
             self.vars[node[1]] = self.walkTree(node[2])
@@ -360,6 +369,7 @@ class Hoc4Execute:
                 return self.vars[node[1]]
             except LookupError:
                 print("Variable indefinida '"+node[1]+"' no se econtro!")
+                sys.exit()
                 return 0
 
 if __name__ == '__main__':
@@ -373,6 +383,8 @@ if __name__ == '__main__':
     # for token in lex:
     #     print(token)
     parser.parse(lex)
+    print()
     for line in parser.lines:
         print(line)
+    print()
     hoc3 = Hoc4Execute(parser)

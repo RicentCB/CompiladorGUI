@@ -1,8 +1,11 @@
 a = PI
-var1 = 0
-IF ( a == PI ) { 
+var1 = 2
+IF ( a == PI AND var1 < 1) { 
     a = a + 1 
     b = a
+    c = 25
     }
 a
 b
+c = c +1
+c
