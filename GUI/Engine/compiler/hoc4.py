@@ -98,17 +98,17 @@ class Hoc4Parser(Parser):
         self.lines = list()
     #LIST
     @_('')
-    def expr(self, p):
+    def listStmt(self, p):
         pass
 
-    @_('expr BRANCH')
-    def expr(self, p):
+    @_('listStmt BRANCH')
+    def listStmt(self, p):
         return p.listStmt
     
     @_('listStmt expr')
     def listStmt(self, p):
         self.lines.append(p.expr)
-        return ('listStmt',p.listStmt)
+        return p.listStmt
 
     @_('listStmt ifStmt')
     def listStmt(self, p):
@@ -196,20 +196,20 @@ class Hoc4Parser(Parser):
     @_('expr NE expr')  # No igual
     def condition(self, p):
         return ('ne', p.expr0, p.expr1)
+    
+    @_('condition')
+    def conditionLogical(self, p):
+        return p.condition
 
     @_('condition AND condition')  # Logica AND
-    def condition(self, p):
+    def conditionLogical(self, p):
         return ('and', p.expr0, p.expr1)
     @_('condition OR condition')  # Logica OR
-    def condition(self, p):
+    def conditionLogical(self, p):
         return ('or', p.expr0, p.expr1)
     @_('NOT condition')  # Logica NOT
-    def condition(self, p):
+    def conditionLogical(self, p):
         return ('not', p.expr)
-
-    # @_('"(" codition ")"')  # Logica 
-    # def condition(self, p):
-    #     return (p.expr)   
 
     #BLOQUES DE CODIGO
     @_('IF condition THEN BRANCH listStmt ENDIF')
