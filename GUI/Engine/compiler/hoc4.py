@@ -12,6 +12,8 @@ class Hoc4Lexer(Lexer):
     tokens = {NUMBER,NUMBER_F, NAME, 
         SM_EXP,
         SIN, COS, ATAN, EXP, LOG, LOG10, SQRT, ABS,
+        IF, THEN, ENDIF, WHILE, ENDWHILE,
+        NE, EQ, GT, GE, LT, LE, OR, AND, NOT,
         PI, N_E, GAMMA, DEG, PHI,
         BRANCH}
 
@@ -30,6 +32,23 @@ class Hoc4Lexer(Lexer):
     LOG = r'LOG'
     SQRT = r'SQRT'
     ABS = r'ABS'
+
+    IF = r'IF'
+    THEN = r'THEN'
+    ENDIF = r'ENDIF'
+    WHILE = r'WHILE'
+    ENDWHILE = r'ENDWHILE'
+
+    EQ = r'==' 
+    NE = r'!='
+    GT = r'>' 
+    GE = r'>=' 
+    LT = r'<' 
+    LE = r'<='
+    OR = r'OR'
+    AND = r'AND'
+    NOT = r'NOT'
+
     # CONSTANTES
     @_(r'PI')
     def PI(self, t):
@@ -79,17 +98,22 @@ class Hoc4Parser(Parser):
         self.lines = list()
     #LIST
     @_('')
-    def listStmt(self, p):
+    def expr(self, p):
         pass
 
-    @_('listStmt BRANCH')
-    def listStmt(self, p):
+    @_('expr BRANCH')
+    def expr(self, p):
         return p.listStmt
     
     @_('listStmt expr')
     def listStmt(self, p):
         self.lines.append(p.expr)
-        return p.listStmt
+        return ('listStmt',p.listStmt)
+
+    @_('listStmt ifStmt')
+    def listStmt(self, p):
+        self.lines.append(p.ifStmt)
+        return p.listStmt    
 
     #CONSTANTES
     @_('PI', 'N_E', 'GAMMA', 'PHI', 'DEG')
@@ -153,6 +177,45 @@ class Hoc4Parser(Parser):
     def expr(self, p):
         return (p.expr)
     
+    #CONDICIONES
+    @_('expr GT expr')  # Mayor que
+    def condition(self, p):
+        return ('gt', p.expr0, p.expr1)
+    @_('expr GE expr')  # Mayor o igual
+    def condition(self, p):
+        return ('ge', p.expr0, p.expr1)
+    @_('expr LT expr')  # Menor que
+    def condition(self, p):
+        return ('lt', p.expr0, p.expr1)
+    @_('expr LE expr')  # Menor o igual
+    def condition(self, p):
+        return ('le', p.expr0, p.expr1)
+    @_('expr EQ expr')  # Igual
+    def condition(self, p):
+        return ('eq', p.expr0, p.expr1)
+    @_('expr NE expr')  # No igual
+    def condition(self, p):
+        return ('ne', p.expr0, p.expr1)
+
+    @_('condition AND condition')  # Logica AND
+    def condition(self, p):
+        return ('and', p.expr0, p.expr1)
+    @_('condition OR condition')  # Logica OR
+    def condition(self, p):
+        return ('or', p.expr0, p.expr1)
+    @_('NOT condition')  # Logica NOT
+    def condition(self, p):
+        return ('not', p.expr)
+
+    # @_('"(" codition ")"')  # Logica 
+    # def condition(self, p):
+    #     return (p.expr)   
+
+    #BLOQUES DE CODIGO
+    @_('IF condition THEN BRANCH listStmt ENDIF')
+    def ifStmt(self, p):
+        print(p)
+        return('if_stmt', p.condition, ('listStmtThen'))
 
 class Hoc4Execute:
 
@@ -222,7 +285,7 @@ if __name__ == '__main__':
     lexer = Hoc4Lexer()
     parser = Hoc4Parser()
     
-    fileProgram = open('GUI/Engine/compiler/progs/programHoc3.txt', 'r')
+    fileProgram = open('GUI/Engine/compiler/progs/programHoc4.txt', 'r')
     text = fileProgram.read()
     # print(text)
     lex = lexer.tokenize(text)
@@ -230,7 +293,7 @@ if __name__ == '__main__':
     #     print(token)
     parser.parse(lex)
     print()
-    # for line in parser.lines:
-    #     print(line)
+    for line in parser.lines:
+        print(line)
 
-    hoc3 = Hoc4Execute(parser)
+    # hoc3 = Hoc4Execute(parser)
