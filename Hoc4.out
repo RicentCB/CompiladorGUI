@@ -49,15 +49,16 @@ Rule 45    condition -> expr LE expr
 Rule 46    condition -> expr LT expr
 Rule 47    condition -> expr GE expr
 Rule 48    condition -> expr GT expr
-Rule 49    superCondition -> ( condition )
+Rule 49    superCondition -> ( conditionLogical )
+Rule 50    conditionLogical -> condition
+Rule 51    conditionLogical -> NOT condition
+Rule 52    conditionLogical -> condition OR condition
+Rule 53    conditionLogical -> condition AND condition
 
 Unused terminals:
 
-    OR
-    AND
-    ENDWHILE
     ENDIF
-    NOT
+    ENDWHILE
 
 Terminals, with rules where they appear:
 
@@ -69,7 +70,7 @@ Terminals, with rules where they appear:
 /                    : 22
 =                    : 6
 ABS                  : 30
-AND                  : 
+AND                  : 53
 ATAN                 : 35
 BRANCH               : 1 2 3 4 18
 COS                  : 36
@@ -89,11 +90,11 @@ LOG10                : 32
 LT                   : 46
 NAME                 : 6 27
 NE                   : 43
-NOT                  : 
+NOT                  : 51
 NUMBER               : 29
 NUMBER_F             : 28
 N_E                  : 41
-OR                   : 
+OR                   : 52
 PHI                  : 39
 PI                   : 42
 PRINTEX              : 11
@@ -108,7 +109,8 @@ error                :
 Nonterminals, with rules where they appear:
 
 assign               : 1 12
-condition            : 49
+condition            : 50 51 52 52 53 53
+conditionLogical     : 49
 end                  : 8 9 10
 expr                 : 3 6 11 13 20 21 21 22 22 23 23 24 24 25 25 26 30 31 32 33 34 35 36 37 43 43 44 44 45 45 46 46 47 47 48 48
 ifCode               : 8 9
@@ -358,7 +360,7 @@ state 8
 
     (8) statment -> ifCode . superCondition statment ELSE statment end
     (9) statment -> ifCode . superCondition statment end
-    (49) superCondition -> . ( condition )
+    (49) superCondition -> . ( conditionLogical )
     (               shift and go to state 41
 
     superCondition                 shift and go to state 40
@@ -366,7 +368,7 @@ state 8
 state 9
 
     (10) statment -> whileCode . superCondition statment end
-    (49) superCondition -> . ( condition )
+    (49) superCondition -> . ( conditionLogical )
     (               shift and go to state 41
 
     superCondition                 shift and go to state 42
@@ -551,6 +553,8 @@ state 13
     LT              reduce using rule 28 (expr -> NUMBER_F .)
     GE              reduce using rule 28 (expr -> NUMBER_F .)
     GT              reduce using rule 28 (expr -> NUMBER_F .)
+    OR              reduce using rule 28 (expr -> NUMBER_F .)
+    AND             reduce using rule 28 (expr -> NUMBER_F .)
 
 
 state 14
@@ -592,6 +596,8 @@ state 14
     LT              reduce using rule 29 (expr -> NUMBER .)
     GE              reduce using rule 29 (expr -> NUMBER .)
     GT              reduce using rule 29 (expr -> NUMBER .)
+    OR              reduce using rule 29 (expr -> NUMBER .)
+    AND             reduce using rule 29 (expr -> NUMBER .)
 
 
 state 15
@@ -681,6 +687,8 @@ state 23
     LT              reduce using rule 38 (expr -> DEG .)
     GE              reduce using rule 38 (expr -> DEG .)
     GT              reduce using rule 38 (expr -> DEG .)
+    OR              reduce using rule 38 (expr -> DEG .)
+    AND             reduce using rule 38 (expr -> DEG .)
 
 
 state 24
@@ -722,6 +730,8 @@ state 24
     LT              reduce using rule 39 (expr -> PHI .)
     GE              reduce using rule 39 (expr -> PHI .)
     GT              reduce using rule 39 (expr -> PHI .)
+    OR              reduce using rule 39 (expr -> PHI .)
+    AND             reduce using rule 39 (expr -> PHI .)
 
 
 state 25
@@ -763,6 +773,8 @@ state 25
     LT              reduce using rule 40 (expr -> GAMMA .)
     GE              reduce using rule 40 (expr -> GAMMA .)
     GT              reduce using rule 40 (expr -> GAMMA .)
+    OR              reduce using rule 40 (expr -> GAMMA .)
+    AND             reduce using rule 40 (expr -> GAMMA .)
 
 
 state 26
@@ -804,6 +816,8 @@ state 26
     LT              reduce using rule 41 (expr -> N_E .)
     GE              reduce using rule 41 (expr -> N_E .)
     GT              reduce using rule 41 (expr -> N_E .)
+    OR              reduce using rule 41 (expr -> N_E .)
+    AND             reduce using rule 41 (expr -> N_E .)
 
 
 state 27
@@ -845,6 +859,8 @@ state 27
     LT              reduce using rule 42 (expr -> PI .)
     GE              reduce using rule 42 (expr -> PI .)
     GT              reduce using rule 42 (expr -> PI .)
+    OR              reduce using rule 42 (expr -> PI .)
+    AND             reduce using rule 42 (expr -> PI .)
 
 
 state 28
@@ -1365,7 +1381,11 @@ state 40
 
 state 41
 
-    (49) superCondition -> ( . condition )
+    (49) superCondition -> ( . conditionLogical )
+    (50) conditionLogical -> . condition
+    (51) conditionLogical -> . NOT condition
+    (52) conditionLogical -> . condition OR condition
+    (53) conditionLogical -> . condition AND condition
     (43) condition -> . expr NE expr
     (44) condition -> . expr EQ expr
     (45) condition -> . expr LE expr
@@ -1395,6 +1415,7 @@ state 41
     (40) expr -> . GAMMA
     (41) expr -> . N_E
     (42) expr -> . PI
+    NOT             shift and go to state 69
     (               shift and go to state 11
     -               shift and go to state 12
     NAME            shift and go to state 44
@@ -1414,8 +1435,9 @@ state 41
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    condition                      shift and go to state 67
-    expr                           shift and go to state 68
+    conditionLogical               shift and go to state 67
+    condition                      shift and go to state 68
+    expr                           shift and go to state 70
 
 state 42
 
@@ -1477,7 +1499,7 @@ state 42
     PI              shift and go to state 27
 
     whileCode                      shift and go to state 9
-    statment                       shift and go to state 69
+    statment                       shift and go to state 71
     ifCode                         shift and go to state 8
     expr                           shift and go to state 64
     assign                         shift and go to state 65
@@ -1561,6 +1583,8 @@ state 44
     LT              reduce using rule 27 (expr -> NAME .)
     GE              reduce using rule 27 (expr -> NAME .)
     GT              reduce using rule 27 (expr -> NAME .)
+    OR              reduce using rule 27 (expr -> NAME .)
+    AND             reduce using rule 27 (expr -> NAME .)
 
 
 state 45
@@ -1571,7 +1595,7 @@ state 45
     (23) expr -> expr . * expr
     (24) expr -> expr . - expr
     (25) expr -> expr . + expr
-    )               shift and go to state 70
+    )               shift and go to state 72
     SM_EXP          shift and go to state 33
     /               shift and go to state 34
     *               shift and go to state 35
@@ -1622,6 +1646,8 @@ state 46
     LT              reduce using rule 26 (expr -> - expr .)
     GE              reduce using rule 26 (expr -> - expr .)
     GT              reduce using rule 26 (expr -> - expr .)
+    OR              reduce using rule 26 (expr -> - expr .)
+    AND             reduce using rule 26 (expr -> - expr .)
     SM_EXP          shift and go to state 33
 
 
@@ -1670,7 +1696,7 @@ state 47
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 71
+    expr                           shift and go to state 73
 
 state 48
 
@@ -1717,7 +1743,7 @@ state 48
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 72
+    expr                           shift and go to state 74
 
 state 49
 
@@ -1764,7 +1790,7 @@ state 49
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 73
+    expr                           shift and go to state 75
 
 state 50
 
@@ -1811,7 +1837,7 @@ state 50
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 74
+    expr                           shift and go to state 76
 
 state 51
 
@@ -1858,7 +1884,7 @@ state 51
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 75
+    expr                           shift and go to state 77
 
 state 52
 
@@ -1905,7 +1931,7 @@ state 52
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 76
+    expr                           shift and go to state 78
 
 state 53
 
@@ -1952,7 +1978,7 @@ state 53
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 77
+    expr                           shift and go to state 79
 
 state 54
 
@@ -1999,7 +2025,7 @@ state 54
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 78
+    expr                           shift and go to state 80
 
 state 55
 
@@ -2044,6 +2070,8 @@ state 55
     LT              reduce using rule 21 (expr -> expr SM_EXP expr .)
     GE              reduce using rule 21 (expr -> expr SM_EXP expr .)
     GT              reduce using rule 21 (expr -> expr SM_EXP expr .)
+    OR              reduce using rule 21 (expr -> expr SM_EXP expr .)
+    AND             reduce using rule 21 (expr -> expr SM_EXP expr .)
     SM_EXP          shift and go to state 33
 
 
@@ -2090,6 +2118,8 @@ state 56
     LT              reduce using rule 22 (expr -> expr / expr .)
     GE              reduce using rule 22 (expr -> expr / expr .)
     GT              reduce using rule 22 (expr -> expr / expr .)
+    OR              reduce using rule 22 (expr -> expr / expr .)
+    AND             reduce using rule 22 (expr -> expr / expr .)
     SM_EXP          shift and go to state 33
 
 
@@ -2136,6 +2166,8 @@ state 57
     LT              reduce using rule 23 (expr -> expr * expr .)
     GE              reduce using rule 23 (expr -> expr * expr .)
     GT              reduce using rule 23 (expr -> expr * expr .)
+    OR              reduce using rule 23 (expr -> expr * expr .)
+    AND             reduce using rule 23 (expr -> expr * expr .)
     SM_EXP          shift and go to state 33
 
 
@@ -2180,6 +2212,8 @@ state 58
     LT              reduce using rule 24 (expr -> expr - expr .)
     GE              reduce using rule 24 (expr -> expr - expr .)
     GT              reduce using rule 24 (expr -> expr - expr .)
+    OR              reduce using rule 24 (expr -> expr - expr .)
+    AND             reduce using rule 24 (expr -> expr - expr .)
     SM_EXP          shift and go to state 33
     /               shift and go to state 34
     *               shift and go to state 35
@@ -2226,6 +2260,8 @@ state 59
     LT              reduce using rule 25 (expr -> expr + expr .)
     GE              reduce using rule 25 (expr -> expr + expr .)
     GT              reduce using rule 25 (expr -> expr + expr .)
+    OR              reduce using rule 25 (expr -> expr + expr .)
+    AND             reduce using rule 25 (expr -> expr + expr .)
     SM_EXP          shift and go to state 33
     /               shift and go to state 34
     *               shift and go to state 35
@@ -2435,7 +2471,7 @@ state 66
     (9) statment -> ifCode superCondition statment . end
     (16) end -> .
   ! shift/reduce conflict for ELSE resolved as shift
-    ELSE            shift and go to state 79
+    ELSE            shift and go to state 81
     BRANCH          reduce using rule 16 (end -> .)
     }               reduce using rule 16 (end -> .)
     {               reduce using rule 16 (end -> .)
@@ -2461,15 +2497,79 @@ state 66
     N_E             reduce using rule 16 (end -> .)
     PI              reduce using rule 16 (end -> .)
 
-    end                            shift and go to state 80
+    end                            shift and go to state 82
 
 state 67
 
-    (49) superCondition -> ( condition . )
-    )               shift and go to state 81
+    (49) superCondition -> ( conditionLogical . )
+    )               shift and go to state 83
 
 
 state 68
+
+    (50) conditionLogical -> condition .
+    (52) conditionLogical -> condition . OR condition
+    (53) conditionLogical -> condition . AND condition
+    )               reduce using rule 50 (conditionLogical -> condition .)
+    OR              shift and go to state 84
+    AND             shift and go to state 85
+
+
+state 69
+
+    (51) conditionLogical -> NOT . condition
+    (43) condition -> . expr NE expr
+    (44) condition -> . expr EQ expr
+    (45) condition -> . expr LE expr
+    (46) condition -> . expr LT expr
+    (47) condition -> . expr GE expr
+    (48) condition -> . expr GT expr
+    (20) expr -> . ( expr )
+    (21) expr -> . expr SM_EXP expr
+    (22) expr -> . expr / expr
+    (23) expr -> . expr * expr
+    (24) expr -> . expr - expr
+    (25) expr -> . expr + expr
+    (26) expr -> . - expr
+    (27) expr -> . NAME
+    (28) expr -> . NUMBER_F
+    (29) expr -> . NUMBER
+    (30) expr -> . ABS ( expr )
+    (31) expr -> . SQRT ( expr )
+    (32) expr -> . LOG10 ( expr )
+    (33) expr -> . LOG ( expr )
+    (34) expr -> . EXP ( expr )
+    (35) expr -> . ATAN ( expr )
+    (36) expr -> . COS ( expr )
+    (37) expr -> . SIN ( expr )
+    (38) expr -> . DEG
+    (39) expr -> . PHI
+    (40) expr -> . GAMMA
+    (41) expr -> . N_E
+    (42) expr -> . PI
+    (               shift and go to state 11
+    -               shift and go to state 12
+    NAME            shift and go to state 44
+    NUMBER_F        shift and go to state 13
+    NUMBER          shift and go to state 14
+    ABS             shift and go to state 15
+    SQRT            shift and go to state 16
+    LOG10           shift and go to state 17
+    LOG             shift and go to state 18
+    EXP             shift and go to state 19
+    ATAN            shift and go to state 20
+    COS             shift and go to state 21
+    SIN             shift and go to state 22
+    DEG             shift and go to state 23
+    PHI             shift and go to state 24
+    GAMMA           shift and go to state 25
+    N_E             shift and go to state 26
+    PI              shift and go to state 27
+
+    condition                      shift and go to state 86
+    expr                           shift and go to state 70
+
+state 70
 
     (43) condition -> expr . NE expr
     (44) condition -> expr . EQ expr
@@ -2482,12 +2582,12 @@ state 68
     (23) expr -> expr . * expr
     (24) expr -> expr . - expr
     (25) expr -> expr . + expr
-    NE              shift and go to state 82
-    EQ              shift and go to state 83
-    LE              shift and go to state 84
-    LT              shift and go to state 85
-    GE              shift and go to state 86
-    GT              shift and go to state 87
+    NE              shift and go to state 87
+    EQ              shift and go to state 88
+    LE              shift and go to state 89
+    LT              shift and go to state 90
+    GE              shift and go to state 91
+    GT              shift and go to state 92
     SM_EXP          shift and go to state 33
     /               shift and go to state 34
     *               shift and go to state 35
@@ -2495,7 +2595,7 @@ state 68
     +               shift and go to state 37
 
 
-state 69
+state 71
 
     (10) statment -> whileCode superCondition statment . end
     (16) end -> .
@@ -2525,9 +2625,9 @@ state 69
     PI              reduce using rule 16 (end -> .)
     ELSE            reduce using rule 16 (end -> .)
 
-    end                            shift and go to state 88
+    end                            shift and go to state 93
 
-state 70
+state 72
 
     (20) expr -> ( expr ) .
     BRANCH          reduce using rule 20 (expr -> ( expr ) .)
@@ -2566,91 +2666,13 @@ state 70
     LT              reduce using rule 20 (expr -> ( expr ) .)
     GE              reduce using rule 20 (expr -> ( expr ) .)
     GT              reduce using rule 20 (expr -> ( expr ) .)
-
-
-state 71
-
-    (30) expr -> ABS ( expr . )
-    (21) expr -> expr . SM_EXP expr
-    (22) expr -> expr . / expr
-    (23) expr -> expr . * expr
-    (24) expr -> expr . - expr
-    (25) expr -> expr . + expr
-    )               shift and go to state 89
-    SM_EXP          shift and go to state 33
-    /               shift and go to state 34
-    *               shift and go to state 35
-    -               shift and go to state 36
-    +               shift and go to state 37
-
-
-state 72
-
-    (31) expr -> SQRT ( expr . )
-    (21) expr -> expr . SM_EXP expr
-    (22) expr -> expr . / expr
-    (23) expr -> expr . * expr
-    (24) expr -> expr . - expr
-    (25) expr -> expr . + expr
-    )               shift and go to state 90
-    SM_EXP          shift and go to state 33
-    /               shift and go to state 34
-    *               shift and go to state 35
-    -               shift and go to state 36
-    +               shift and go to state 37
+    OR              reduce using rule 20 (expr -> ( expr ) .)
+    AND             reduce using rule 20 (expr -> ( expr ) .)
 
 
 state 73
 
-    (32) expr -> LOG10 ( expr . )
-    (21) expr -> expr . SM_EXP expr
-    (22) expr -> expr . / expr
-    (23) expr -> expr . * expr
-    (24) expr -> expr . - expr
-    (25) expr -> expr . + expr
-    )               shift and go to state 91
-    SM_EXP          shift and go to state 33
-    /               shift and go to state 34
-    *               shift and go to state 35
-    -               shift and go to state 36
-    +               shift and go to state 37
-
-
-state 74
-
-    (33) expr -> LOG ( expr . )
-    (21) expr -> expr . SM_EXP expr
-    (22) expr -> expr . / expr
-    (23) expr -> expr . * expr
-    (24) expr -> expr . - expr
-    (25) expr -> expr . + expr
-    )               shift and go to state 92
-    SM_EXP          shift and go to state 33
-    /               shift and go to state 34
-    *               shift and go to state 35
-    -               shift and go to state 36
-    +               shift and go to state 37
-
-
-state 75
-
-    (34) expr -> EXP ( expr . )
-    (21) expr -> expr . SM_EXP expr
-    (22) expr -> expr . / expr
-    (23) expr -> expr . * expr
-    (24) expr -> expr . - expr
-    (25) expr -> expr . + expr
-    )               shift and go to state 93
-    SM_EXP          shift and go to state 33
-    /               shift and go to state 34
-    *               shift and go to state 35
-    -               shift and go to state 36
-    +               shift and go to state 37
-
-
-state 76
-
-    (35) expr -> ATAN ( expr . )
+    (30) expr -> ABS ( expr . )
     (21) expr -> expr . SM_EXP expr
     (22) expr -> expr . / expr
     (23) expr -> expr . * expr
@@ -2664,9 +2686,9 @@ state 76
     +               shift and go to state 37
 
 
-state 77
+state 74
 
-    (36) expr -> COS ( expr . )
+    (31) expr -> SQRT ( expr . )
     (21) expr -> expr . SM_EXP expr
     (22) expr -> expr . / expr
     (23) expr -> expr . * expr
@@ -2680,9 +2702,9 @@ state 77
     +               shift and go to state 37
 
 
-state 78
+state 75
 
-    (37) expr -> SIN ( expr . )
+    (32) expr -> LOG10 ( expr . )
     (21) expr -> expr . SM_EXP expr
     (22) expr -> expr . / expr
     (23) expr -> expr . * expr
@@ -2696,7 +2718,87 @@ state 78
     +               shift and go to state 37
 
 
+state 76
+
+    (33) expr -> LOG ( expr . )
+    (21) expr -> expr . SM_EXP expr
+    (22) expr -> expr . / expr
+    (23) expr -> expr . * expr
+    (24) expr -> expr . - expr
+    (25) expr -> expr . + expr
+    )               shift and go to state 97
+    SM_EXP          shift and go to state 33
+    /               shift and go to state 34
+    *               shift and go to state 35
+    -               shift and go to state 36
+    +               shift and go to state 37
+
+
+state 77
+
+    (34) expr -> EXP ( expr . )
+    (21) expr -> expr . SM_EXP expr
+    (22) expr -> expr . / expr
+    (23) expr -> expr . * expr
+    (24) expr -> expr . - expr
+    (25) expr -> expr . + expr
+    )               shift and go to state 98
+    SM_EXP          shift and go to state 33
+    /               shift and go to state 34
+    *               shift and go to state 35
+    -               shift and go to state 36
+    +               shift and go to state 37
+
+
+state 78
+
+    (35) expr -> ATAN ( expr . )
+    (21) expr -> expr . SM_EXP expr
+    (22) expr -> expr . / expr
+    (23) expr -> expr . * expr
+    (24) expr -> expr . - expr
+    (25) expr -> expr . + expr
+    )               shift and go to state 99
+    SM_EXP          shift and go to state 33
+    /               shift and go to state 34
+    *               shift and go to state 35
+    -               shift and go to state 36
+    +               shift and go to state 37
+
+
 state 79
+
+    (36) expr -> COS ( expr . )
+    (21) expr -> expr . SM_EXP expr
+    (22) expr -> expr . / expr
+    (23) expr -> expr . * expr
+    (24) expr -> expr . - expr
+    (25) expr -> expr . + expr
+    )               shift and go to state 100
+    SM_EXP          shift and go to state 33
+    /               shift and go to state 34
+    *               shift and go to state 35
+    -               shift and go to state 36
+    +               shift and go to state 37
+
+
+state 80
+
+    (37) expr -> SIN ( expr . )
+    (21) expr -> expr . SM_EXP expr
+    (22) expr -> expr . / expr
+    (23) expr -> expr . * expr
+    (24) expr -> expr . - expr
+    (25) expr -> expr . + expr
+    )               shift and go to state 101
+    SM_EXP          shift and go to state 33
+    /               shift and go to state 34
+    *               shift and go to state 35
+    -               shift and go to state 36
+    +               shift and go to state 37
+
+
+state 81
 
     (8) statment -> ifCode superCondition statment ELSE . statment end
     (7) statment -> . { statmentList }
@@ -2756,12 +2858,12 @@ state 79
     PI              shift and go to state 27
 
     ifCode                         shift and go to state 8
-    statment                       shift and go to state 97
+    statment                       shift and go to state 102
     whileCode                      shift and go to state 9
     expr                           shift and go to state 64
     assign                         shift and go to state 65
 
-state 80
+state 82
 
     (9) statment -> ifCode superCondition statment end .
     BRANCH          reduce using rule 9 (statment -> ifCode superCondition statment end .)
@@ -2791,34 +2893,148 @@ state 80
     ELSE            reduce using rule 9 (statment -> ifCode superCondition statment end .)
 
 
-state 81
+state 83
 
-    (49) superCondition -> ( condition ) .
-    {               reduce using rule 49 (superCondition -> ( condition ) .)
-    PRINTEX         reduce using rule 49 (superCondition -> ( condition ) .)
-    IF              reduce using rule 49 (superCondition -> ( condition ) .)
-    WHILE           reduce using rule 49 (superCondition -> ( condition ) .)
-    NAME            reduce using rule 49 (superCondition -> ( condition ) .)
-    (               reduce using rule 49 (superCondition -> ( condition ) .)
-    -               reduce using rule 49 (superCondition -> ( condition ) .)
-    NUMBER_F        reduce using rule 49 (superCondition -> ( condition ) .)
-    NUMBER          reduce using rule 49 (superCondition -> ( condition ) .)
-    ABS             reduce using rule 49 (superCondition -> ( condition ) .)
-    SQRT            reduce using rule 49 (superCondition -> ( condition ) .)
-    LOG10           reduce using rule 49 (superCondition -> ( condition ) .)
-    LOG             reduce using rule 49 (superCondition -> ( condition ) .)
-    EXP             reduce using rule 49 (superCondition -> ( condition ) .)
-    ATAN            reduce using rule 49 (superCondition -> ( condition ) .)
-    COS             reduce using rule 49 (superCondition -> ( condition ) .)
-    SIN             reduce using rule 49 (superCondition -> ( condition ) .)
-    DEG             reduce using rule 49 (superCondition -> ( condition ) .)
-    PHI             reduce using rule 49 (superCondition -> ( condition ) .)
-    GAMMA           reduce using rule 49 (superCondition -> ( condition ) .)
-    N_E             reduce using rule 49 (superCondition -> ( condition ) .)
-    PI              reduce using rule 49 (superCondition -> ( condition ) .)
+    (49) superCondition -> ( conditionLogical ) .
+    {               reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    PRINTEX         reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    IF              reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    WHILE           reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    NAME            reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    (               reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    -               reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    NUMBER_F        reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    NUMBER          reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    ABS             reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    SQRT            reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    LOG10           reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    LOG             reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    EXP             reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    ATAN            reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    COS             reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    SIN             reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    DEG             reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    PHI             reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    GAMMA           reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    N_E             reduce using rule 49 (superCondition -> ( conditionLogical ) .)
+    PI              reduce using rule 49 (superCondition -> ( conditionLogical ) .)
 
 
-state 82
+state 84
+
+    (52) conditionLogical -> condition OR . condition
+    (43) condition -> . expr NE expr
+    (44) condition -> . expr EQ expr
+    (45) condition -> . expr LE expr
+    (46) condition -> . expr LT expr
+    (47) condition -> . expr GE expr
+    (48) condition -> . expr GT expr
+    (20) expr -> . ( expr )
+    (21) expr -> . expr SM_EXP expr
+    (22) expr -> . expr / expr
+    (23) expr -> . expr * expr
+    (24) expr -> . expr - expr
+    (25) expr -> . expr + expr
+    (26) expr -> . - expr
+    (27) expr -> . NAME
+    (28) expr -> . NUMBER_F
+    (29) expr -> . NUMBER
+    (30) expr -> . ABS ( expr )
+    (31) expr -> . SQRT ( expr )
+    (32) expr -> . LOG10 ( expr )
+    (33) expr -> . LOG ( expr )
+    (34) expr -> . EXP ( expr )
+    (35) expr -> . ATAN ( expr )
+    (36) expr -> . COS ( expr )
+    (37) expr -> . SIN ( expr )
+    (38) expr -> . DEG
+    (39) expr -> . PHI
+    (40) expr -> . GAMMA
+    (41) expr -> . N_E
+    (42) expr -> . PI
+    (               shift and go to state 11
+    -               shift and go to state 12
+    NAME            shift and go to state 44
+    NUMBER_F        shift and go to state 13
+    NUMBER          shift and go to state 14
+    ABS             shift and go to state 15
+    SQRT            shift and go to state 16
+    LOG10           shift and go to state 17
+    LOG             shift and go to state 18
+    EXP             shift and go to state 19
+    ATAN            shift and go to state 20
+    COS             shift and go to state 21
+    SIN             shift and go to state 22
+    DEG             shift and go to state 23
+    PHI             shift and go to state 24
+    GAMMA           shift and go to state 25
+    N_E             shift and go to state 26
+    PI              shift and go to state 27
+
+    condition                      shift and go to state 103
+    expr                           shift and go to state 70
+
+state 85
+
+    (53) conditionLogical -> condition AND . condition
+    (43) condition -> . expr NE expr
+    (44) condition -> . expr EQ expr
+    (45) condition -> . expr LE expr
+    (46) condition -> . expr LT expr
+    (47) condition -> . expr GE expr
+    (48) condition -> . expr GT expr
+    (20) expr -> . ( expr )
+    (21) expr -> . expr SM_EXP expr
+    (22) expr -> . expr / expr
+    (23) expr -> . expr * expr
+    (24) expr -> . expr - expr
+    (25) expr -> . expr + expr
+    (26) expr -> . - expr
+    (27) expr -> . NAME
+    (28) expr -> . NUMBER_F
+    (29) expr -> . NUMBER
+    (30) expr -> . ABS ( expr )
+    (31) expr -> . SQRT ( expr )
+    (32) expr -> . LOG10 ( expr )
+    (33) expr -> . LOG ( expr )
+    (34) expr -> . EXP ( expr )
+    (35) expr -> . ATAN ( expr )
+    (36) expr -> . COS ( expr )
+    (37) expr -> . SIN ( expr )
+    (38) expr -> . DEG
+    (39) expr -> . PHI
+    (40) expr -> . GAMMA
+    (41) expr -> . N_E
+    (42) expr -> . PI
+    (               shift and go to state 11
+    -               shift and go to state 12
+    NAME            shift and go to state 44
+    NUMBER_F        shift and go to state 13
+    NUMBER          shift and go to state 14
+    ABS             shift and go to state 15
+    SQRT            shift and go to state 16
+    LOG10           shift and go to state 17
+    LOG             shift and go to state 18
+    EXP             shift and go to state 19
+    ATAN            shift and go to state 20
+    COS             shift and go to state 21
+    SIN             shift and go to state 22
+    DEG             shift and go to state 23
+    PHI             shift and go to state 24
+    GAMMA           shift and go to state 25
+    N_E             shift and go to state 26
+    PI              shift and go to state 27
+
+    condition                      shift and go to state 104
+    expr                           shift and go to state 70
+
+state 86
+
+    (51) conditionLogical -> NOT condition .
+    )               reduce using rule 51 (conditionLogical -> NOT condition .)
+
+
+state 87
 
     (43) condition -> expr NE . expr
     (20) expr -> . ( expr )
@@ -2863,9 +3079,9 @@ state 82
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 98
+    expr                           shift and go to state 105
 
-state 83
+state 88
 
     (44) condition -> expr EQ . expr
     (20) expr -> . ( expr )
@@ -2910,9 +3126,9 @@ state 83
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 99
+    expr                           shift and go to state 106
 
-state 84
+state 89
 
     (45) condition -> expr LE . expr
     (20) expr -> . ( expr )
@@ -2957,9 +3173,9 @@ state 84
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 100
+    expr                           shift and go to state 107
 
-state 85
+state 90
 
     (46) condition -> expr LT . expr
     (20) expr -> . ( expr )
@@ -3004,9 +3220,9 @@ state 85
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 101
+    expr                           shift and go to state 108
 
-state 86
+state 91
 
     (47) condition -> expr GE . expr
     (20) expr -> . ( expr )
@@ -3051,9 +3267,9 @@ state 86
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 102
+    expr                           shift and go to state 109
 
-state 87
+state 92
 
     (48) condition -> expr GT . expr
     (20) expr -> . ( expr )
@@ -3098,9 +3314,9 @@ state 87
     N_E             shift and go to state 26
     PI              shift and go to state 27
 
-    expr                           shift and go to state 103
+    expr                           shift and go to state 110
 
-state 88
+state 93
 
     (10) statment -> whileCode superCondition statment end .
     BRANCH          reduce using rule 10 (statment -> whileCode superCondition statment end .)
@@ -3130,7 +3346,7 @@ state 88
     ELSE            reduce using rule 10 (statment -> whileCode superCondition statment end .)
 
 
-state 89
+state 94
 
     (30) expr -> ABS ( expr ) .
     BRANCH          reduce using rule 30 (expr -> ABS ( expr ) .)
@@ -3169,9 +3385,11 @@ state 89
     LT              reduce using rule 30 (expr -> ABS ( expr ) .)
     GE              reduce using rule 30 (expr -> ABS ( expr ) .)
     GT              reduce using rule 30 (expr -> ABS ( expr ) .)
+    OR              reduce using rule 30 (expr -> ABS ( expr ) .)
+    AND             reduce using rule 30 (expr -> ABS ( expr ) .)
 
 
-state 90
+state 95
 
     (31) expr -> SQRT ( expr ) .
     BRANCH          reduce using rule 31 (expr -> SQRT ( expr ) .)
@@ -3210,9 +3428,11 @@ state 90
     LT              reduce using rule 31 (expr -> SQRT ( expr ) .)
     GE              reduce using rule 31 (expr -> SQRT ( expr ) .)
     GT              reduce using rule 31 (expr -> SQRT ( expr ) .)
+    OR              reduce using rule 31 (expr -> SQRT ( expr ) .)
+    AND             reduce using rule 31 (expr -> SQRT ( expr ) .)
 
 
-state 91
+state 96
 
     (32) expr -> LOG10 ( expr ) .
     BRANCH          reduce using rule 32 (expr -> LOG10 ( expr ) .)
@@ -3251,9 +3471,11 @@ state 91
     LT              reduce using rule 32 (expr -> LOG10 ( expr ) .)
     GE              reduce using rule 32 (expr -> LOG10 ( expr ) .)
     GT              reduce using rule 32 (expr -> LOG10 ( expr ) .)
+    OR              reduce using rule 32 (expr -> LOG10 ( expr ) .)
+    AND             reduce using rule 32 (expr -> LOG10 ( expr ) .)
 
 
-state 92
+state 97
 
     (33) expr -> LOG ( expr ) .
     BRANCH          reduce using rule 33 (expr -> LOG ( expr ) .)
@@ -3292,9 +3514,11 @@ state 92
     LT              reduce using rule 33 (expr -> LOG ( expr ) .)
     GE              reduce using rule 33 (expr -> LOG ( expr ) .)
     GT              reduce using rule 33 (expr -> LOG ( expr ) .)
+    OR              reduce using rule 33 (expr -> LOG ( expr ) .)
+    AND             reduce using rule 33 (expr -> LOG ( expr ) .)
 
 
-state 93
+state 98
 
     (34) expr -> EXP ( expr ) .
     BRANCH          reduce using rule 34 (expr -> EXP ( expr ) .)
@@ -3333,9 +3557,11 @@ state 93
     LT              reduce using rule 34 (expr -> EXP ( expr ) .)
     GE              reduce using rule 34 (expr -> EXP ( expr ) .)
     GT              reduce using rule 34 (expr -> EXP ( expr ) .)
+    OR              reduce using rule 34 (expr -> EXP ( expr ) .)
+    AND             reduce using rule 34 (expr -> EXP ( expr ) .)
 
 
-state 94
+state 99
 
     (35) expr -> ATAN ( expr ) .
     BRANCH          reduce using rule 35 (expr -> ATAN ( expr ) .)
@@ -3374,9 +3600,11 @@ state 94
     LT              reduce using rule 35 (expr -> ATAN ( expr ) .)
     GE              reduce using rule 35 (expr -> ATAN ( expr ) .)
     GT              reduce using rule 35 (expr -> ATAN ( expr ) .)
+    OR              reduce using rule 35 (expr -> ATAN ( expr ) .)
+    AND             reduce using rule 35 (expr -> ATAN ( expr ) .)
 
 
-state 95
+state 100
 
     (36) expr -> COS ( expr ) .
     BRANCH          reduce using rule 36 (expr -> COS ( expr ) .)
@@ -3415,9 +3643,11 @@ state 95
     LT              reduce using rule 36 (expr -> COS ( expr ) .)
     GE              reduce using rule 36 (expr -> COS ( expr ) .)
     GT              reduce using rule 36 (expr -> COS ( expr ) .)
+    OR              reduce using rule 36 (expr -> COS ( expr ) .)
+    AND             reduce using rule 36 (expr -> COS ( expr ) .)
 
 
-state 96
+state 101
 
     (37) expr -> SIN ( expr ) .
     BRANCH          reduce using rule 37 (expr -> SIN ( expr ) .)
@@ -3456,9 +3686,11 @@ state 96
     LT              reduce using rule 37 (expr -> SIN ( expr ) .)
     GE              reduce using rule 37 (expr -> SIN ( expr ) .)
     GT              reduce using rule 37 (expr -> SIN ( expr ) .)
+    OR              reduce using rule 37 (expr -> SIN ( expr ) .)
+    AND             reduce using rule 37 (expr -> SIN ( expr ) .)
 
 
-state 97
+state 102
 
     (8) statment -> ifCode superCondition statment ELSE statment . end
     (16) end -> .
@@ -3488,9 +3720,21 @@ state 97
     PI              reduce using rule 16 (end -> .)
     ELSE            reduce using rule 16 (end -> .)
 
-    end                            shift and go to state 104
+    end                            shift and go to state 111
 
-state 98
+state 103
+
+    (52) conditionLogical -> condition OR condition .
+    )               reduce using rule 52 (conditionLogical -> condition OR condition .)
+
+
+state 104
+
+    (53) conditionLogical -> condition AND condition .
+    )               reduce using rule 53 (conditionLogical -> condition AND condition .)
+
+
+state 105
 
     (43) condition -> expr NE expr .
     (21) expr -> expr . SM_EXP expr
@@ -3498,6 +3742,8 @@ state 98
     (23) expr -> expr . * expr
     (24) expr -> expr . - expr
     (25) expr -> expr . + expr
+    OR              reduce using rule 43 (condition -> expr NE expr .)
+    AND             reduce using rule 43 (condition -> expr NE expr .)
     )               reduce using rule 43 (condition -> expr NE expr .)
     SM_EXP          shift and go to state 33
     /               shift and go to state 34
@@ -3506,7 +3752,7 @@ state 98
     +               shift and go to state 37
 
 
-state 99
+state 106
 
     (44) condition -> expr EQ expr .
     (21) expr -> expr . SM_EXP expr
@@ -3514,6 +3760,8 @@ state 99
     (23) expr -> expr . * expr
     (24) expr -> expr . - expr
     (25) expr -> expr . + expr
+    OR              reduce using rule 44 (condition -> expr EQ expr .)
+    AND             reduce using rule 44 (condition -> expr EQ expr .)
     )               reduce using rule 44 (condition -> expr EQ expr .)
     SM_EXP          shift and go to state 33
     /               shift and go to state 34
@@ -3522,7 +3770,7 @@ state 99
     +               shift and go to state 37
 
 
-state 100
+state 107
 
     (45) condition -> expr LE expr .
     (21) expr -> expr . SM_EXP expr
@@ -3530,6 +3778,8 @@ state 100
     (23) expr -> expr . * expr
     (24) expr -> expr . - expr
     (25) expr -> expr . + expr
+    OR              reduce using rule 45 (condition -> expr LE expr .)
+    AND             reduce using rule 45 (condition -> expr LE expr .)
     )               reduce using rule 45 (condition -> expr LE expr .)
     SM_EXP          shift and go to state 33
     /               shift and go to state 34
@@ -3538,7 +3788,7 @@ state 100
     +               shift and go to state 37
 
 
-state 101
+state 108
 
     (46) condition -> expr LT expr .
     (21) expr -> expr . SM_EXP expr
@@ -3546,6 +3796,8 @@ state 101
     (23) expr -> expr . * expr
     (24) expr -> expr . - expr
     (25) expr -> expr . + expr
+    OR              reduce using rule 46 (condition -> expr LT expr .)
+    AND             reduce using rule 46 (condition -> expr LT expr .)
     )               reduce using rule 46 (condition -> expr LT expr .)
     SM_EXP          shift and go to state 33
     /               shift and go to state 34
@@ -3554,7 +3806,7 @@ state 101
     +               shift and go to state 37
 
 
-state 102
+state 109
 
     (47) condition -> expr GE expr .
     (21) expr -> expr . SM_EXP expr
@@ -3562,6 +3814,8 @@ state 102
     (23) expr -> expr . * expr
     (24) expr -> expr . - expr
     (25) expr -> expr . + expr
+    OR              reduce using rule 47 (condition -> expr GE expr .)
+    AND             reduce using rule 47 (condition -> expr GE expr .)
     )               reduce using rule 47 (condition -> expr GE expr .)
     SM_EXP          shift and go to state 33
     /               shift and go to state 34
@@ -3570,7 +3824,7 @@ state 102
     +               shift and go to state 37
 
 
-state 103
+state 110
 
     (48) condition -> expr GT expr .
     (21) expr -> expr . SM_EXP expr
@@ -3578,6 +3832,8 @@ state 103
     (23) expr -> expr . * expr
     (24) expr -> expr . - expr
     (25) expr -> expr . + expr
+    OR              reduce using rule 48 (condition -> expr GT expr .)
+    AND             reduce using rule 48 (condition -> expr GT expr .)
     )               reduce using rule 48 (condition -> expr GT expr .)
     SM_EXP          shift and go to state 33
     /               shift and go to state 34
@@ -3586,7 +3842,7 @@ state 103
     +               shift and go to state 37
 
 
-state 104
+state 111
 
     (8) statment -> ifCode superCondition statment ELSE statment end .
     BRANCH          reduce using rule 8 (statment -> ifCode superCondition statment ELSE statment end .)

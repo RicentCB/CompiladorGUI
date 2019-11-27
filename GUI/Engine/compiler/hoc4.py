@@ -252,28 +252,23 @@ class Hoc4Parser(Parser):
     def condition(self, p):
         return ('ne', p.expr0, p.expr1)
     
-    # @_('"(" conditionLogical ")"')
-    # def superCondition(self, p):
-    #     return p.conditionLogical
-    
-    @_(' "(" condition ")" ')
+    @_('"(" conditionLogical ")"')
     def superCondition(self, p):
-        return p.condition
+        return p.conditionLogical
     
+    @_('condition AND condition')  # Logica AND
+    def conditionLogical(self, p):
+        return ('and', p.condition0, p.condition1)
+    @_('condition OR condition')  # Logica OR
+    def conditionLogical(self, p):
+        return ('or', p.condition0, p.condition1)
+    @_('NOT condition')  # Logica NOT
+    def conditionLogical(self, p):
+        return ('not', p.condition)
 
-    # @_('condition AND condition')  # Logica AND
-    # def conditionLogical(self, p):
-    #     return ('and', p.condition0, p.condition1)
-    # @_('condition OR condition')  # Logica OR
-    # def conditionLogical(self, p):
-    #     return ('or', p.condition0, p.condition1)
-    # @_('NOT condition')  # Logica NOT
-    # def conditionLogical(self, p):
-    #     return ('not', p.condition)
-
-    # @_('condition')
-    # def conditionLogical(self, p):
-    #     return p.condition
+    @_('condition')
+    def conditionLogical(self, p):
+        return p.condition
 
 class Hoc4Execute:
 
