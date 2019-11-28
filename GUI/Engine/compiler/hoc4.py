@@ -13,7 +13,7 @@ class Hoc4Lexer(Lexer):
     tokens = {NUMBER,NUMBER_F, NAME, 
         SM_EXP,
         SIN, COS, ATAN, EXP, LOG, LOG10, SQRT, ABS,
-        IF, ENDIF, ELSE, WHILE, ENDWHILE,
+        IF, ELSE, WHILE, 
         NE, EQ, GT, GE, LT, LE, OR, AND, NOT,
         PI, N_E, GAMMA, DEG, PHI,
         BRANCH, PRINTEX}
@@ -37,9 +37,6 @@ class Hoc4Lexer(Lexer):
 
     IF = r'IF'
     ELSE = r'ELSE'
-    ENDIF = r'ENDIF'
-    WHILE = r'WHILE'
-    ENDWHILE = r'ENDWHILE'
 
     EQ = r'==' 
     NE = r'!='
@@ -141,20 +138,20 @@ class Hoc4Parser(Parser):
 
     @_('whileCode superCondition statment end')
     def statment(self, p):
-        return ('whileCode', p.superCondition, ('branch', p.statment))
+        return ('whileCode', p.superCondition, p.statment)
     @_('ifCode superCondition statment end')
     def statment(self, p):
-        return ('ifCode', p.superCondition, ('branch', p.statment))    
+        return ('ifCode', p.superCondition, p.statment)
     @_('ifCode superCondition statment ELSE statment end')
     def statment(self, p):
-        return ('ifCodeElse', p.superCondition, ('branch', p.statment0, p.statment1))
+        return ('ifCodeElse', p.superCondition, p.statment0, p.statment1)
     
     @_('"{" statmentList "}"')
     def statment(self, p):
         return (p.statmentList)    
     @_('WHILE')
     def whileCode(self, p):
-        return p.WHILE
+        return ("WHILE")
     @_('IF')
     def ifCode(self, p):
         return ("IF")
@@ -277,10 +274,10 @@ class Hoc4Execute:
         self.vars = {}
         self.pc = 0
         while self.pc < len(self.parser.lines):
-            result = self.walkTree(self.parser.lines[self.pc])
-            if result is not None and (isinstance(result,int) or isinstance(result, float)):
-                if line[0] == 'var':
-                    print(result)
+            self.walkTree(self.parser.lines[self.pc])
+            # if result is not None and (isinstance(result,int) or isinstance(result, float)):
+            #     if line[0] == 'var':
+            #         print(result)
             self.pc += 1
         
     #funcion que evalua una condicion sea logica o no
@@ -349,14 +346,24 @@ class Hoc4Execute:
             return math.sqrt(self.walkTree(node[1]))
         elif node[0] == 'ABS':
             return math.fabs(self.walkTree(node[1]))
-        #Statments
+        # PALABRAS RESERVADAS
+        if node[0] == 'print':
+            print(self.walkTree(node[1]))
+        # BLOQUES DE CODIGO
         if node[0] == 'ifCode': #Funcion if
             condition = self.evaluateCondition(node[1])
             if condition:
-                self.walkTree(node[2][1])
+                self.walkTree(node[2])
+        if node[0] == 'ifCodeElse':  #Funcion if
+            condition = self.evaluateCondition(node[1])
+            if condition:   #Ejectuar pirmer statment
+                self.walkTree(node[2])
+            else:
+                self.walkTree(node[3])
+        # STATMENTS
         elif node[0] == 'stmtList':
-            n1 = self.walkTree(node[1])
-            n2 = self.walkTree(node[2])
+            self.walkTree(node[1])
+            self.walkTree(node[2])
         elif node[0] == 'stmt':
             return self.walkTree(node[1])
         #Variables

@@ -55,11 +55,6 @@ Rule 51    conditionLogical -> NOT condition
 Rule 52    conditionLogical -> condition OR condition
 Rule 53    conditionLogical -> condition AND condition
 
-Unused terminals:
-
-    ENDIF
-    ENDWHILE
-
 Terminals, with rules where they appear:
 
 (                    : 20 30 31 32 33 34 35 36 37 49
@@ -76,8 +71,6 @@ BRANCH               : 1 2 3 4 18
 COS                  : 36
 DEG                  : 38
 ELSE                 : 8
-ENDIF                : 
-ENDWHILE             : 
 EQ                   : 44
 EXP                  : 34
 GAMMA                : 40
