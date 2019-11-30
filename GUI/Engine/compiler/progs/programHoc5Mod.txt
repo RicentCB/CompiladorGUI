@@ -1,0 +1,22 @@
+a = 0
+PRINT a
+SWITCH (a) {
+    CASE 0 :
+        a = a +1
+        PRINT a
+        PRINT "Caso 1"
+        break
+    CASE 10:
+        PRINT "Caso 2"
+        break
+    CASE 3:
+        PRINT "Caso 3"
+        break
+    CASE 4:
+        PRINT "Caso 4"
+        break
+    DEFAULT :
+        PRINT "Caso DEFAULT"
+        break
+}
+PRINT "Fin SWITCH"

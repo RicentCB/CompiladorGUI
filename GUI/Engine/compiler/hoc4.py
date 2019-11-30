@@ -13,7 +13,7 @@ class Hoc4Lexer(Lexer):
     tokens = {NUMBER,NUMBER_F, NAME, 
         SM_EXP,
         SIN, COS, ATAN, EXP, LOG, LOG10, SQRT, ABS,
-        IF, ELSE, WHILE, 
+        IF, ELSE, WHILE, SWITCH, CASE, DEFAULT, ENDCASE,
         NE, EQ, GT, GE, LT, LE, OR, AND, NOT,
         PI, N_E, GAMMA, DEG, PHI,
         BRANCH, PRINTEX,
@@ -23,7 +23,7 @@ class Hoc4Lexer(Lexer):
     ignore = '\t '
     SM_EXP = r'\^'
 
-    literals = { '+', '-', '/', '*', '(', ')', '=', '{', '}'}
+    literals = { '+', '-', '/', '*', '(', ')', '=', '{', '}', ':'}
 
     BRANCH = '\n'
 
@@ -41,6 +41,10 @@ class Hoc4Lexer(Lexer):
     IF = r'IF'
     ELSE = r'ELSE'
     WHILE = r'WHILE'
+    SWITCH = r'SWITCH'
+    ENDCASE = r'break'
+    CASE = r'CASE'
+    DEFAULT = r'DEFAULT'
 
     EQ = r'==' 
     NE = r'!='
@@ -144,26 +148,58 @@ class Hoc4Parser(Parser):
     @_('PRINTEX STRING')
     def statment(self, p):
         return ('print', p[1])
-
+    @_('"{" statmentList "}"')
+    def statment(self, p):
+        return (p.statmentList)  
+    #  C  O  D  I  G  O
+    #While
     @_('whileCode superCondition statment end')
     def statment(self, p):
         return ('whileCode', p.superCondition, p.statment)
+    #If
     @_('ifCode superCondition statment end')
     def statment(self, p):
         return ('ifCode', p.superCondition, p.statment)
     @_('ifCode superCondition statment ELSE statment end')
     def statment(self, p):
         return ('ifCodeElse', p.superCondition, p.statment0, p.statment1)
-    
-    @_('"{" statmentList "}"')
+    #Switch - Case
+    @_('switchCode "(" NAME ")" superSwitchList')
     def statment(self, p):
-        return (p.statmentList)    
+        return ('switchCode', p.NAME, (p.superSwitchList))
+    @_('"{" BRANCH switchList "}"')
+    def superSwitchList(self,p):
+        return (p.switchList)
+    @_('switchList caseSwitch')
+    def switchList(self, p):
+        if p.switchList == None:
+            return p.caseSwitch
+        else:
+            return ('caseList', p.switchList, p.caseSwitch)
+    @_('')
+    def switchList(self, p):
+        pass
+    @_('CASE expr ":" BRANCH statmentList ENDCASE BRANCH')
+    def caseSwitch(self, p):
+        return ('caseSwitch', p.expr, p.statmentList)   
+    @_('DEFAULT ":" BRANCH statmentList ENDCASE BRANCH')    
+    def caseSwitch(self, p):
+        return ('caseDefault', p.statmentList)   
+
+# ('switchCode', 'a', ('caseList', ('caseList', ('caseList', ('caseSwitch', (('num', 1), ('stmt', ('print', '"Caso 1"')))), ('caseSwitch', (('num', 2), ('stmt', ('print', '"Caso 2"'))))), ('caseSwitch', (('num', 3), ('stmt', ('print', '"Caso 3"'))))), ('caseSwitch', (('num', 4), ('stmt', ('print', '"Caso 4"'))))))
+    
+
+    #REDUCCIONES PALABRAS CLAVE
     @_('WHILE')
     def whileCode(self, p):
         return ("WHILE")
     @_('IF')
     def ifCode(self, p):
         return ("IF")
+    @_('SWITCH')
+    def switchCode(self, p):
+        return ('SWITCH')
+
     @_('')
     def end(self, p):
         pass
@@ -312,9 +348,27 @@ class Hoc4Execute:
                 return self.walkTree(condition[1]) == self.walkTree(condition[2])
             elif condition[0] == "ne":
                 return self.walkTree(condition[1]) != self.walkTree(condition[2])
-    #Funcion que ejecuta un nodo dado
+    #Funcion que crea un arreglo para evular una condicion Switch
+    def createSwitch(self, node):
+        arrayAllCases = list()
+        if node[0] == 'caseList':
+            retCases1 = self.createSwitch(node[1])
+            retCases2 = self.createSwitch(node[2])
+            arrayAllCases.extend(retCases1)
+            arrayAllCases.extend(retCases2)
+        elif node[0] == 'caseSwitch':
+            #Creamos Caso
+            case = self.walkTree(node[1])
+            statements = node[2]
+            arrayAllCases.append(('case', case, statements))
+        else: #node[0] == 'caseDefault'
+            statements = node[1]
+            arrayAllCases.append(('default', statements))
+        return arrayAllCases
 
-    #Funcion que reduce y evalua los nodos creads por el parser
+        # ('switchCode', 'a', ('caseList', ('caseList', ('caseList', ('caseList', ('caseSwitch', ('num', 1), ('stmt', ('print', '"Caso 1"'))), ('caseSwitch', ('num', 2), ('stmt', ('print', '"Caso 2"')))), ('caseSwitch', ('num', 3), ('stmt', ('print', '"Caso 3"')))), ('caseSwitch', ('num', 4), ('stmt', ('print', '"Caso 4"')))), ('caseDefault', ('stmt', ('print', '"Caso DEFAULT"')))))
+
+    #Funcion que ejecuta, reduce y evalua los nodos creads por el parser
     def walkTree(self, node):
         if isinstance(node, int):
             return node
@@ -377,6 +431,41 @@ class Hoc4Execute:
             while self.evaluateCondition(node[1]):
                 self.walkTree(node[2])
 
+        elif node[0] == 'switchCode':
+            #Traer Casos
+            casesSw = self.createSwitch(node[2])
+            mainVar = 0
+            #Tratar de conseguir el valor de la variable
+            try:
+                mainVar = self.vars[node[1]]
+            except LookupError:
+                print("La variabla usada en el switch '"+node[1]+"' no se econtro!")
+                sys.exit() 
+            #Verificar Casos 
+            arrayCases = list()
+            for node in casesSw:
+                if node[0] == 'case':
+                    if node[1] not in arrayCases:
+                        arrayCases.append(node[1])
+                    else:
+                        print("Caso ya definido: ",node[1])
+                        sys.exit()
+                elif node[0] == 'default':
+                    if 'default' not in arrayCases:
+                        arrayCases.append('default')
+                    else:
+                        print("Solo puede existe un default")
+                        sys.exit()
+            #Buscar y ejecutar
+            for node in casesSw: 
+                if node[0] == 'case':
+                    if mainVar == node[1]:  #Variable Igual al caso
+                        self.walkTree(node[2])  #Ejecutar codigo
+                        break;
+                elif node[0] == 'default':
+                    self.walkTree(node[1])
+                    break;
+
         # STATMENTS
         elif node[0] == 'stmtList':
             self.walkTree(node[1])
@@ -400,7 +489,7 @@ if __name__ == '__main__':
     lexer = Hoc4Lexer()
     parser = Hoc4Parser()
     
-    fileProgram = open('GUI/Engine/compiler/progs/programHoc4.txt', 'r')
+    fileProgram = open('GUI/Engine/compiler/progs/programHoc5Mod.txt', 'r')
     text = fileProgram.read()
     # print(text)
     lex = lexer.tokenize(text)
