@@ -16,7 +16,9 @@ class Hoc4Lexer(Lexer):
         IF, ELSE, WHILE, 
         NE, EQ, GT, GE, LT, LE, OR, AND, NOT,
         PI, N_E, GAMMA, DEG, PHI,
-        BRANCH, PRINTEX}
+        BRANCH, PRINTEX,
+        STRING
+        }
 
     ignore = '\t '
     SM_EXP = r'\^'
@@ -49,6 +51,8 @@ class Hoc4Lexer(Lexer):
     OR = r'OR'
     AND = r'AND'
     NOT = r'NOT'
+
+    STRING = r'\".*?\"'
 
     # CONSTANTES
     @_(r'PI')
@@ -137,6 +141,9 @@ class Hoc4Parser(Parser):
     @_('PRINTEX expr')
     def statment(self, p):
         return ('print', p.expr)
+    @_('PRINTEX STRING')
+    def statment(self, p):
+        return ('print', p[1])
 
     @_('whileCode superCondition statment end')
     def statment(self, p):
@@ -350,7 +357,10 @@ class Hoc4Execute:
             return math.fabs(self.walkTree(node[1]))
         # PALABRAS RESERVADAS
         if node[0] == 'print':
-            print(self.walkTree(node[1]))
+            if isinstance(node[1], str):
+                print(node[1].replace('"',''))
+            else:
+                print(self.walkTree(node[1]))
             
         # BLOQUES DE CODIGO
         if node[0] == 'ifCode': #Funcion if

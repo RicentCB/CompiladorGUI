@@ -2,18 +2,20 @@ a = 10
 var1 = 0
 b = a
 c = 0
+PRINT "Primer IF"
 IF ( a == 10 AND var1 < 1) { 
     a = a + 1 
     b = a
     c = 25
+    PRINT "Entro al IF"
     IF ( a == b){
+        PRINT "Volvio a entrar xd"
         PRINT c + b
     }
+}ELSE{
+    PRINT "No entro al IF xd"
 }
-PRINT a
-PRINT b
 c = c +1
-
 PRINT c
 PRINT a
 PRINT b
