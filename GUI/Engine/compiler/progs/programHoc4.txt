@@ -1,8 +1,8 @@
-a = PI
+a = 10
 var1 = 0
 b = a
 c = 0
-IF ( a == PI AND var1 < 1) { 
+IF ( a == 10 AND var1 < 1) { 
     a = a + 1 
     b = a
     c = 25
@@ -13,10 +13,19 @@ IF ( a == PI AND var1 < 1) {
 PRINT a
 PRINT b
 c = c +1
+
 PRINT c
-IF (c != a){
-    c = SIN(PI)
-} ELSE{
-    c = COS(PI)
+PRINT a
+PRINT b
+WHILE (a < 10){
+    a = a + 1
+    IF (c != a){
+        c = SIN(PI)
+        c = a
+    } ELSE{
+        c = COS(PI)
+        c = a + 1
+    }
+    PRINT c
 }
-PRINT c
+PRINT a + 100

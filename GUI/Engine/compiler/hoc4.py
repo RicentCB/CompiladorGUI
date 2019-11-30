@@ -24,7 +24,8 @@ class Hoc4Lexer(Lexer):
     literals = { '+', '-', '/', '*', '(', ')', '=', '{', '}'}
 
     BRANCH = '\n'
-    PRINTEX = 'PRINT'
+
+    PRINTEX = r'PRINT'
     #Palabras Reservadas
     SIN = r'SIN'
     COS = r'COS'
@@ -34,9 +35,10 @@ class Hoc4Lexer(Lexer):
     LOG = r'LOG'
     SQRT = r'SQRT'
     ABS = r'ABS'
-
+    #Codigo
     IF = r'IF'
     ELSE = r'ELSE'
+    WHILE = r'WHILE'
 
     EQ = r'==' 
     NE = r'!='
@@ -349,17 +351,22 @@ class Hoc4Execute:
         # PALABRAS RESERVADAS
         if node[0] == 'print':
             print(self.walkTree(node[1]))
+            
         # BLOQUES DE CODIGO
         if node[0] == 'ifCode': #Funcion if
             condition = self.evaluateCondition(node[1])
             if condition:
                 self.walkTree(node[2])
-        if node[0] == 'ifCodeElse':  #Funcion if
+        elif node[0] == 'ifCodeElse':  #Funcion if
             condition = self.evaluateCondition(node[1])
             if condition:   #Ejectuar pirmer statment
                 self.walkTree(node[2])
             else:
                 self.walkTree(node[3])
+        elif node[0] == 'whileCode':    #Funcion While
+            while self.evaluateCondition(node[1]):
+                self.walkTree(node[2])
+
         # STATMENTS
         elif node[0] == 'stmtList':
             self.walkTree(node[1])
