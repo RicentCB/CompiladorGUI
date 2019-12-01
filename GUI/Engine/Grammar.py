@@ -28,8 +28,8 @@ class Grammar():
                     if car != "\n":
                         self.strGrammar += car
             #Modificar de acuerdo a la ruta especifica
-            # pathLexAn = "GUI/Engine/files/analizadorLexicoGramatica.txt"
-            pathLexAn = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/analizadorLexicoGramatica.txt"
+            pathLexAn = "Engine/files/analizadorLexicoGramatica.txt"
+            #pathLexAn = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/analizadorLexicoGramatica.txt"
             #Crear Analizador Lexico para Gramaticas
             # regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
             # regExp2 = "(-)&(>)"
@@ -226,56 +226,29 @@ class Grammar():
                     termSym.append(simbolo)
         return sorted(set(termSym))
     
-    def first(self, regla, regla_anterior=[]):        
+    def first(self, regla):        
         c_first = []
+        f_aux = []
         terminales = self.simbolosTerminales()
-        if(regla[0]==Alphabet.symbol_EPSILON):    
-            #c_first.append(regla[0])
+        no_terminales = self.simbolos_NoTerminales()
+        if regla[0] in terminales:
             return regla[0]
-        elif regla[0] in terminales:
-            #c_first.append(regla[0])
+        if regla[0] == Alphabet.symbol_EPSILON:
             return regla[0]
-        else:
-        #Para el caso de que es un simbolo no terminal
-            #contador = 0
-            for rule in self.rules:
-                if rule[0]==regla[0]:
-                    if self.is_nullable(regla[0]) == False:
-                        first_auxiliar = self.first(rule[1],rule[1])
-                        if isinstance(first_auxiliar, str):
-                            c_first.append(first_auxiliar)
-                        else:
-                            c_first = c_first + first_auxiliar
-                    elif self.is_nullable(regla[0]) and (regla[0] in self.simbolos_NoTerminales()):
-                        eliminar_epsilon = False 
-                        first_auxiliar2 = self.first(rule[1])
-                        c_first.append(first_auxiliar2)
-                        contador = 0
-                        if len(regla_anterior) > 1:
-                            eliminar_epsilon = True
-                            for simbolo in regla_anterior:
-                                if self.is_nullable(simbolo):
-                                    contador = contador+1
-                                else:
-                                    break
-                            for i in range(contador+1):
-                                indice = regla_anterior.index(regla[0])+i
-                                first_auxiliar = self.first(regla_anterior[indice])
-                                if isinstance(first_auxiliar, str):
-                                    c_first.append(first_auxiliar)
-                                else:
-                                    c_first = c_first + first_auxiliar
-                        if eliminar_epsilon is True:
-                            auxiliar1 = set(c_first)
-                            auxiliar1.discard(Alphabet.symbol_EPSILON)
-                            auxiliar2 = list(auxiliar1)
-                            c_first = auxiliar2  
-            #Quitamos elementos repetidos
-            auxiliar = []
-            for simbolo in c_first:
-                if simbolo not in auxiliar:
-                    auxiliar.append(simbolo)
-            return auxiliar
+        #Recorremos todas las reglas
+        for rule in self.rules:
+            if rule[0] == regla[0] and rule[1][0] != regla[0]:
+                f_aux = agregar(self.first(rule[1]), f_aux)
+                if Alphabet.symbol_EPSILON in f_aux and len(regla) > 1:
+                    del regla[0]
+                    f_aux.remove(Alphabet.symbol_EPSILON)
+                    f_aux2 = self.first(regla)
+                    c_first = agregar(f_aux, c_first)
+                    c_first = agregar(f_aux2, c_first)    
+                else:
+                    c_first = agregar(f_aux, c_first)
+                aux = set(c_first)
+        return list(aux)
 
     #Esta función determina si una regla
     #contiene producciones con epsilon, es decir, que 
@@ -481,12 +454,16 @@ def agregar(elementos, lista):
     return lista
 
 if __name__ == "__main__":
-    path = "GUI/Engine/Examples/GramaticaEj.txt" #Belmont
-    pathDict = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/dictFile.txt" #Belmont
+    path = "Engine/Examples/gramLR0.txt" #Belmont
+    pathDict = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/gramLR0.txt" #Belmont
     #path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
     g1 = Grammar(path)
-    print("-------ll1--------")
-    print(g1.creatTableLL1())
+    #print("-------ll1--------")
+    for simbolo in g1.simbolos_NoTerminales():
+        frst = g1.follow(simbolo)
+        print(f"Follow de {simbolo}: {frst}")
+    
+    #print(g1.creatTableLL1())
     # termSym.remove(Alphabet().symbol_EPSILON)
     # arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
     # anString = "(025*110)"
