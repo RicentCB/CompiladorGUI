@@ -186,9 +186,6 @@ class Hoc4Parser(Parser):
     def caseSwitch(self, p):
         return ('caseDefault', p.statmentList)   
 
-# ('switchCode', 'a', ('caseList', ('caseList', ('caseList', ('caseSwitch', (('num', 1), ('stmt', ('print', '"Caso 1"')))), ('caseSwitch', (('num', 2), ('stmt', ('print', '"Caso 2"'))))), ('caseSwitch', (('num', 3), ('stmt', ('print', '"Caso 3"'))))), ('caseSwitch', (('num', 4), ('stmt', ('print', '"Caso 4"'))))))
-    
-
     #REDUCCIONES PALABRAS CLAVE
     @_('WHILE')
     def whileCode(self, p):
@@ -489,15 +486,15 @@ if __name__ == '__main__':
     lexer = Hoc4Lexer()
     parser = Hoc4Parser()
     
-    fileProgram = open('GUI/Engine/compiler/progs/programHoc5Mod.txt', 'r')
+    fileProgram = open('Engine/compiler/progs/programHoc5Mod.txt', 'r')
     text = fileProgram.read()
     # print(text)
     lex = lexer.tokenize(text)
     # for token in lex:
     #     print(token)
     parser.parse(lex)
-    print()
-    for line in parser.lines:
-        print(line)
-    print()
+    # print()
+    # for line in parser.lines:
+    #     print(line)
+    # print()
     hoc3 = Hoc4Execute(parser)

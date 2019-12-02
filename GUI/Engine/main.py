@@ -7,6 +7,7 @@ from Grammar import Grammar
 from analizadorLexico import LexAnalizer
 from LR0 import LR0
 from LR1 import LR1
+from hoc4 import *
 
 #Funcion que retorna el id mas grande de todos los AFNS insertados
 def setLastIdState(filePath):
@@ -234,3 +235,19 @@ else:   #Numero de argumentos valido
             print(json.dumps({"Stack":stack, "String":string, "Action":action, "message":True}))
         else:
             print(json.dumps({"message": "Error opcion Grammar no valida"}));
+    elif (sys.argv[1] == "Interpreter"):
+        lexer = Hoc4Lexer()
+        parser = Hoc4Parser()
+
+        fileProgram = open(sys.argv[2], 'r')
+        text = fileProgram.read()
+        # print(text)
+        lex = lexer.tokenize(text)
+        # for token in lex:
+        #     print(token)
+        parser.parse(lex)
+        # print()
+        # for line in parser.lines:
+        #     print(line)
+        # print()
+        hoc3 = Hoc4Execute(parser)
