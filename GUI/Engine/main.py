@@ -6,6 +6,7 @@ from state import State
 from Grammar import Grammar
 from analizadorLexico import LexAnalizer
 from LR0 import LR0
+from LR1 import LR1
 
 #Funcion que retorna el id mas grande de todos los AFNS insertados
 def setLastIdState(filePath):
@@ -148,6 +149,7 @@ else:   #Numero de argumentos valido
     #Opciones de Gramatica
     elif(sys.argv[1] == "Grammar"):
         fileGrammar = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/grammar.txt"
+        
         if(sys.argv[2] == "PathLL1"):
             #Creamos un objeto gramatica y guardamos 
             fileObjectGrammar = open(fileGrammar, 'wb')
@@ -172,6 +174,7 @@ else:   #Numero de argumentos valido
             #Analizar la cadena
             stack, string, action = gramObj.analizeStr(sys.argv[3], lexAn, dictStr)
             print(json.dumps({"Stack":stack, "String":string, "Action":action, "message":True}))
+        
         #Crear Tabla LRO
         elif(sys.argv[2] == "PathLR0"):
             #Creamos un objeto gramatica y guardamos 
@@ -200,19 +203,20 @@ else:   #Numero de argumentos valido
             #Analizar la cadena
             stack, string, action = LRAn.analizeStr(sys.argv[3], lexAn, dictStr)
             print(json.dumps({"Stack":stack, "String":string, "Action":action, "message":True}))
-        #Crear Tabla LRO
-        elif(sys.argv[2] == "PathLR0"):
+        
+        #Crear Tabla LR1
+        elif(sys.argv[2] == "PathLR1"):
             #Creamos un objeto gramatica y guardamos 
             fileObjectGrammar = open(fileGrammar, 'wb')
             gramObject = Grammar(sys.argv[3])
             pickle.dump(sys.argv[3], fileObjectGrammar)
             fileObjectGrammar.close()
             #Crear tabla ll1 y mostrarla
-            LR0Obj = LR0(gramObject)
-            head, body = LR0Obj.createTableLR0()
+            LR1Obj = LR1(gramObject)
+            head, body = LR1Obj.createTableLR1()
             print(json.dumps({"Head":head, "Body":body, "message": True}))
-        #Analizar una cadena con LR0
-        elif(sys.argv[2] == "StringLR0"):
+        #Analizar una cadena con LR1
+        elif(sys.argv[2] == "StringLR1"):
             fileObjRead = open(fileGrammar, 'rb')
             pathStringGrammar = pickle.load(fileObjRead) 
             fileObjRead.close()
@@ -224,9 +228,9 @@ else:   #Numero de argumentos valido
             #Crear diccinario
             dictStr = createDictFile(sys.argv[5])
             #Crear LRO
-            LRAn = LR0(gramObj)
+            LR1An = LR1(gramObj)
             #Analizar la cadena
-            stack, string, action = LRAn.analizeStr(sys.argv[3], lexAn, dictStr)
+            stack, string, action = LR1An.analizeStr(sys.argv[3], lexAn, dictStr)
             print(json.dumps({"Stack":stack, "String":string, "Action":action, "message":True}))
         else:
             print(json.dumps({"message": "Error opcion Grammar no valida"}));
