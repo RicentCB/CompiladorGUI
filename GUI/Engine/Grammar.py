@@ -28,8 +28,8 @@ class Grammar():
                     if car != "\n":
                         self.strGrammar += car
             #Modificar de acuerdo a la ruta especifica
-            pathLexAn = "Engine/files/analizadorLexicoGramatica.txt"
-            #pathLexAn = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/analizadorLexicoGramatica.txt"
+            #pathLexAn = "Engine/files/analizadorLexicoGramatica.txt"
+            pathLexAn = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/analizadorLexicoGramatica.txt"
             #Crear Analizador Lexico para Gramaticas
             # regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
             # regExp2 = "(-)&(>)"

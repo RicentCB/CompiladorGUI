@@ -10,28 +10,37 @@ class LR1:
     #Metodo cerradura, dado una regla con "punto" (indice), y conjunto de simbolos {"$"..}
     #regresara una lista con las reglas y sus "pintos"
     # Regresa lista de tuplas
+    # S -> .b {alfa}
     def closure(self, rule, index, items):
         if (index == len(rule[1])) or (rule[1][index] in self.grammar.termSymbs):
             return [(rule, index, items)]
         else:   #Simbolo es NO terminal
                 #Calculara la misma Cerradura
             auxRules = list()
-            auxRules.append((rule, index))
-            nonTerm = rule[1][index]
+            auxRules.append((rule, index, items))   #Insertar Regla
+            nonTerm = rule[1][index]    #Termino Alfa
+            #Preguntar que hay despues del punto de la "regla"
+            #Calcular conjunto de items para el first {Alfa}
+            firstItems = list()
+            for i in range(index+1, len(rule[1])):
+                firstItems.append(rule[1][i])
+            #Reglas de la gramatica
             for ruleAux in self.grammar.rules:
                 if nonTerm == ruleAux[0]:
                     if (ruleAux == rule and index != 0) or (ruleAux != rule):
-                        #Calcular conjunto de items para el first {Alfa}
-                        firstItems = list()
-                        for i in range(index+1,len(ruleAux[1])):
-                            firstItems.append(ruleAux[1][i])
-                        #Llamar funcion first
-                        first = set()
-                        if len(firstItems) > 0:
-                            first = set(self.grammar.first(firstItems))
-                        first = first.union({Alphabet.symbol_STRINGEND})
-                        arAux = self.closure(ruleAux, 0, first)
-                        auxRules.extend(arAux)
+                        #Preguntar que hay despues del punto 
+                        if len(firstItems) == 0:
+                            arAux = self.closure(ruleAux, 0, items)
+                            auxRules.extend(arAux)
+                        else: 
+                            #Llamar funcion first
+                            first = set()
+                            if len(firstItems) > 0:
+                                first = set(self.grammar.first(firstItems))
+                            else:
+                                first = items
+                            arAux = self.closure(ruleAux, 0, first)
+                            auxRules.extend(arAux)
             #Eliminar reglas repetidas
             outRules = list()
             for ruleAux in auxRules:
@@ -42,15 +51,16 @@ class LR1:
     #Funcion ir, recivbe un "estado" (lista de regla con punto) y un elemento,
     #devuleve otro "estado"
     def goTo(self, state, symbol):
-        auxPairs = list()
-        for pair in state:
-            if len(pair[0][1]) > pair[1]:
-                if symbol == pair[0][1][pair[1]]:
-                    auxPairs.append((pair[0], pair[1]+1))
+        auxRules = list()
+        for rule in state:
+            if len(rule[0][1]) > rule[1]:
+                if symbol == rule[0][1][rule[1]]:
+                    #append(regla, indice+1, items)
+                    auxRules.append((rule[0], rule[1]+1, rule[2]))
         #Calcular cerradura de cada nueva regla con punto
         newRules = list()
-        for pair in auxPairs:
-            newRules.extend(self.closure(pair[0], pair[1]))
+        for rule in auxRules:
+            newRules.extend(self.closure(rule[0], rule[1], rule[2]))
         #Eliminar elementos repetidos
         finalRules = list()
         for rule in newRules:
@@ -68,6 +78,7 @@ class LR1:
                 outItmes.append(pair[0][1][pair[1]])
         order = self.grammar.nonTermSymbs.copy()
         order.extend(self.grammar.termSymbs)
+        # order = ['S', 'C', 'c', 'd']
         return sorted(list(set(outItmes)), key=order.index)
 
     def createSets(self):
@@ -82,7 +93,7 @@ class LR1:
             #Verificar transciones (IrA)
             for item in items:
                 newState = self.goTo(states[apunt], item)
-                #Verificar au no existe ese estado
+                #Verificar aun no existe ese estado
                 if newState not in states:  #Aun no existe
                     states.append(newState)
                 #Crear trasicion
@@ -125,7 +136,7 @@ class LR1:
             return ""
 
 
-    def createTableLR0(self):
+    def createTableLR1(self):
         #Creamos los conjuntos de "reglas"
         states, transitions = self.createSets()
         #Crear cabecera con simboloes terminales y no-terminales
@@ -170,7 +181,7 @@ class LR1:
 
     def analizeStr(self, stringAn, lexAnString, dicSymbTerm):
         #Crear tabla de transcion
-        headTb, bodyTb = self.createTableLR0()
+        headTb, bodyTb = self.createTableLR1()
         #Crear tabla de accion
         actionTable = (headTb, bodyTb)
         stringAn += Alphabet.symbol_STRINGEND
@@ -239,10 +250,10 @@ class LR1:
         return regStack, regString, regAction
 
 def main():
-    pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine//Examples/gramLR0.txt"
+    pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine//Examples/gramLR1.txt"
     gr = Grammar(pathGR)
     LR1Test = LR1(gr)
-    print(LR1Test.createSets())
+    print(LR1Test.createTableLR1())
     '''
     anString = "025*(025+110)"
     lexAnString = LexAnalizer.createLexFile("/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/lex.txt", anString)
