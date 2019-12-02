@@ -380,10 +380,34 @@ table.title-upper th{
 #tabs .container-tab{
     padding: 30px 40px;
 }
+/****************************************************************************************/
+/* ------------------------ I N T E R P R E T E     P  A  G  E ------------------------ */
+/****************************************************************************************/
+pre{
+    font-size: .85em;
+}
+section#code-interpreter{
+    width: 100%;
+    padding: 0 80px;
+    box-sizing: border-box;
+}
+section#code-interpreter .uplod-file{
+    margin-top: 50px;
+}
+section#code-interpreter textarea{
+    background-color: #575757;
+    width: 100%;
+    font-family: 'Quicksand', sans-serif;
+    color: #ccc;
+    padding: 25px;
+    font-size: 1.2em;
+}
 /*  -----------------------------  H E L P E R    C L A S S  -----------------------------  */
+.col-container{
+    display: flex;
+}
 .col-50{
-    width: 50%;
-    float: left;
+    flex: 1;
     padding: 10px;
     box-sizing: border-box;
 }

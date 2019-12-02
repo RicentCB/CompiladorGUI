@@ -38,28 +38,32 @@
             <li class="menu-element active">
                 <a href="grammar.html"><i class="fas fa-font"></i>Gramatica</a>
             </li>
-            
+            <li class="menu-element">
+                <a href="hoc.html"><i class="fas fa-font"></i>Interprete</a>
+            </li>
         </ul>
     </aside>
     <main id="grammar">
         <h1 class="main-title">Gramatica</h1>
-        <p class="col-50">
-            En este apartado crearas una un analizador sintactico de tipo LL1, dado una gramatica como entrada
-            <br>
-            <br>
-            Todas las reglas de la gramatica deberan estar constriudas de la siguiente manera:
-        </p>
-        <p class="col-50" style="background-color: #94cde7;">
-            S -> a A C | B b c; <br>
-            A -> e D ; <br>
-            B -> f | g ; <br>
-            C -> h | i ; <br>
-            D -> b E | &#949; ; <br>
-            E -> e D | d D | &#949; | c; <br>
-        </p>
+        <div class="col-container">
+            <p class="col-50">
+                En este apartado crearas una un analizador sintactico de tipo LL1, dado una gramatica como entrada
+                <br>
+                <br>
+                Todas las reglas de la gramatica deberan estar constriudas de la siguiente manera:
+            </p>
+            <p class="col-50" style="background-color: #94cde7;">
+                S -> a A C | B b c; <br>
+                A -> e D ; <br>
+                B -> f | g ; <br>
+                C -> h | i ; <br>
+                D -> b E | &#949; ; <br>
+                E -> e D | d D | &#949; | c; <br>
+            </p>
+        </div>
         <!-- F  I  L  E    I  N  P  U  T -->
         <div class="one-input" id="inputString">
-            <form>
+            <form class="col-container">
                 <div class="uplod-file col-50">
                     <p style="text-align: center" id="title-lexAn">Selecciona el archivo del analizador lexico</p>
                     <input type="file" id="file-input-lexAn"/>
@@ -145,9 +149,6 @@
                 </div>
             </div>
         </div>
-
-        
-
 
     </main>
 

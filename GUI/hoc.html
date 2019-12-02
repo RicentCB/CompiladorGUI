@@ -32,56 +32,68 @@
             <li class="menu-element">
                 <a href="afn.html"><i class="fas fa-edit"></i>AFN</a>
             </li>
-            <li class="menu-element active">
+            <li class="menu-element">
                 <a href="lexico.html"><i class="fab fa-adn"></i>Lexico</a>
             </li>
             <li class="menu-element">
                 <a href="grammar.html"><i class="fas fa-font"></i>Gramatica</a>
             </li>
-            <li class="menu-element">
+            <li class="menu-element active">
                 <a href="hoc.html"><i class="fas fa-font"></i>Interprete</a>
             </li>
         </ul>
     </aside>
     <main>
-        <h1 class="main-title">Analizador Lexico</h1>
-        <p>
-            En esta secci&oacute;n podras realizar <b>anlizadores lexicos con expresiones regulares</b>, dichas 
-            expresiones estaran dadas por cualquiera caracter, <b>excluyendo: '(', ')', '&', '|', '+', '*', '?'.</b>
-            <br>
-            Ya que dichos simbolos son usados para hacer las operaciones con dichas expresiones:
-        </p>
-        <ul>
-            <li> + : Cerradura Positiva</li>
-            <li> + : Cerradura Estrella</li>
-            <li> & : Concatenacion</li>
-            <li> | : Pipe u operacion OR</li>
-            <li> ? : Opcional</li>
-            <li> (): Usados para albergar otra expresion</li>
-        </ul>
-        <br>
-        <p>
-            Si fuese <b>necesario hacer uso de estos simbolos "exclusivos"</b>, solo es necesario <b>antecederlos con una diagonal invertida '\'.</b>
-            Ademas las <b>expresiones puede ser usadas con rangos</b>, como: "A-Z", "a-z", "0-9". Se puede hacer uso de rangos contenidos en estos;
-            por ejemplo: "C-M", "2-5".
-            <br>
-            <br>
-            Pero <b>nunca mezclando rangos</b> entre ellos como "a-K", "0-z", "A-3", etc...
-        </p>
-        <p>
-            Se tiene que </b>asignar un token cada expresion regular.</b> 
-            Con dichas expresion se <b>podra analizar una cadena, y el resultado sera el los "tokens"</b> asociados a dicha cadena,
-            si <b>no se correspondiera con alguna expresion regular</b> el token devuelto sera = <b>-1</b> 
-        </p>
-        <section class="input-container" id="regular-expression-continer">
+        <h1 class="main-title">Interprete</h1>
+        <div class="col-container">
+            <p class="col-50">
+                En esta secci&oacute;n podras <b>realizar la interpretacion de un codigo</b>, dicho     interprete acepta statements:
+                <br>
+                <br>
+                    If - Else<br>
+                    do while<br>
+                    switch - case<br>
+                <br>
+                <b>Todas las condiciones necesitan estar entre "()" parentesis, si se coloca mas de     una instruccion a seguir estas deberan estar entre "{}".</b>
+                <br>
+                <br>
+                En el lado <b>izquierdo observaras un ejemplo</b> de que sentencias pueden ser  ejecutadas.
+            </p>
+            <pre class="col-50" style="background-color: #94cde7;">
+            a = 10
+            var1 = 0
+            b = a
+            c = 0
+            PRINT "Primer IF"
+            IF ( a == 10 AND var1 < 1) { 
+                a = a + 1 
+                b = a
+            }ELSE{
+                PRINT "Condicion Else"
+            }
+            WHILE (a < 10){
+                a = a + 1
+                IF (c != a){
+                    c = SIN(PI)
+                    c = a
+                } ELSE{
+                    c = COS(PI)
+                    c = a + 1
+                }
+                PRINT c
+            }
+            PRINT a + 100
+            </pre>
+        </div>
+        <section id="code-interpreter">
 
+            <div class="uplod-file">
+                <p style="text-align: center" id="title-in-grammar-ll1">Selecciona el archivo de entrada para interpretar</p>
+                <input type="file" id="file-input-code-interpreter"/>
+                <label for="file-input-code-interpreter" class="btn-2">Subir Codigo</label>
+            </div>
+            <textarea  id="" cols="30" rows="10"></textarea>
         </section>
-        <section class="create-table-result" id="regular-exp">
-            <!-- ADD TABLE WITH JS -->
-        </section>
-
-
-
     </main>
 
     <script src="js/vendor/modernizr-3.7.1.min.js"></script>
