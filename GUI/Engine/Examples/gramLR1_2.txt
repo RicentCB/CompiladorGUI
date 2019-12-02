@@ -1,0 +1,4 @@
+S' -> S;
+S -> A a A b | B b B a;
+A -> Epsilon;
+B -> Epsilon;

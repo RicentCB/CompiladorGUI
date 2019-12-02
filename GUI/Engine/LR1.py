@@ -104,7 +104,7 @@ class LR1:
         return states, transitions
 
     #================================================
-    #   ==============  Tabla LRO  ==============  
+    #   ==============  Tabla LR1  ==============  
     #================================================
     def findTransition(self, arrayTrans, elemIni, objTrans):
         for trans in arrayTrans:
@@ -131,9 +131,7 @@ class LR1:
                 if elem == symbol:
                     reduction[0].pop(reduction[0].index(elem))
                     return strOut
-            return ""
-        else:
-            return ""
+        return ""
 
 
     def createTableLR1(self):
@@ -205,7 +203,7 @@ class LR1:
             auxAction = regAction[-1].copy()
             auxString = regString[-1]
             if auxAction[0] == -1:
-                print("Error en la cadena analizada por LRO")
+                print("Error en la cadena analizada por LR1")
                 sys.exit()
             #Accion Valida
             if auxAction[0][0] == "r":    #Reduccion
@@ -250,11 +248,9 @@ class LR1:
         return regStack, regString, regAction
 
 def main():
-    pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine//Examples/gramLR1.txt"
+    pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine//Examples/gramLR0.txt"
     gr = Grammar(pathGR)
     LR1Test = LR1(gr)
-    print(LR1Test.createTableLR1())
-    '''
     anString = "025*(025+110)"
     lexAnString = LexAnalizer.createLexFile("/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/lex.txt", anString)
     #Diccionario
@@ -270,8 +266,7 @@ def main():
         tokenArray.append(auxArray[1])
     dictTerm = dict(zip(symbArray, tokenArray))
 
-    reg1, reg2, reg3 = LRTest.analizeStr(anString, lexAnString, dictTerm)
+    reg1, reg2, reg3 = LR1Test.analizeStr(anString, lexAnString, dictTerm)
 
-    '''
 if __name__ == "__main__":
     main()

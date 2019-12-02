@@ -200,5 +200,33 @@ else:   #Numero de argumentos valido
             #Analizar la cadena
             stack, string, action = LRAn.analizeStr(sys.argv[3], lexAn, dictStr)
             print(json.dumps({"Stack":stack, "String":string, "Action":action, "message":True}))
+        #Crear Tabla LRO
+        elif(sys.argv[2] == "PathLR0"):
+            #Creamos un objeto gramatica y guardamos 
+            fileObjectGrammar = open(fileGrammar, 'wb')
+            gramObject = Grammar(sys.argv[3])
+            pickle.dump(sys.argv[3], fileObjectGrammar)
+            fileObjectGrammar.close()
+            #Crear tabla ll1 y mostrarla
+            LR0Obj = LR0(gramObject)
+            head, body = LR0Obj.createTableLR0()
+            print(json.dumps({"Head":head, "Body":body, "message": True}))
+        #Analizar una cadena con LR0
+        elif(sys.argv[2] == "StringLR0"):
+            fileObjRead = open(fileGrammar, 'rb')
+            pathStringGrammar = pickle.load(fileObjRead) 
+            fileObjRead.close()
+            #Creamos la gramatica
+            gramObj = Grammar(pathStringGrammar)
+            #Crear analizador Lexico
+            pathLex = sys.argv[4]
+            lexAn = LexAnalizer.createLexFile(pathLex, sys.argv[3])
+            #Crear diccinario
+            dictStr = createDictFile(sys.argv[5])
+            #Crear LRO
+            LRAn = LR0(gramObj)
+            #Analizar la cadena
+            stack, string, action = LRAn.analizeStr(sys.argv[3], lexAn, dictStr)
+            print(json.dumps({"Stack":stack, "String":string, "Action":action, "message":True}))
         else:
             print(json.dumps({"message": "Error opcion Grammar no valida"}));
