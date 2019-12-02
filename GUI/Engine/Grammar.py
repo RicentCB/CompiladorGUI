@@ -31,7 +31,7 @@ class Grammar():
             #pathLexAn = "Engine/files/analizadorLexicoGramatica.txt"
             pathLexAn = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/files/analizadorLexicoGramatica.txt"
             #Crear Analizador Lexico para Gramaticas
-            # regExp1 = "(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
+            # regExp1 = "(/)|(^)|(-)|(\&)|(\()|(\))|(\?)|(\*)|(\+)|(((A-Z)|(a-z))&((A-Z)|(a-z)|(0-9)|('))*)"
             # regExp2 = "(-)&(>)"
             # regExp3 = "(;)"
             # regExp4 = "( )+"
@@ -459,26 +459,24 @@ if __name__ == "__main__":
     #path = "c:/Users/brian/Documents/CompiladorGUI/GUI/Engine/gram.txt"
     g1 = Grammar(path)
     #print("-------ll1--------")
-    for simbolo in g1.simbolos_NoTerminales():
-        frst = g1.follow(simbolo)
-        print(f"Follow de {simbolo}: {frst}")
+    # for simbolo in g1.simbolos_NoTerminales():
+    #     frst = g1.follow(simbolo)
+    #     print(f"Follow de {simbolo}: {frst}")
     
-    #print(g1.creatTableLL1())
-    # termSym.remove(Alphabet().symbol_EPSILON)
-    # arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
-    # anString = "(025*110)"
-    # lexAnString = LexAnalizer.createLexFile("/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/lex.txt", anString)
-    # #Crear diccionario
-    # symbArray = list()
-    # tokenArray = list()
-    # dictFile = open(pathDict, "r")
-    # fileLines = dictFile.readlines()
-    # for line in fileLines:
-    #     auxArray = line.split()
-    #     symbArray.append(auxArray[0])
-    #     tokenArray.append(auxArray[1])
-    # dictTerm = dict(zip(symbArray, tokenArray))
-    # #Analizar Cadena
-    # reg1, reg2, reg3 = g1.analizeStr(anString, lexAnString, dictTerm)
+    arrayRegExStr = ["(\()", "(\))", "(\*)", "(\+)", "(a)"]
+    anString = "(025*110)"
+    lexAnString = LexAnalizer.createLexFile("/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/lex.txt", anString)
+    #Crear diccionario
+    symbArray = list()
+    tokenArray = list()
+    dictFile = open(pathDict, "r")
+    fileLines = dictFile.readlines()
+    for line in fileLines:
+        auxArray = line.split()
+        symbArray.append(auxArray[0])
+        tokenArray.append(auxArray[1])
+    dictTerm = dict(zip(symbArray, tokenArray))
+    #Analizar Cadena
+    reg1, reg2, reg3 = g1.analizeStr(anString, lexAnString, dictTerm)
 
     

@@ -41,6 +41,12 @@ class RegularExp():
                 return Token.symbol_PARD
             elif car == Alphabet.symbol_INTER:      #'?': Opcional
                 return Token.symbol_INTER
+            
+            # elif car == Alphabet.symbol_exp:
+            #     return Token.symbol_exp
+            # elif car == Alphabet.symbol_div:
+            #     return Token.symbol_div
+
             else:#Verificamos si es simbolo o rango
                 if(self.stringAn[self.apCarActual] == '-'): #Rango
                     rangeString = self.stringAn[self.apCarActual-1]+"-"+self.stringAn[self.apCarActual+1]
@@ -53,6 +59,7 @@ class RegularExp():
                         self.rangeAux.append(rangeString)    
                         self.apCarActual = self.apCarActual + 1
                         return Token.symbol_RANGE
+                
                 else:   #Caracter
                     return Token.symbol_ALL
         else:

@@ -275,6 +275,7 @@ $(document).ready(function(){
             
             let resultPython = new PythonShell('main.py', optionsPython);
             resultPython.on('message', function (jsonString) {
+                console.log(jsonString)
                 if (jsonString["message"] == true){
                     Swal.fire("Cadena Aceptada", "", "success");
                     //Construir la tabla con json generado

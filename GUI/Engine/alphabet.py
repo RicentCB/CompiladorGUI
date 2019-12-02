@@ -11,6 +11,8 @@ class Alphabet():
     symbol_CONC = '&'   #  &
     symbol_PARI = '('   #  (
     symbol_PARD = ')'   #  )
+    symbol_exp = "^"
+    symbol_div = "/"
     #Gramatica
     # symbol_EPSILON = "ε"
     # symbol_EPSILON = "Epsilon"
@@ -33,6 +35,8 @@ class Token():
     symbol_INTER = 80   #  ?
     symbol_ALL = 90
     symbol_RANGE = 100
+    symbol_exp = 110
+    symbol_div = 120
     #Tokens Definidos para la clase Gramatica
     grammar_SIMBOLO = 10    #L&(L|D)*
     grammar_FLECHA  = 20    #->

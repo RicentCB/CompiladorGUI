@@ -10,19 +10,22 @@ class LR0:
     #Metodo cerradura, dado una regla con "punto" (indice)
     #regresara una lista con las reglas y sus "pintos"
     # Regresa lista de tuplas
-    def closure(self, rule, index):
+    def closure(self, rule, index, reglasPasadas = list()):
         if (index == len(rule[1])) or (rule[1][index] in self.grammar.termSymbs):
             return [(rule, index)]
         else:   #Simbolo es NO terminal
                 #Calculara la misma Cerradura
             auxRules = list()
             auxRules.append((rule, index))
+            reglasPasadas.append((rule,index))
             nonTerm = rule[1][index]
             for ruleAux in self.grammar.rules:
                 if nonTerm == ruleAux[0]:
-                    if (ruleAux == rule and index != 0) or (ruleAux != rule):
-                        arAux = self.closure(ruleAux, 0)
-                        auxRules.extend(arAux)
+                    tuplaAux = (ruleAux, 0)
+                    if  tuplaAux not in reglasPasadas:
+                        if (ruleAux == rule and index != 0) or (ruleAux != rule):
+                            arAux = self.closure(ruleAux, 0, reglasPasadas)
+                            auxRules.extend(arAux)
             #Eliminar reglas repetidas
             outRules = list()
             for ruleAux in auxRules:
@@ -61,6 +64,7 @@ class LR0:
                 outItmes.append(pair[0][1][pair[1]])
         order = self.grammar.nonTermSymbs.copy()
         order.extend(self.grammar.termSymbs)
+        order = ['^', 'SIN', 'num', '/', '-', '+', '*',')', '(', 'E', 'F', 'P','T']
         return sorted(list(set(outItmes)), key=order.index)
 
 
@@ -154,7 +158,8 @@ class LR0:
         elif action[0] == "d":
             return [action]
         elif action[0] == "r": #Reduccion:
-            return [action, self.grammar.rules[int(action[1])]]
+            numRule = action.replace('r', '')
+            return [action, self.grammar.rules[int(numRule)]]
         elif action == Alphabet.symbol_ACCEPT:
             return [action]
         return [-1]
@@ -230,13 +235,13 @@ class LR0:
         return regStack, regString, regAction
 
 def main():
-    pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine//Examples/gramLR0.txt"
+    pathGR = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/gram_LR1.txt"
     gr = Grammar(pathGR)
     LRTest = LR0(gr)
-    anString = "025*(025+110)"
-    lexAnString = LexAnalizer.createLexFile("/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/lex.txt", anString)
+    anString = "2.97*6+5*(4-8)*SIN(16)"
+    lexAnString = LexAnalizer.createLexFile("/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/lex_LR0.txt", anString)
     #Diccionario
-    pathDict = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/dictFile.txt" #Belmont
+    pathDict = "/home/ricardo/ESCOM/5Semestre/Compiladores/CompiladorGUI/GUI/Engine/Examples/dictFile_LR0.txt" #Belmont
     #Crear diccionario
     symbArray = list()
     tokenArray = list()

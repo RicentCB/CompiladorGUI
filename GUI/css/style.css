@@ -396,10 +396,10 @@ section#code-interpreter .uplod-file{
     margin-top: 50px;
 }
 section#code-interpreter textarea{
-    background-color: #575757;
+    background-color: #011627;
     width: 100%;
     font-family: 'Quicksand', sans-serif;
-    color: #ccc;
+    color: #c792ea; 
     padding: 25px;
     font-size: 1.1em;
     box-sizing: border-box;

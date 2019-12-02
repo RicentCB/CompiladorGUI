@@ -1,0 +1,22 @@
+i = 0
+s = 0
+WHILE (i <= 10){
+    s = s + i
+    i = i +1
+}
+PRINT "EL valor de S es: "
+PRINT s
+i = 2
+SWITCH (i){
+    CASE 1:
+        s = 11
+        BREAK
+    CASE 2:
+        s = 12
+        BREAK
+    CASE 3:
+        s = 13
+        BREAK
+}
+PRINT "EL valor de S es: "
+PRINT s
