@@ -315,6 +315,7 @@ class Hoc4Execute:
         self.parser = parser
         self.vars = {}
         self.pc = 0
+        self.out = ""
         while self.pc < len(self.parser.lines):
             self.walkTree(self.parser.lines[self.pc])
             # if result is not None and (isinstance(result,int) or isinstance(result, float)):

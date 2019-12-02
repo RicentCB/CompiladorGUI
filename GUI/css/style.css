@@ -39,6 +39,7 @@ a.btn{
     border-radius: 5px;
     padding: 0 25px;
     text-align: center;
+    cursor: pointer;
 }
 .swal2-container{
     font-family: 'Quicksand', sans-serif;
@@ -401,6 +402,13 @@ section#code-interpreter textarea{
     color: #ccc;
     padding: 25px;
     font-size: 1.1em;
+    box-sizing: border-box;
+}
+section#code-interpreter #result-code{
+    background-color: #011627;
+    color: #21c7a8;
+    padding: 20px;
+    box-sizing: border-box;
 }
 /*  -----------------------------  H E L P E R    C L A S S  -----------------------------  */
 .col-container{

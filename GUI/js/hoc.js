@@ -30,18 +30,19 @@ $(document).ready(function(){
         }
     });
     //Boton Interpretar
+    let resultCode = sectionCode.find("#result-code")
     btnInterpreter.click(function(e){
         e.preventDefault();
         console.log(pathCode)
         optionsPython.args = ["Interpreter", pathCode];
 
         let resultPython = new PythonShell('main.py', optionsPython);
+        let finalAns = ""
         resultPython.on('message', function (ans) {
             //Insertar JSON en Arreglo
-            console.log(ans)
-            // if (ans["message"] == true){
-                
-            // }
+            auxAns = "<p>"+ans+"</p>";
+            resultCode.append(auxAns)
         });
+        
     })
 });
